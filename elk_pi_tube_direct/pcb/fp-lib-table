@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Acorn_Electron)(type KiCad)(uri ${KIPRJMOD}/AcornElectron.pretty)(options "")(descr "Acorn Electron footprint library"))
+  (lib (name myelin-kicad)(type Github)(uri https://github.com/myelin/myelin-kicad.pretty)(options allow_pretty_writing_to_this_dir=${KIPRJMOD}/../../third_party/myelin-kicad.pretty)(descr ""))
+)
