@@ -16,10 +16,10 @@ This is not an official Google product.
   address decoding and level shifting for a Raspberry Pi running
   PiTubeDirect.
 
-Coming soon:
-
 - 32kb_flash_cartridge: Simple Acorn Electron cartridge with two 16kB
   flash banks.
+
+Coming soon:
 
 - dual_ported_ram: Acorn Electron cartridge using a CPLD and a 128kB
   SRAM chip to implement dual ported RAM that can be read or written

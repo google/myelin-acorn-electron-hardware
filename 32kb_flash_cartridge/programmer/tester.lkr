@@ -1,0 +1,9 @@
+MEMORY
+{
+   MAIN: start = $1100, size = $2000, fill = no;
+}
+
+SEGMENTS
+{
+   CODE: load = MAIN, type = rw;
+}
