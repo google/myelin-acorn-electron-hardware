@@ -45,18 +45,19 @@ end standalone_programmer;
 architecture Behavioural of standalone_programmer is
 
   -- 
-  signal CTL : std_logic_vector (7 downto 0);
+  signal CTL : std_logic_vector (6 downto 0);
   signal A : std_logic_vector (15 downto 0);
-  signal D : std_logic_vector (7 downto 0);
+  signal D_from_SPI : std_logic_vector(7 downto 0);
+  signal D_from_cart : std_logic_vector (7 downto 0);
   signal spi_bit_count : std_logic_vector (4 downto 0) := "00000";
   signal memory_access : std_logic := '0';
   signal read_nwrite : std_logic := '1';
 
 begin
 
-  -- hackily using the AVR's SPI clock for both the PHI0 and 16MHZ lines, but inverted so we can do the reads and writes at the right time
-  cart_PHI0 <= not avr_SCK;
-  cart_16MHZ <= not avr_SCK;
+  -- hackily using the AVR's SPI clock for both the PHI0 and 16MHZ lines.
+  cart_PHI0 <= avr_SCK;
+  cart_16MHZ <= avr_SCK;
 
   -- always drive A, only drive D/nOE/nOE2 during memory access
   cart_ROMQA <= A(14);
@@ -66,61 +67,96 @@ begin
   cart_nINFD <= '1';
 
   -- nOE for A(15:14) in "00", "01"
-  cart_nOE <= '0' when memory_access = '1' and A(15) = '0' else '1';
+  cart_nOE <= '0' when (memory_access = '1' and A(15) = '0' and avr_SCK = '1') else '1';
   -- nOE2 for A(15:14) = "10"
-  cart_nOE2 <= '0' when memory_access = '1' and A(15 downto 14) = "10" else '1';
+  cart_nOE2 <= '0' when (memory_access = '1' and A(15 downto 14) = "10" and avr_SCK = '1') else '1';
   -- D driven on writes, tristated on reads
-  cart_D <= D when memory_access = '1' and read_nwrite = '0' else "ZZZZZZZZ";
+  cart_D <= D_from_SPI when memory_access = '1' and read_nwrite = '0' else "ZZZZZZZZ";
+
+  -- AVR sends 0x80 for read, 0x00 for write
+  read_nwrite <= CTL(6);
 
   process (avr_SCK, cpld_SS)
   begin
+
+    -- SPI timing with AVR defaults: CPOL=0, CPHA=0
+    -- Sample on SCK rising edge, setup on SCK falling edge.
+
+    --   SS \________________________
+    --  SCK ___/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__
+    -- MOSI x00000111111222222333333444444555555666666777777000000111111222222333333444444...
+    -- MISO x00000111111222222333333444444555555666666777777000000111111222222333333444444...
+
+    -- This means we get barely any time to think in between bytes -- just the high period of
+    -- SCK after the 8th bit.  We need to set up MISO on the falling edge of avr_SCK.
+
     if cpld_SS = '1' then
 
       -- asynchronous reset (must not happen on an avr_SCK edge)
+      CTL <= "1111111";
       spi_bit_count <= "00000";
-      memory_access <= '0';
       A <= "0000000000000000";
-      D <= "00000000";
+      D_from_SPI <= "00000000";
 
     elsif rising_edge(avr_SCK) then
 
-      -- to read: clock in 0x80 A15-8 A7-0 0x00, and the data byte will come out in the 4th byte
-      -- this is implemented
-
-      -- to write: clock in 0x81 A15-8 A7-0 D, and the byte will be written on the final clock.
-      memory_access <= '0';
-      read_nwrite <= '1';
+      -- to read: clock in "1000000" & A15, A14-7, A6-0 & 0, 0x00, and the data byte will come out in the 4th byte
+      -- to write: clock in "0000000" & A15, A14-7 A6-0 & 0, D, and the byte will be written on the final clock.
 
       -- increment the count each time
       spi_bit_count <= std_logic_vector(unsigned(spi_bit_count) + 1);
 
       -- clock in a bit, depending on spi_bit_count
       if spi_bit_count(4 downto 3) = "00" then
-        -- reading CTL
-        CTL <= CTL(6 downto 0) & avr_MOSI;
+        -- reading CTL (outputting 1 on MISO) and A15
+        CTL <= CTL(5 downto 0) & A(15);
+        A(15) <= avr_MOSI;
       elsif spi_bit_count(4 downto 3) = "01" or spi_bit_count(4 downto 3) = "10" then
-        -- reading A
-        A <= A(14 downto 0) & avr_MOSI;
-        if spi_bit_count = "10111" and CTL = "10000001" then
-          -- doing a memory read this cycle.
-          memory_access <= '1';
-          read_nwrite <= '1';
+        -- reading A (outputting 0 on MISO)
+        if spi_bit_count /= "10111" then
+          A(14 downto 0) <= A(13 downto 0) & avr_MOSI;
         end if;
       else
         -- reading or writing data; spi_bit_count(4 downto 3) = "11"
-        if memory_access = '1' and read_nwrite = '1' then
-          avr_MISO <= cart_D(7);
-          D <= cart_D(6 downto 0) & '0';
-        else
-          avr_MISO <= D(7);
-          D <= D(6 downto 0) & avr_MOSI;
-        end if;
-        if spi_bit_count = "11111" and CTL = "10000000" then
-          -- execute a memory write, now that we have the whole 8 bits
-          memory_access <= '1';
-          read_nwrite <= '0';
-        end if;
+        D_from_SPI <= D_from_SPI(6 downto 0) & avr_MOSI;
       end if;
+    end if;
+
+    if cpld_SS = '1' then
+
+      avr_MISO <= '0';
+      D_from_cart <= "10101010";
+      memory_access <= '0';
+
+    elsif falling_edge(avr_SCK) then
+
+      -- We always update MISO on an avr_SCK falling edge.
+
+      -- memory_access is set to 1 on the falling edge when the avr is setting up
+      -- the final bit of the address, then back to 0 on the next falling edge.
+      -- This is so we generate a clean pulse on cart_nOE and cart_nOE2, by ANDing
+      -- with avr_SCK.
+      memory_access <= '0';
+
+      if spi_bit_count(4 downto 3) = "00" then
+        -- reading CTL, outputting 1
+        avr_MISO <= '1';
+      elsif spi_bit_count(4 downto 3) = "01" or spi_bit_count(4 downto 3) = "10" then
+        -- reading A, outputting 0
+        avr_MISO <= '0';
+        if spi_bit_count = "10110" then
+          -- the AVR is setting up a 0 bit (it's finished sending us the address), so we set
+          -- memory_access = '1', and the access will occur once avr_SCK goes high again.
+          memory_access <= '1';
+        elsif spi_bit_count = "10111" then
+          D_from_cart <= cart_D; -- actually perform the read
+        end if;
+      else
+        -- reading out data register (happens even when nothing is going on)
+        avr_MISO <= D_from_cart(7);
+        D_from_cart <= D_from_cart(6 downto 0) & '0';
+      end if;
+
     end if;
   end process;
 
