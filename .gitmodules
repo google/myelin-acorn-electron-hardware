@@ -4,3 +4,6 @@
 [submodule "third_party/Arduino-Makefile"]
 	path = third_party/Arduino-Makefile
 	url = git@github.com:sudar/Arduino-Makefile.git
+[submodule "third_party/libxsvf"]
+	path = third_party/libxsvf
+	url = git@github.com:myelin/libxsvf.git
