@@ -1,3 +1,6 @@
 [submodule "third_party/myelin-kicad.pretty"]
 	path = third_party/myelin-kicad.pretty
 	url = git@github.com:myelin/myelin-kicad.pretty
+[submodule "third_party/Arduino-Makefile"]
+	path = third_party/Arduino-Makefile
+	url = git@github.com:sudar/Arduino-Makefile.git
