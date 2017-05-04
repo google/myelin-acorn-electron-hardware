@@ -13,14 +13,17 @@
 // limitations under the License.
 
 #include <SPI.h>
+#include <avr/power.h>
+#include "libxsvf.h"
 
 // This code is for the Pro Micro onboard a standalone_programmer PCB.
 // It talks to the CPLD over SPI, and provides a USB serial interface.
 
-// It is also connected to the CPLD's JTAG port, and will one day be
-// able to program the CPLD too.
+// It can also program the CPLD over its JTAG port.
 
 // Pinout:
+
+// CPLD JTAG port
 
 // TDO = D18 (PF7)
 #define TDO_PIN 18
@@ -31,10 +34,15 @@
 // TDI = D21 (PF4)
 #define TDI_PIN 21
 
+// Cartridge pins
+
 #define cart_nIRQ 6
 #define cart_nNMI 7
 #define cart_nRDY 8
 #define cart_nRST 9
+
+// CPLD SPI port
+
 #define cpld_SS 10
 #define cpld_MOSI 16
 #define cpld_MISO 14
@@ -43,7 +51,9 @@
 //#define NOISY
 
 void setup() {
-  // Set clock divider so we're running at full speed
+  // For some reason the caterina bootloader on Chinese Pro Micro
+  // boards doesn't always set the clock prescaler properly.
+  clock_prescale_set(clock_div_1);
 
   // Set pin directions for CPLD JTAG
   pinMode(TDO_PIN, INPUT);
@@ -86,11 +96,20 @@ uint8_t read_byte(uint16_t A) {
   // ROM2 = 10xx xxxx xxxx xxxx (8000-BFFF)
 
   uint8_t ctl = (read_nwrite ? 0x80 : 0x00) | ((A & (uint16_t)0x8000) >> (uint16_t)15);
-  uint8_t ctl_r = SPI.transfer(ctl);
+#ifdef NOISY
+  uint8_t ctl_r =
+#endif
+    SPI.transfer(ctl);
   uint8_t a_high = (A & (uint16_t)0x7F80) >> (uint16_t)7;
-  uint8_t a_high_r = SPI.transfer(a_high);
+#ifdef NOISY
+  uint8_t a_high_r =
+#endif
+    SPI.transfer(a_high);
   uint8_t a_low = (A & (uint16_t)0x007F) << (uint16_t)1;
-  uint8_t a_low_r = SPI.transfer(a_low);
+#ifdef NOISY
+  uint8_t a_low_r =
+#endif
+    SPI.transfer(a_low);
   uint8_t d = 0x42;
   uint8_t d_r = SPI.transfer(d);
 #ifdef NOISY
@@ -123,32 +142,49 @@ uint8_t read_byte(uint16_t A) {
   return d_r;
 }
 
+extern void arduino_play_svf(int tms_pin, int tdi_pin, int tdo_pin, int tck_pin, int trst_pin);
+
 void loop() {
 
 #define LINE_SIZE 16
   uint8_t buf[LINE_SIZE];
 
   if (Serial.available()) {
-    if (Serial.read() == 'R') {
-      for (uint16_t addr = 0; addr < (uint16_t)32768; ++addr) {
-
-        uint8_t d = read_byte(addr);
-        buf[addr % LINE_SIZE] = d;
-        Serial.print(" ");
-        Serial.print(d/16, HEX);
-        Serial.print(d & 0x0F, HEX);
-
-        if ((addr % LINE_SIZE) == LINE_SIZE - 1) {
-          Serial.print("  ");
-          for (uint8_t i = 0; i < 16; ++i) {
-            char c = (char)buf[i];
-            Serial.print((c < 32 || c > 127) ? '.' : c);
-          }
-          Serial.println();
-        }
-
+    int c = Serial.read();
+    switch (c) {
+      case 'C': {
+        // program CPLD
+        Serial.println("SEND SVF");
+        arduino_play_svf(TMS_PIN, TDI_PIN, TDO_PIN, TCK_PIN, -1);
+        Serial.println("SVF DONE");
+        break;
       }
-      Serial.print("\n\n");
+      case 'R': {
+        // read out ROM
+        for (uint16_t addr = 0; addr < (uint16_t)32768; ++addr) {
+
+          uint8_t d = read_byte(addr);
+          buf[addr % LINE_SIZE] = d;
+          Serial.print(" ");
+          Serial.print(d/16, HEX);
+          Serial.print(d & 0x0F, HEX);
+
+          if ((addr % LINE_SIZE) == LINE_SIZE - 1) {
+            Serial.print("  ");
+            for (uint8_t i = 0; i < 16; ++i) {
+              char c = (char)buf[i];
+              Serial.print((c < 32 || c > 127) ? '.' : c);
+            }
+            Serial.println();
+          }
+
+        }
+        Serial.print("\n\n");
+        break;
+      }
+      default:
+        Serial.println("?");
+        break;
     }
   }
 
