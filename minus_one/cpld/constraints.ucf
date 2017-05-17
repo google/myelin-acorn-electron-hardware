@@ -1,0 +1,63 @@
+# Pin assignments / constraints
+# -----------------------------
+
+# 6502 address bus
+NET A0 LOC = P6;
+NET A1 LOC = P5;
+NET A2 LOC = P3;
+NET A3 LOC = P2;
+# We skip A4-A7 because they aren't necessary for ROM paging.
+# This means cart_nROMSTB (address decode for &FC73) isn't
+# implemented, but I don't think that's commonly used.
+NET A8 LOC = P7;
+NET A9 LOC = P16;
+NET A10 LOC = P44;
+NET A11 LOC = P42;
+NET A12 LOC = P12;
+NET A13 LOC = P8;
+NET A14 LOC = P20;
+NET A15 LOC = P19;
+
+# 6502 data bus
+NET D<0> LOC = P28;
+NET D<1> LOC = P29;
+NET D<2> LOC = P30;
+NET D<3> LOC = P31;
+NET D<4> LOC = P32;
+NET D<5> LOC = P34;
+NET D<6> LOC = P36;
+NET D<7> LOC = P37;
+
+# 6502 reset line
+NET nRST LOC = P33;
+
+# 6502 input clock
+NET PHI0 LOC = P43;
+
+# 6502 read / !write
+NET RnW LOC = P40;
+
+# cartridge address decodes
+NET cart0_nOE LOC = P27;
+NET cart2_nOE LOC = P41;
+NET cart4_nOE LOC = P18;
+
+# address decode for bank 13
+NET cart_nOE2 LOC = P1;
+
+# low bit of bank ID
+NET cart_ROMQA LOC = P14;
+
+# address decode for &FCxx
+NET cart_nINFC LOC = P39;
+
+# address decode for &FDxx
+NET cart_nINFD LOC = P38;
+
+# not implemented: this should be '0' when A=&FC73, but here it'll always be '1'
+NET cart_nROMSTB LOC = P13;
+
+# unused pins
+NET GPIO1 LOC = P21;
+NET GPIO2 LOC = P22;
+NET GPIO3 LOC = P23;
