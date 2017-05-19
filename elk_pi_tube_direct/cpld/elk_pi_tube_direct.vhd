@@ -57,34 +57,26 @@ begin
 
     -- tube /CE signal: A=FCEx
     nTUBE <= '0' when (elk_nINFC = '0' and elk_A7 = '1' and elk_A6 = '1' and elk_A5 = '1' and elk_A4 = '0') else '1';
-    -- tube_nTUBE <= nTUBE;
+    tube_nTUBE <= nTUBE;
 
     -- debug /CE signal: A=FCFx
     nDEBUG <= '0' when (elk_nINFC = '0' and elk_A7 = '1' and elk_A6 = '1' and elk_A5 = '1' and elk_A4 = '1') else '1';
     
     -- copy across other signals
     tube_nRST <= elk_nRST;
-    -- tube_RnW <= elk_RnW;
+    tube_RnW <= elk_RnW;
     tube_PHI0 <= elk_PHI0;
-    -- tube_A0 <= elk_A0;
+    tube_A0 <= elk_A0;
     tube_A1 <= elk_A1;
     tube_A2 <= elk_A2;
 
-    -- DEBUG: leds (0 = on)
-    tube_D(5) <= not counter(3); -- LED5
-    tube_A0 <= not counter(2); -- LED4
-    tube_nTUBE <= not counter(1); -- LED3
-    tube_RnW <= not counter(0); -- LED2
-
     -- data goes both ways
-    -- tube_D <=
-    --     elk_D when (nTUBE = '0' and elk_RnW = '0') else 
-    --     "ZZZZZZZZ";
+    tube_D <=
+        elk_D when (nTUBE = '0' and elk_RnW = '0') else
+        "ZZZZZZZZ";
     elk_D <=
         tube_D when (nTUBE = '0' and elk_RnW = '1') else
-        --counter(4 downto 0) & elk_A2 & elk_A1 & elk_A0 
-        counter(3 downto 0) & '0' & elk_A2 & elk_A1 & elk_A0
-        when (nDEBUG = '0' and elk_RnW = '1') else
+        counter(3 downto 0) & '0' & elk_A2 & elk_A1 & elk_A0 when (nDEBUG = '0' and elk_RnW = '1') else
         "ZZZZZZZZ";
     -- this should give
     -- 00001000 (&08)
@@ -104,9 +96,9 @@ begin
     -- increment debug counter
     process (elk_PHI0)
     begin
-        if rising_edge(elk_PHI0) then
+        if falling_edge(elk_PHI0) then
             if nDEBUG = '0' and elk_RnW = '0' then
-                -- reading or writing one of the debug registers
+                -- writing one of the debug registers
                 counter <= std_logic_vector(unsigned(counter) + 1);
             end if;
         end if;
