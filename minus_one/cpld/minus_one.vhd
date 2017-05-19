@@ -16,7 +16,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity cart_box_3 is 
+entity minus_one is
     Port (
         -- can't use a std_logic_vector here because we're missing A7-4 :(
         A15 : in std_logic;
@@ -50,42 +50,51 @@ entity cart_box_3 is
         cart_nINFD : out std_logic;
 
         cart_nROMSTB : out std_logic;
+
+        GPIO1 : in std_logic;
+        GPIO2 : in std_logic;
+        GPIO3 : in std_logic
     );
-end cart_box_3;
+end minus_one;
 
-architecture Behavioural of cart_box_3 is
+architecture Behavioural of minus_one is
 
+    -- '1' when A = &8000-BFFF, i.e. sideways address space
     signal sideways_select : std_logic;
-    signal Fxxx : std_logic;
 
+    -- high byte on the address bus
+    signal A_high : std_logic_vector(7 downto 0);
+
+    -- low nybble on the address bus
+    signal A_low : std_logic_vector(3 downto 0);
+
+    -- register: currently selected bank
     signal bank : std_logic_vector(3 downto 0);
 
 begin
 
+    A_high <= A15 & A14 & A13 & A12 & A11 & A10 & A9 & A8;
+    A_low <= A3 & A2 & A1 & A0;
+
     -- '1' when A = &8000-BFFF
-    sideways_select <= '1' when (A15 = '1' and A14 = '0') else '0';
-
-    -- '1' when A = Fxxx
-    Fxxx <= '1' when (A15 = '1' and A14 = '1' and A13 = '1' and A12 = '1') else '0';
-
-    -- '1' when A = FEx5 (selecting ROM bank)
-    bank_select <= '1' when (
-        Fxxx = '1' and A11 = '1' and A10 = '1' and A9 = '1' and A8 = '0'
-        and A3 = '0' and A2 = '1' and A1 = '0' and A0 = '1') else '0';
+    sideways_select <= '1' when (A15 & A14 = "10") else '0';
 
     -- nOE for all cartridges
-    cart0_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = '000') else '1';
-    cart2_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = '001') else '1';
-    cart4_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = '010') else '1';
+    cart0_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = "000") else '1';
+    cart2_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = "001") else '1';
+    cart4_nOE <= '0' when sideways_select = '1' and (bank(3 downto 1) = "010") else '1';
+
+    -- bank select within cartridge address space
+    cart_ROMQA <= bank(0);
 
     -- nOE2 (shared by all cartridges)
-    cart_nOE2 <= '0' when sideways_select = '1' and bank = '1101' else '1';
+    cart_nOE2 <= '0' when sideways_select = '1' and bank = "1101" else '1';
 
     -- '0' when A = FCxx
-    cart_nINFC <= '0' when (Fxxx = '1' and A11 = '1' and A10 = '1' and A9 = '0' and A8 = '0') else '0';
+    cart_nINFC <= '0' when (A_high = x"FC") else '1';
 
     -- '0' when A = FDxx
-    cart_nINFD <= '0' when (Fxxx = '1' and A11 = '1' and A10 = '1' and A9 = '0' and A8 = '1') else '0';
+    cart_nINFD <= '0' when (A_high = x"FD") else '1';
 
     -- nROMSTB is not implemented
     cart_nROMSTB <= '1';
@@ -94,10 +103,10 @@ begin
     begin
         if nRST = '0' then
             -- default to something that'll deactivate all cartridges
-            bank <= '1010';
-        elif falling_edge(PHI0) then
-            -- ROM bank is selected by writing to &FEx5
-            if RnW = '0' and bank_select = '1' and D(7 downto 4) = '0000' then
+            bank <= "1010";
+        elsif falling_edge(PHI0) then
+            -- ROM bank is selected by writing "0000xxxx" to &FEx5
+            if RnW = '0' and A_high = x"FE" and A_low = x"5" and D(7 downto 4) = "0000" then
                 bank <= D(3 downto 0);
             end if;
         end if;
