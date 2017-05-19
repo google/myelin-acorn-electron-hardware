@@ -48,18 +48,22 @@ end elk_pi_tube_direct;
 
 architecture Behavioural of elk_pi_tube_direct is
 
+    -- '0' when A = &FCEx: Tube memory space
     signal nTUBE : std_logic;
 
+    -- '0' when A = &FCFx, for debugging
     signal nDEBUG : std_logic;
+
+    -- Debug counter that is incremented any time the Electron writes to &FCFx
     signal counter : std_logic_vector(4 downto 0) := "00000";
 
 begin
 
-    -- tube /CE signal: A=FCEx
+    -- tube /CE signal: A = &FCEx
     nTUBE <= '0' when (elk_nINFC = '0' and elk_A7 = '1' and elk_A6 = '1' and elk_A5 = '1' and elk_A4 = '0') else '1';
     tube_nTUBE <= nTUBE;
 
-    -- debug /CE signal: A=FCFx
+    -- debug /CE signal: A = &FCFx
     nDEBUG <= '0' when (elk_nINFC = '0' and elk_A7 = '1' and elk_A6 = '1' and elk_A5 = '1' and elk_A4 = '1') else '1';
     
     -- copy across other signals
@@ -78,20 +82,6 @@ begin
         tube_D when (nTUBE = '0' and elk_RnW = '1') else
         counter(3 downto 0) & '0' & elk_A2 & elk_A1 & elk_A0 when (nDEBUG = '0' and elk_RnW = '1') else
         "ZZZZZZZZ";
-    -- this should give
-    -- 00001000 (&08)
-    -- 00010000 (&10)
-    -- 00011000 (&18)
-    -- 00100000 (&20)
-    -- 00101000 (&28)
-    -- 00110000 (&30)
-    -- 00111000 (&38)
-    -- ...
-    -- 11111000 (&F8)
-    -- 00000000 (&00)
-    -- although it looks like some of those get skipped. 58, 58, 70, 80, 88, 90, 98.
-    -- could it be possible that basic is doing multiple reads?  either that or we're updating the counter multiple times.
-    -- or if elk_PHI0 is too slow and the address isn't set up yet?  let's try doing it on the falling edge instead.
 
     -- increment debug counter
     process (elk_PHI0)
