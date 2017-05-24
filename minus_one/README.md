@@ -18,3 +18,5 @@ Tested with:
 - My Elk PiTubeDirect cartridge
 
 - My 32kb_flash_cartridge (original and standard)
+
+[Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=13089).
