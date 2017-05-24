@@ -24,3 +24,5 @@ I've made various different PCBs for this:
   power and ground planes before generating gerbers to send off to the
   fab, and several data lines are shorted to ground in the units that
   I have.
+
+[Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=12730).
