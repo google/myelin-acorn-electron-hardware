@@ -10,3 +10,5 @@ installed containing the Tube Host code (I use
 [MMFS](https://github.com/hoglet67/MMFS), flashed into one of my
 [32kb_flash_cartridge](../32kb_flash_cartridge/) standard boards), otherwise the interface
 shows up in the Electron's memory (&FCE*) but doesn't do anything.
+
+[Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=11325&start=720#p166961).
