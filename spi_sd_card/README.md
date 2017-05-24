@@ -31,3 +31,7 @@ On SD card:
 - 6 - GND
 - 7 - DAT0/MISO (orange)
 - 8 - DAT1
+
+[Discussion on the Stardot forums](http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=12737&start=30#p170599).
+
+![Photo of the hardware](elk_pi_tube_direct_sd_mmfs_600px.jpeg)
