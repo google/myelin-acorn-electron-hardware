@@ -12,3 +12,5 @@ xc3sprog)
 
 [mcu/](mcu/) - Firmware for the Pro Micro (use the Arduino IDE,
 selecting the Arduino Leonardo board option)
+
+[Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=12964).
