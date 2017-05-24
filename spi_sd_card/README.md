@@ -5,9 +5,9 @@ This folder contains VHDL for an experimental SD card interface, that
 implements the simple parallel port interface used by MMC_ElkPlus1.asm
 in [MMFS](https://github.com/hoglet67/MMFS/).
 
-The original plan was to implement the memory-mapped SPI port as seen
-in MMC_MemoryMapped.asm, except at &FCD0 rather than &FE18, but this
-was easier :)
+It also contains an experimental version of the memory-mapped SPI port
+as seen in MMC_MemoryMapped.asm, except at &FCD0 rather than &FE18,
+but this isn't working yet.
 
 Hardware-wise, right now it's an elk_pi_tube_direct cartridge with an
 SD socket taped to the top, and jumper wires everywhere.  It draws

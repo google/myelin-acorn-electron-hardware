@@ -56,21 +56,21 @@ architecture Behavioural of spi_sd_card is
 
     signal A_lower : std_logic_vector(7 downto 0);
 
-    -- Memory mapped SPI registers (TODO)
+    ---- Memory mapped SPI registers ----
 
     -- our own chip select: Elk is reading/writing &FCD0
-    --signal nSPI : std_logic; -- '0' when A = &FCD0
+    signal nSPI : std_logic; -- '0' when A = &FCD0
 
     -- our data register
-    --signal REG : std_logic_vector(7 downto 0) := x"00";
+    signal REG : std_logic_vector(7 downto 0) := x"00";
 
     -- transfer in progress when '1'
-    --signal transfer_in_progress : std_logic := '0';
+    signal transfer_in_progress : std_logic := '0';
 
     -- transfer bit counter
-    --signal bit_count : std_logic_vector(3 downto 0) := (others => '0');
+    signal bit_count : std_logic_vector(3 downto 0) := (others => '0');
 
-    -- Simple version to work with MMFS ElkPlus1 interface
+    ---- Plus 1 workalike registers ----
 
     -- '0' when the Elk is accessing parallel port registers
     signal nDATA : std_logic; -- '0' when A = &FC71
@@ -87,23 +87,20 @@ begin
     -- address comparison convenience (note missing A3 in elk_pi_tube_direct r1)
     A_lower <= elk_A7 & elk_A6 & elk_A5 & elk_A4 & '0' & elk_A2 & elk_A1 & elk_A0;
 
-    -- Memory-mapped SPI version (TODO)
+    -- Memory-mapped SPI version
 
     -- /CE signal: A = &FCD0 (or FCD8 because we don't have A3, but this will get fixed in future hardware)
-    --nSPI <= '0' when (elk_nINFC = '0' and A_lower = x"D0") else '1';
-
-    -- allow the electron to read our buffer
-    --elk_D <=
-    --    REG when (nSPI = '0' and elk_RnW = '1') else
-    --    "ZZZZZZZZ";
+    nSPI <= '0' when (elk_nINFC = '0' and A_lower = x"D0") else '1';
 
     -- Simple version to work with MMFS ElkPlus1 interface
 
     nDATA <= '0' when (elk_nINFC = '0' and A_lower = x"71") else '1';
     nSTATUS <= '0' when (elk_nINFC = '0' and A_lower = x"72") else '1';
 
-    -- read status register at &FC72
+    -- Shared: read memory-mapped data register, and Plus 1 status register
     elk_D <=
+        x"4" & bit_count when (nSPI = '0' and elk_RnW = '1' and transfer_in_progress = '1') else
+        REG when (nSPI = '0' and elk_RnW = '1') else
         MISO & "0000000" when (nSTATUS = '0' and elk_RnW = '1') else
         "ZZZZZZZZ";
 
@@ -111,8 +108,30 @@ begin
     process (elk_PHI0)
     begin
         if falling_edge(elk_PHI0) then
-            -- handle writes to &FC71
-            if nDATA = '0' and elk_RnW = '0' then
+            if transfer_in_progress = '1' then
+                -- first priority: service any current transfers
+                if SCK = '1' then
+                    -- change MOSI on falling edge
+                    MOSI <= REG(7);
+                    SCK <= '0';
+                else
+                    -- read MISO on rising edge
+                    SCK <= '1';
+                    REG <= REG(6 downto 0) & MISO;
+                    if bit_count = "0111" then
+                        transfer_in_progress <= '0';
+                    else
+                        bit_count <= std_logic_vector(unsigned(bit_count) + 1);
+                    end if;
+                end if;
+            elsif nSPI = '0' and elk_RnW = '0' then
+                -- the Electron is writing to &FCD0 to start a transfer
+                REG <= elk_D;
+                transfer_in_progress <= '1';
+                bit_count <= "0000";
+                SCK <= '1';
+            elsif nDATA = '0' and elk_RnW = '0' then
+                -- handle write to &FC71
                 MOSI <= elk_D(0);
                 SCK <= elk_D(1);
             end if;
