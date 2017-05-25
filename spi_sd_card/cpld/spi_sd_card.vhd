@@ -72,7 +72,7 @@ architecture Behavioural of spi_sd_card is
     signal bit_count : std_logic_vector(3 downto 0) := (others => '0');
 
     -- delay bit, to make everything slower
-    signal delay : std_logic := '0';
+    signal delay : std_logic_vector(3 downto 0) := (others => '0');
 
     ---- Plus 1 workalike registers ----
 
@@ -120,10 +120,10 @@ begin
             -- Memory-mapped and bit-banged SPI
             if transfer_in_progress = '1' then
                 -- first priority: service any current SPI transfers
-                if delay = '0' then
-                    delay <= '1';
+                if delay /= "0000" then
+                    delay <= std_logic_vector(unsigned(delay) + 1);
                 else
-                    delay <= '0';
+                    delay <= "0000"; -- 0000 for no delay, 1111 for 1 cycle, ..., 0001 for 15 cycles
                     if SCK = '1' then
                         -- change MOSI on falling edge
                         MOSI <= REG(7);
@@ -145,7 +145,6 @@ begin
                 transfer_in_progress <= '1';
                 bit_count <= "0000";
                 SCK <= '1';
-                delay <= '0';
             elsif nDATA = '0' and elk_RnW = '0' then
                 -- handle write to &FC71
                 MOSI <= elk_D(0);
