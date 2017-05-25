@@ -58,10 +58,11 @@ architecture Behavioural of spi_sd_card is
 
     ---- Memory mapped SPI registers ----
 
-    -- our own chip select: Elk is reading/writing &FCD0
+    -- chip selects
     signal nSPI : std_logic; -- '0' when A = &FCD0
+    signal nSPI_STATUS : std_logic; -- '0' when A = &FCD1
 
-    -- our data register
+    -- data register
     signal REG : std_logic_vector(7 downto 0) := x"00";
 
     -- transfer in progress when '1'
@@ -70,9 +71,12 @@ architecture Behavioural of spi_sd_card is
     -- transfer bit counter
     signal bit_count : std_logic_vector(3 downto 0) := (others => '0');
 
+    -- delay bit, to make everything slower
+    signal delay : std_logic := '0';
+
     ---- Plus 1 workalike registers ----
 
-    -- '0' when the Elk is accessing parallel port registers
+    -- chip selects
     signal nDATA : std_logic; -- '0' when A = &FC71
     signal nSTATUS : std_logic; -- '0' when A = &FC72
 
@@ -87,41 +91,52 @@ begin
     -- address comparison convenience (note missing A3 in elk_pi_tube_direct r1)
     A_lower <= elk_A7 & elk_A6 & elk_A5 & elk_A4 & '0' & elk_A2 & elk_A1 & elk_A0;
 
-    -- Memory-mapped SPI version
+    ---- Memory-mapped SPI ----
 
-    -- /CE signal: A = &FCD0 (or FCD8 because we don't have A3, but this will get fixed in future hardware)
     nSPI <= '0' when (elk_nINFC = '0' and A_lower = x"D0") else '1';
+    nSPI_STATUS <= '0' when (elk_nINFC = '0' and A_lower = x"D1") else '1';
 
-    -- Simple version to work with MMFS ElkPlus1 interface
+    ---- Plus 1 parallel port emulation ----
 
     nDATA <= '0' when (elk_nINFC = '0' and A_lower = x"71") else '1';
     nSTATUS <= '0' when (elk_nINFC = '0' and A_lower = x"72") else '1';
 
-    -- Shared: read memory-mapped data register, and Plus 1 status register
+    ---- Data bus ----
+
     elk_D <=
+        -- Memory-mapped SPI
         x"4" & bit_count when (nSPI = '0' and elk_RnW = '1' and transfer_in_progress = '1') else
         REG when (nSPI = '0' and elk_RnW = '1') else
+        "0000000" & transfer_in_progress when (nSPI_STATUS = '0' and elk_RnW = '1') else
+        -- Plus 1 parallel port
         MISO & "0000000" when (nSTATUS = '0' and elk_RnW = '1') else
+        -- default
         "ZZZZZZZZ";
 
     -- handle writes
     process (elk_PHI0)
     begin
         if falling_edge(elk_PHI0) then
+            -- Memory-mapped and bit-banged SPI
             if transfer_in_progress = '1' then
-                -- first priority: service any current transfers
-                if SCK = '1' then
-                    -- change MOSI on falling edge
-                    MOSI <= REG(7);
-                    SCK <= '0';
+                -- first priority: service any current SPI transfers
+                if delay = '0' then
+                    delay <= '1';
                 else
-                    -- read MISO on rising edge
-                    SCK <= '1';
-                    REG <= REG(6 downto 0) & MISO;
-                    if bit_count = "0111" then
-                        transfer_in_progress <= '0';
+                    delay <= '0';
+                    if SCK = '1' then
+                        -- change MOSI on falling edge
+                        MOSI <= REG(7);
+                        SCK <= '0';
                     else
-                        bit_count <= std_logic_vector(unsigned(bit_count) + 1);
+                        -- read MISO on rising edge
+                        SCK <= '1';
+                        REG <= REG(6 downto 0) & MISO;
+                        if bit_count = "0111" then
+                            transfer_in_progress <= '0';
+                        else
+                            bit_count <= std_logic_vector(unsigned(bit_count) + 1);
+                        end if;
                     end if;
                 end if;
             elsif nSPI = '0' and elk_RnW = '0' then
@@ -130,6 +145,7 @@ begin
                 transfer_in_progress <= '1';
                 bit_count <= "0000";
                 SCK <= '1';
+                delay <= '0';
             elsif nDATA = '0' and elk_RnW = '0' then
                 -- handle write to &FC71
                 MOSI <= elk_D(0);
