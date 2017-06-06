@@ -1,0 +1,2 @@
+default:
+	python make.py

@@ -20,6 +20,11 @@ This is not an official Google product.
   using a CPLD to provide address decoding and level shifting for a
   Raspberry Pi running PiTubeDirect.  (Built, verified.)
 
+- [expansion_minispartan_breakout](expansion_minispartan_breakout/):
+  Breakout board for the Electron's rear expansion connector, with
+  buffers and footprint to attach a Scarab miniSpartan6+ LX25 board.
+  (Built, untested.)
+
 - [minus_one](minus_one/): Acorn Electron expansion that provides
   three Plus 1 workalike cartridge slots.  (Built, verified.)
 
@@ -28,10 +33,6 @@ This is not an official Google product.
   Mini PCB built but had a PCB error.)
 
 Coming soon:
-
-- expansion_minispartan_breakout: Breakout board for the Electron's
-  rear expansion connector, with buffers and footprint to attach a
-  Scarab miniSpartan6+ LX25 board.  (Built, untested.)
 
 - dual_ported_ram: Acorn Electron cartridge using a CPLD and a 128kB
   SRAM chip to implement dual ported RAM that can be read or written

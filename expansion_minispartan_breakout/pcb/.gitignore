@@ -1,0 +1,5 @@
+*.bak
+gerbers/paste-top.zip
+gerbers/paste-bottom.zip
+gerbers/paste.zip
+gerbers/pcb.zip
