@@ -32,6 +32,9 @@ This is not an official Google product.
   cartridge with two 16kB flash banks.  (Built, verified standard PCB.
   Mini PCB built but had a PCB error.)
 
+- [upurs_usb_port](upurs_usb_port/): Code to run on an ATMEGA32U4 to
+  use it as a USB to serial adapter for UPURS.
+
 Coming soon:
 
 - dual_ported_ram: Acorn Electron cartridge using a CPLD and a 128kB
