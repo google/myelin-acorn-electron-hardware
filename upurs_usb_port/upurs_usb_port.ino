@@ -28,13 +28,13 @@
 // USE_INVERTED_SOFTWARE_SERIAL will give you an accurate baud rate, with the
 // inverted logic levels that it expects:
 
-// #define USE_INVERTED_SOFTWARE_SERIAL
+#define USE_INVERTED_SOFTWARE_SERIAL
 
 // If you're connecting TXD and RXD via an inverter (perhaps a CPLD running
 // the code in spi_sd_card/cpld), USE_SOFTWARE_SERIAL will give you the an
 // accurate baud rate that should be compatible with UPURS:
 
-#define USE_SOFTWARE_SERIAL
+// #define USE_SOFTWARE_SERIAL
 
 // Alternatively you can leave both of the above undefined to use hardware
 // serial, which is a bit easier on the AVR, but runs at a slightly high baud
@@ -54,14 +54,20 @@
 
 // #define IGNORE_BBC_RX
 
+// Define DEBUG_REPORT_WHEN_QUIET to output a report on the state of the
+// system every second when nothing else is happening:
+
+// #define DEBUG_REPORT_WHEN_QUIET
+
 // ----------------------------------------------------------------------
 
 #if defined(USE_INVERTED_SOFTWARE_SERIAL) || defined(USE_SOFTWARE_SERIAL)
 #include <SoftwareSerial.h>
 #endif
 
-// Serial receive -- PD2, D0.
-#define RXD_PIN 0
+// Serial receive -- usually PD2, D0, but we need one with a pin change
+// interrupt, so we use pin 8 (PB4/PCINT4/ADC11)
+#define RXD_PIN 8
 
 // Serial transmit -- PD3, D1.
 #define TXD_PIN 1
@@ -106,7 +112,7 @@ void setup() {
 	digitalWrite(RTS_PIN, HIGH);
 }
 
-// static unsigned long last_activity = 0;
+static unsigned long last_activity = 0;
 
 void loop() {
 	// static int written = 0;
@@ -119,22 +125,24 @@ void loop() {
 #ifdef DEBUG_USB_LOOPBACK
 			SerialUSB.write(c);
 #endif
-			// last_activity = millis();
+			last_activity = millis();
 			// ++written;
 		}
 
 #ifndef IGNORE_BBC_RX
 		while (SerialBBC.available()) {
 			SerialUSB.write(SerialBBC.read());
-			// last_activity = millis();
+			last_activity = millis();
 		}
 #endif
 
-		// if (millis() - last_activity > 1000) {
-		// 	SerialUSB.print("status: ");
-		// 	SerialUSB.print(digitalRead(CTS_PIN) == HIGH ? "cts high" : "cts low");
-		// 	SerialUSB.println();
-		// 	last_activity = millis();
-		// }
+#ifdef DEBUG_REPORT_WHEN_QUIET
+		if (millis() - last_activity > 1000) {
+			SerialUSB.print("status: ");
+			SerialUSB.print(digitalRead(CTS_PIN) == HIGH ? "cts high" : "cts low");
+			SerialUSB.println();
+			last_activity = millis();
+		}
+#endif
 	}
 }
