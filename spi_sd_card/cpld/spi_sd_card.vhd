@@ -58,6 +58,7 @@ architecture Behavioural of spi_sd_card is
     signal RXD : std_logic; -- input to CPLD/Electron
     signal RTS : std_logic := '1'; -- request for data from PC
     signal CTS : std_logic; -- PC is allowing us to send
+    signal invert_serial : std_logic := '1'; -- invert serial port for UPURS
 
     -- chip selects
     signal nSERIAL_IO : std_logic; -- '0' when A = &FCB1
@@ -103,6 +104,8 @@ begin
     tube_D(7) <= SCK;
     MISO <= tube_D(0);
 
+    --tube_A1 <= elk_PHI0; -- DEBUG: show clock
+    --tube_A1 <= '1' when nSERIAL_IO='0' and elk_PHI0='1' else '0'; -- DEBUG: show reg accesses
     tube_A1 <= TXD; -- tx output
     RXD <= tube_A2; -- rx input
     tube_nRST <= RTS; -- permit remote station to send when RTS=1
@@ -129,7 +132,7 @@ begin
 
     elk_D <=
         -- Serial port
-        RXD & "11111" & CTS & "1" when (nSERIAL_IO = '0' and elk_RnW = '1') else
+        (RXD xor invert_serial) & "11111" & CTS & "1" when (nSERIAL_IO = '0' and elk_RnW = '1') else
         -- Memory-mapped SPI
         x"4" & bit_count when (nSPI = '0' and elk_RnW = '1' and transfer_in_progress = '1') else
         REG when (nSPI = '0' and elk_RnW = '1') else
@@ -146,7 +149,8 @@ begin
             -- Serial port: Electron is writing RTS and TXD bits
             if nSERIAL_IO = '0' and elk_RnW = '0' then
                 RTS <= elk_D(6);
-                TXD <= elk_D(0);
+                TXD <= elk_D(0) xor invert_serial;
+                --TXD <= elk_D(7) xor invert_serial; -- DEBUG allow upurs to echo chars back
             end if;
 
             -- Memory-mapped and bit-banged SPI

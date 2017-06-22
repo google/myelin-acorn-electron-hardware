@@ -12,23 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ----------------------------------------------------------------------
+
+// This code is designed to run on an Atmel ATMEGA32U4 chip (in my case, a
+// $3.50 Pro Micro clone from Aliexpress), connected to a BBC Micro or Acorn
+// Electron running Martin Barr's UPURS ROM software.
+
+// --- Serial comms options ---
+
 // UPURS uses inverted logic because it expects the User Port pins to be wired
 // (with a series resistor and a diode from GND) straight to pins at RS232
 // levels (+13V = 0, -13V = 1).
 
-// Either define USE_INVERTED_SOFTWARE_SERIAL to do this in software, using
-// SoftwareSerial, or leave it undefined, and add an inverter externally
-// on the TX/RX lines (CTS and RTS are implemented in software either way).
-// #define USE_INVERTED_SOFTWARE_SERIAL
-// #define USE_SOFTWARE_SERIAL
+// If you're connecting directly to a BBC's User Port,
+// USE_INVERTED_SOFTWARE_SERIAL will give you an accurate baud rate, with the
+// inverted logic levels that it expects:
 
-// For debugging -- define this to echo everything back to the USB port.
-// This will break UPURS, by sometimes spending too long between characters.
+// #define USE_INVERTED_SOFTWARE_SERIAL
+
+// If you're connecting TXD and RXD via an inverter (perhaps a CPLD running
+// the code in spi_sd_card/cpld), USE_SOFTWARE_SERIAL will give you the an
+// accurate baud rate that should be compatible with UPURS:
+
+#define USE_SOFTWARE_SERIAL
+
+// Alternatively you can leave both of the above undefined to use hardware
+// serial, which is a bit easier on the AVR, but runs at a slightly high baud
+// rate that isn't compatible with the current version of UPURS.
+
+// --- Debug options ---
+
+// Define DEBUG_USB_LOOPBACK to echo everything back to the USB port. This
+// will break UPURS, by sometimes spending too long between characters, and
+// also confuse clients, but is good when you have a logic analyzer attached
+// to TXD and TXD.
+
 // #define DEBUG_USB_LOOPBACK
 
-// Define this to ignore anything coming back from the BBC, i.e. when
-// using a CPLD to output debug pulses on the RX pin...
-#define IGNORE_BBC_RX
+// Define IGNORE_BBC_RX this to ignore anything coming back from the BBC, i.e.
+// when using a CPLD to output debug pulses on the RX pin:
+
+// #define IGNORE_BBC_RX
+
+// ----------------------------------------------------------------------
 
 #if defined(USE_INVERTED_SOFTWARE_SERIAL) || defined(USE_SOFTWARE_SERIAL)
 #include <SoftwareSerial.h>
@@ -68,7 +94,11 @@ void setup() {
 	// Init hardware or software serial port for comms with BBC/Electron
 	pinMode(TXD_PIN, OUTPUT);
 	pinMode(RXD_PIN, INPUT);
-	SerialBBC.begin(115200);
+#if defined(USE_INVERTED_SOFTWARE_SERIAL) || defined(USE_SOFTWARE_SERIAL)
+	SerialBBC.begin(114000);  // 114678 bps using SoftwareSerial
+#else
+	SerialBBC.begin(115200);  // 117647 bps using HardwareSerial
+#endif
 
 	// Configure flow control
 	pinMode(CTS_PIN, INPUT);
@@ -79,7 +109,6 @@ void setup() {
 // static unsigned long last_activity = 0;
 
 void loop() {
-	int cts = 0;
 	// static int written = 0;
 
 	while (1) {
@@ -97,7 +126,7 @@ void loop() {
 #ifndef IGNORE_BBC_RX
 		while (SerialBBC.available()) {
 			SerialUSB.write(SerialBBC.read());
-			last_activity = millis();
+			// last_activity = millis();
 		}
 #endif
 
