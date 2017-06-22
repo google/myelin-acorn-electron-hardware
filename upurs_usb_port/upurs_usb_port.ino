@@ -19,12 +19,18 @@
 // Either define USE_INVERTED_SOFTWARE_SERIAL to do this in software, using
 // SoftwareSerial, or leave it undefined, and add an inverter externally
 // on the TX/RX lines (CTS and RTS are implemented in software either way).
-#define USE_INVERTED_SOFTWARE_SERIAL
+// #define USE_INVERTED_SOFTWARE_SERIAL
+// #define USE_SOFTWARE_SERIAL
 
-// For debugging -- define this to echo everything back to the USB port
-#define DEBUG_USB_LOOPBACK
+// For debugging -- define this to echo everything back to the USB port.
+// This will break UPURS, by sometimes spending too long between characters.
+// #define DEBUG_USB_LOOPBACK
 
-#ifdef USE_INVERTED_SOFTWARE_SERIAL
+// Define this to ignore anything coming back from the BBC, i.e. when
+// using a CPLD to output debug pulses on the RX pin...
+#define IGNORE_BBC_RX
+
+#if defined(USE_INVERTED_SOFTWARE_SERIAL) || defined(USE_SOFTWARE_SERIAL)
 #include <SoftwareSerial.h>
 #endif
 
@@ -49,103 +55,52 @@
 
 #ifdef USE_INVERTED_SOFTWARE_SERIAL
 SoftwareSerial SerialBBC(RXD_PIN, TXD_PIN, true);
+#elif defined(USE_SOFTWARE_SERIAL)
+SoftwareSerial SerialBBC(RXD_PIN, TXD_PIN);
 #else
 #define SerialBBC Serial1
 #endif
 
 void setup() {
+	// Init USB serial port with dummy speed value
 	SerialUSB.begin(9600);
 
+	// Init hardware or software serial port for comms with BBC/Electron
 	pinMode(TXD_PIN, OUTPUT);
 	pinMode(RXD_PIN, INPUT);
 	SerialBBC.begin(115200);
 
-	pinMode(CTS_PIN, INPUT); // ~35k pullup
+	// Configure flow control
+	pinMode(CTS_PIN, INPUT);
 	pinMode(RTS_PIN, OUTPUT);
 	digitalWrite(RTS_PIN, HIGH);
 }
 
-#ifdef USE_BUFFER
-
-#define BUF_SIZE 1024
-uint8_t buf[BUF_SIZE];
-int buf_write_ptr = 0;
-int buf_read_ptr = 0;
-int buf_usage = 0;
-unsigned long last_activity = 0;
-
-void loop() {
-	// read everything we can from USB
-	while (buf_usage < BUF_SIZE && SerialUSB.available()) {
-		buf[buf_write_ptr] = SerialUSB.read();
-		buf_write_ptr = (buf_write_ptr + 1) % BUF_SIZE;
-		buf_usage++;
-		last_activity = millis();
-	}
-	// write as much as we can to the BBC
-	while (buf_usage > 0 && digitalRead(CTS_PIN) == HIGH) {
-		// BBC is clearing us to send; pass anything we have on
-		// from the USB port
-		SerialBBC.write(buf[buf_read_ptr]);
-		buf_read_ptr = (buf_read_ptr + 1) % BUF_SIZE;
-		buf_usage--;
-		last_activity = millis();
-	}
-	// pass BBC data back up to the USB
-	if (SerialBBC.available()) {
-		SerialUSB.write(SerialBBC.read());
-		last_activity = millis();
-	}
-	if (millis() - last_activity > 1000) {
-		SerialUSB.print("status: ");
-		SerialUSB.print(digitalRead(CTS_PIN) == HIGH ? "cts high" : "cts low");
-		SerialUSB.println();
-		last_activity = millis();
-	}
-}
-
-#else // !USE_BUFFER
-
-//#define RETRY_AFTER_CTS
-unsigned long last_activity = 0;
+// static unsigned long last_activity = 0;
 
 void loop() {
 	int cts = 0;
-	int buffered_char = -1;
-	static int written = 0;
+	// static int written = 0;
 
 	while (1) {
-		cts = digitalRead(CTS_PIN);
-		while (cts == HIGH && SerialUSB.available()) {
-#ifdef RETRY_AFTER_CTS
-			if (buffered_char == -1) {
-#endif
-				buffered_char = SerialUSB.read();
-#ifdef RETRY_AFTER_CTS
-			}
-#endif
-			SerialBBC.write(buffered_char);
-			cts = digitalRead(CTS_PIN);
-			if (cts == LOW) {
-				digitalWrite(RTS_PIN, LOW); // DEBUG blip after writing a char
-				digitalWrite(RTS_PIN, HIGH);
-				break;
-			}
+		while (digitalRead(CTS_PIN) == HIGH && SerialUSB.available()) {
+			int c = SerialUSB.read();
+			SerialBBC.write(c);
+			SerialBBC.flush();
 #ifdef DEBUG_USB_LOOPBACK
-			// SerialUSB.write(buffered_char);
+			SerialUSB.write(c);
 #endif
-			buffered_char = -1; // successfully wrote the character -- no need to retry
 			// last_activity = millis();
 			// ++written;
 		}
-		// if (!cts && written) {
-		// 	SerialUSB.print("[CTS!]");
-		// 	written = 0;
-		// }
+
+#ifndef IGNORE_BBC_RX
 		while (SerialBBC.available()) {
 			SerialUSB.write(SerialBBC.read());
 			last_activity = millis();
 		}
+#endif
+
 		// if (millis() - last_activity > 1000) {
 		// 	SerialUSB.print("status: ");
 		// 	SerialUSB.print(digitalRead(CTS_PIN) == HIGH ? "cts high" : "cts low");
@@ -154,5 +109,3 @@ void loop() {
 		// }
 	}
 }
-
-#endif // !USE_BUFFER
