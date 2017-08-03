@@ -41,6 +41,7 @@
 #define cpld_MISO 14
 #define cpld_SCK 15
 #define cpld_SS A0
+#define cpld_SD_SEL A1
 
 //#define NOISY
 
@@ -66,13 +67,25 @@ void setup() {
   pinMode(cpld_INT, INPUT);
   pinMode(cpld_SS, OUTPUT);
   digitalWrite(cpld_SS, HIGH);
+  pinMode(cpld_SD_SEL, OUTPUT);
+  digitalWrite(cpld_SD_SEL, HIGH);  // HIGH = select fast serial port; LOW = select SD card
   SPI.begin();
   SPI.beginTransaction(SPISettings(16000000L, MSBFIRST, SPI_MODE0));
+
+  // Unused as yet, but if we ever want to try to implement a serial port on the
+  // CPLD, this should set up Timer4 to provide a 115200x4 clock on PC6/D5.  See
+  // comments in serial_sd_adapter.vhd for more detail.
+
+  // TCCR4A = 0x82;  // COM4A = b'10, FOC4A = 0, PWM4A = 1
+  // TCCR4B = 0x01;  // No prescaling -- clock ==
+  // TCCR4D = 0x00;  // Fast PWM
+  // OCR4C = 139;  // Timer period = 64 MHz / 139 = 460431.65 Hz, i.e. 115107.91 Hz * 4
+  // OCR4A = 139 / 2; // Clear OC4A around halfway through the clock cycle
 }
 
 void loop() {
-  // Initiate transfer
-  digitalWrite(cpld_SS, LOW);
+  digitalWrite(cpld_SD_SEL, HIGH);  // Select fast serial port
+  digitalWrite(cpld_SS, LOW);  // Initiate transfer
 
   // First byte is a status byte
   uint8_t avr_status =

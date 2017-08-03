@@ -22,6 +22,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity serial_sd_adapter is
     Port (
+        -- Pins that connect to the Electron bus
+
         elk_D : inout std_logic_vector(7 downto 0);
 
         elk_nINFC : in std_logic;
@@ -37,13 +39,50 @@ entity serial_sd_adapter is
         elk_RnW : in std_logic;
         elk_PHI0 : in std_logic;
 
+        -- Pins that would normally connect to the Raspberry Pi,
+        -- but are repurposed here for SPI to the AVR, SPI to the
+        -- SD card, and serial for UPURS.
+
+        -- AVR interface: MISO, MOSI, SCK, /SS, INT.
+        -- The first four are a standard SPI port, with the AVR as
+        -- master and CPLD as slave.  INT is an output from the CPLD
+        -- that goes high when we have a byte to send to the AVR.
+        --
+        -- Future plans:
+        --
+        -- * Add a clock line so the AVR can provide a 2 or 4MHz clock
+        --   to the CPLD.  4M/35 = 114.285kHz, which is probably within
+        --   UPURS's acceptable range.  See below.
+
+        -- SD interface: MISO, MOSI, SCK, /SS
+
+        -- UPURS interface: RXD, TXD
+        -- This mostly works for the UPURS suite of tools when attached
+        -- to an AVR running upurs_usb_port.ino (in this repo), but
+        -- is unreliable against HostFS:UPURS.  An interesting experiment
+        -- might be to handle the serial port in the CPLD (with the AVR
+        -- providing a 2MHz or 4MHz clock for timing).
+
+        -- We could use the AVR's 64MHz PLL clock divided by 139, which
+        -- would give us 115108 Hz * 4, i.e. just about perfect to drive
+        -- the UART.  OC4A and /OC4A are PC6 (D5) and PC7 (D13).  See
+        -- comments in serial_sd_mcu.ino for more detail.
+
+        -- (Alternatively we can provide the entire serial port, ignore
+        -- the rate entirely, and just clock a shift register when we get
+        -- a read or write, but that wouldn't work with unmodified UPURS.)
+
+        -- Pins without comments below are unused.
+
         tube_A0 : out std_logic; -- avr MISO
         tube_A1 : out std_logic; -- serial TXD
         tube_A2 : in std_logic; -- serial RXD
 
         tube_D : inout std_logic_vector(7 downto 0);
         -- D0 = sd MISO
+        -- D1 = avr /SD_SS
         -- D2 = avr /SS
+        -- D3
         -- D4 = avr SCK
         -- D5 = sd /SS
         -- D6 = sd MOSI
@@ -69,6 +108,7 @@ architecture Behavioural of serial_sd_adapter is
     signal avr_SCK : std_logic; -- input from AVR
     signal avr_nSS : std_logic; -- input from AVR
     signal avr_INT : std_logic; -- output to AVR
+    signal avr_nSD_SEL : std_logic; -- input from AVR
 
     signal nAVR_SPI : std_logic; -- '0' when A = &FCA0;
     signal nAVR_SPI_STATUS : std_logic; -- '0' when A = &FCA1;
@@ -131,14 +171,17 @@ begin
     -- mappings to actual pins
 
     avr_MOSI <= tube_RnW;
-    tube_A0 <= 'Z' when avr_nSS = '1' else avr_MISO;
+    tube_A0 <= 'Z' when avr_nSS = '1' else
+        MISO when avr_nSD_SEL = '0' else
+        avr_MISO;
     avr_SCK <= tube_D(4);
     avr_nSS <= tube_D(2);
+    avr_nSD_SEL <= tube_D(2);
     tube_nTUBE <= avr_INT;
 
-    tube_D(5) <= nSS;
-    tube_D(6) <= MOSI;
-    tube_D(7) <= SCK;
+    tube_D(5) <= avr_nSS when avr_nSD_SEL = '0' else nSS;
+    tube_D(6) <= avr_MOSI when avr_nSD_SEL = '0' else MOSI;
+    tube_D(7) <= avr_SCK when avr_nSD_SEL = '0' else SCK;
     MISO <= tube_D(0);
 
     tube_A1 <= TXD; -- tx output
