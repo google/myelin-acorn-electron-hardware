@@ -36,12 +36,19 @@
 
 // CPLD SPI port
 
+// Good to put this one on a PCINT pin, i.e. PB*.
+// PB0-3 are the SPI port, leaving PB4=D8, PB5=D9, PB6=D10, PB7=D11.
 #define cpld_INT 10
 #define cpld_MOSI 16
 #define cpld_MISO 14
 #define cpld_SCK 15
-#define cpld_SS A0
-#define cpld_SD_SEL A1
+
+// These two used to be A0/A1 so need to be moved on the Electron version before they'll work
+#define cpld_SS 9
+#define cpld_SD_SEL 8
+
+// This is connected to the CPLD but unused in the BBC version
+#define cpld_MISC1 6
 
 //#define NOISY
 
@@ -49,6 +56,9 @@ void setup() {
   // For some reason the caterina bootloader on Chinese Pro Micro
   // boards doesn't always set the clock prescaler properly.
   clock_prescale_set(clock_div_1);
+
+  // Set pullups for unused pins
+  pinMode(cpld_MISC1, INPUT_PULLUP);
 
   // Set pin directions for CPLD JTAG
   pinMode(TDO_PIN, INPUT);

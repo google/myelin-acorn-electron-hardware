@@ -18,4 +18,6 @@ HostFS, running against sweh's TubeHost code on an attached laptop.
 This provides quite a quick filing system that leaves PAGE=&E00, as
 all the buffers are in the host machine's memory.
 
+- [In-progress PCB for the BBC version](bbc_1mhz_bus_pcb/)
+
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=13292).

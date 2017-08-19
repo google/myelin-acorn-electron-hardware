@@ -81,7 +81,7 @@ entity serial_sd_adapter is
         tube_D : inout std_logic_vector(7 downto 0);
         -- D0 = sd MISO
         -- D1 = avr /SD_SS
-        -- D2 = avr /SS
+        -- D2 = avr /SS  = /SD_SEL
         -- D3
         -- D4 = avr SCK
         -- D5 = sd /SS
