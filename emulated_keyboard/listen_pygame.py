@@ -92,7 +92,7 @@ class Main:
     def send_keys(self):
         s = c = b = 0
         others = []
-        for beebcode in self.keys_down.keys():  # ha, ha
+        for beebcode in self.keys_down:
             if beebcode == 0x07:
                 s = 1
             elif beebcode == 0x17:
@@ -101,13 +101,15 @@ class Main:
                 b = 1
             else:
                 others.append(beebcode)
-        others = others[:2]  # max 2 keys at once
+        # max 2 keys at once, with most recently pressed keys having priority.
+        # this probably breaks games, but gives nice rollover when typing :)
+        others, leftovers = others[-2:], others[:-2]
         while len(others) < 2: others.append(KEY_NONE)
-        print s, c, b, others
+        print s, c, b, others, leftovers
         self.set_keys(others[0], others[1], s, c, b)
 
     def main(self):
-        self.keys_down = {}
+        self.keys_down = []
 
         print "Opening port"
         self.ser = serial.Serial(guess_port(), timeout=2)
@@ -120,16 +122,13 @@ class Main:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return
-                if event.type == pygame.KEYDOWN:
+                elif event.type == pygame.KEYDOWN:
                     v = scancodes_to_beebcodes.get(event.key, None)
                     if v is not None:
                         print "beebcode %02x" % v
-                        self.keys_down[v] = 1
-                        self.send_keys()
-                    #if event.key == 27:
-                    #    pygame.quit()
-                    #    return
-                    #else:
+                        if v not in self.keys_down:
+                            self.keys_down.append(v)
+                            self.send_keys()
                     print("KEYDOWN %s %s" % (
                         event.key,
                         '' if (event.key < 32 or event.key > 127) else '(%s)' % chr(event.key)))
@@ -138,8 +137,9 @@ class Main:
                     v = scancodes_to_beebcodes.get(event.key, None)
                     if v is not None:
                         print "beebcode %02x" % v
-                        if self.keys_down.has_key(v):
-                            del self.keys_down[v]
+                        if v in self.keys_down:
+                            while v in self.keys_down:
+                                self.keys_down.remove(v)
                             self.send_keys()
 
 if __name__ == '__main__':
