@@ -1,0 +1,48 @@
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+NET nkben LOC = P12;
+NET col_idx<0> LOC = P13;
+NET col_idx<1> LOC = P14;
+NET col_idx<2> LOC = P16;
+NET col_idx<3> LOC = P18;
+
+NET row_output<0> LOC = P2;
+NET row_output<6> LOC = P3;
+NET row_output<7> LOC = P5;
+NET row_output<2> LOC = P6;
+NET row_output<1> LOC = P7;
+NET row_output<5> LOC = P41;
+NET row_output<4> LOC = P42;
+NET row_output<3> LOC = P43;
+NET break_output LOC = P44;
+
+NET spi_sel LOC = P30;
+NET spi_mosi LOC = P29;
+NET spi_miso LOC = P28;
+NET spi_clk LOC = P27;
+
+#NET col_input<6> LOC = P2;
+#NET col_input<11> LOC = P12;
+#NET col_input<10> LOC = P13;
+#NET col_input<12> LOC = P14;
+#NET col_input<0> LOC = P16;
+#NET col_input<2> LOC = P18;
+#NET col_input<9> LOC = P19;
+#NET col_input<4> LOC = P20;
+#NET col_input<5> LOC = P21;
+#NET col_input<8> LOC = P22;
+#NET col_input<7> LOC = P36;
+#NET col_input<3> LOC = P37;
+#NET col_input<1> LOC = P38;
