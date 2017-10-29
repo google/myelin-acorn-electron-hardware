@@ -20,6 +20,10 @@
 
 # by Phillip Pearson
 
+# TODO check if I need to enlarge the holes on the CPU socket, because the
+# 220-1-40-006 datasheet says to have 0.9mm holes.  The pins are 0.46mm dia
+# though, so 0.8 should probably be OK.
+
 # A board to make it easier to piggyback on the 6502's pins in an Electron or
 # BBC Micro. This converts all the 5V signals to 3.3V, for compatibility with
 # FPGAs and newer MCUs.
@@ -50,6 +54,36 @@
 # - 10 signals on the CPU
 # - 6: A13 x 2, A14 x 2, A15 x 2
 # - 4: dbuf and abuf /CE and A->B
+
+# Size constraints
+# ----------------
+
+# The board can extend past the top of the 6502 about 1" before hitting the
+# top of the Electron's case. In the Electron, the keyboard connector is in
+# line with pin 13 of the 6502, and starts 59mm to the left of the left row of
+# 6502 pins, and has 22 pins with 0.1" spacing, so is 2.2" (55.88mm) long. The
+# RF circuitry starts just after pin 13, so ending the board there is probably
+# a good plan.
+
+# In the BBC, the keyboard connector is in line with the bottom of the 6502.
+
+# When making a board to plug into this, if you put a
+# Pin_Header_Angled_2x20_Pitch2.54mm at (128.7, 78.54), so the left row of
+# pins is at x=128.7, and draw a 3mm thick line left from (102.23, 108.96),
+# that should be pretty accurate, including space for the connector in between
+# the angled headers... i.e. you have 26.47 mm between the left row of your
+# connector and the edge of the keyboard connector, and will probably need an
+# L-shaped board.  The top of the board can extend up to y=53.14, so you have
+# about 55mm from the keyboard connector to the top of the case.  The RF
+# circuitry means the left side of the board has to finish around (102.23 -
+# 25.4 * 1.3) = 69.21.
+
+# Daughterboards
+# --------------
+
+# I have two ideas right now.  #1 is something to let me plug in my
+# miniSpartan6+.  #2 is a MachXO-based RAM/flash/SD card board that might
+# possibly also include a PiTubeDirect socket.
 
 import sys, os
 here = os.path.dirname(sys.argv[0])
@@ -105,7 +139,7 @@ cpu_1, cpu_2 = [
             Pin(34, "RnW", ["cpu_RnW"]),
             Pin(35, "NC_XTLO", ["cpu_NC_XTLO"]),
             Pin(36, "NC_BE", ["cpu_NC_BE"]),  # NC on R6502, BE on W65C02S; WDC says to tie to VDD
-            Pin(37, "PHI0_IN", ["cpu_PHI0_IN"]),
+            Pin(37, "PHI0_IN", ["cpu_PHI0_IN"]),  # PHI2_IN on W65C02S
             Pin(38, "nSO", ["cpu_nSO"]),
             Pin(39, "PHI2_OUT", ["cpu_PHI2_OUT"]),
             Pin(40, "nRESET", ["cpu_nRESET"]),
@@ -188,6 +222,7 @@ data_buf = myelin_kicad_pcb.Component(
     ],
 )
 dbuf_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C4")
+dbuf_nCE_pullup = myelin_kicad_pcb.R0805("10k", "dbuf_nCE", "3V3", ref="R2")
 
 # unidirectional buffer for address lines, cpu -> expansion connector
 # *** maybe make this bidirectional for future expansion
@@ -219,6 +254,7 @@ addr_buf_lo = myelin_kicad_pcb.Component(
     ],
 )
 addr_buf_lo_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C5")
+abuf_nCE_pullup = myelin_kicad_pcb.R0805("10k", "abuf_nCE", "3V3", ref="R3")
 
 addr_buf_hi = myelin_kicad_pcb.Component(
     footprint="Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm",
@@ -401,6 +437,10 @@ connector = myelin_kicad_pcb.Component(
         Pin("40", "", ["ext_A15"]),
     ],
 )
+gp1_pullup = myelin_kicad_pcb.R0805("10k", "ext_GP1", "3V3", ref="R4")
+gp3_pullup = myelin_kicad_pcb.R0805("10k", "ext_GP3", "3V3", ref="R5")
+gp4_pullup = myelin_kicad_pcb.R0805("10k", "ext_GP4", "3V3", ref="R6")
+
 
 staples = [
     myelin_kicad_pcb.Component(
