@@ -1,0 +1,1 @@
+Daughterboard to connect a cpu_socket_expansion board to a Scarab miniSpartan6+ board.
