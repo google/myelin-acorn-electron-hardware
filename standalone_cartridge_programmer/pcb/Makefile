@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: standalone_programmer.net
-
-standalone_programmer.net: standalone_programmer.py
-	python standalone_programmer.py
+NAME=standalone_programmer
+include ../../common/Makefile.pcb

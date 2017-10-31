@@ -142,7 +142,136 @@ uint8_t read_byte(uint16_t A) {
   return d_r;
 }
 
+uint8_t write_byte(uint16_t A, uint8_t D) {
+  uint8_t read_nwrite = 0; // write
+
+  digitalWrite(cpld_SS, LOW);
+  // address space:
+  // FCxx = 1111 1100 xxxx xxxx
+  // FDxx = 1111 1101 xxxx xxxx
+  // ROM0 = 00xx xxxx xxxx xxxx (0000-3FFF)
+  // ROM1 = 01xx xxxx xxxx xxxx (4000-7FFF)
+  // ROM2 = 10xx xxxx xxxx xxxx (8000-BFFF)
+
+  uint8_t ctl = (read_nwrite ? 0x80 : 0x00) | ((A & (uint16_t)0x8000) >> (uint16_t)15);
+  SPI.transfer(ctl);
+  uint8_t a_high = (A & (uint16_t)0x7F80) >> (uint16_t)7;
+  SPI.transfer(a_high);
+  uint8_t a_low = (A & (uint16_t)0x007F) << (uint16_t)1;
+  SPI.transfer(a_low);
+  uint8_t d_r = SPI.transfer(D);
+  digitalWrite(cpld_SS, HIGH);
+
+  return d_r;
+}
+
+enum ChipType {
+  UNKNOWN = 0,
+  SST39SF010,
+  SST39SF020,
+  SST39SF040
+};
+
+ChipType identify_chip() {
+  write_byte(0x1555, 0xAA);
+  write_byte(0x2AAA, 0x55);
+  write_byte(0x1555, 0x90);
+  if (read_byte(0x0000) == 0xBF) {
+    uint8_t chip_id = read_byte(0x0001);
+    Serial.print("Chip ID: ");
+    Serial.println(chip_id, HEX);
+    ChipType t = ChipType::UNKNOWN;
+    switch (chip_id) {
+      case 0xB5: Serial.println("SST39SF010"); t = ChipType::SST39SF010; break;
+      case 0xB6: Serial.println("SST39SF020"); t = ChipType::SST39SF020; break;
+      case 0xB7: Serial.println("SST39SF040"); t = ChipType::SST39SF040; break;
+    }
+    write_byte(0x1555, 0xAA);
+    write_byte(0x2AAA, 0x55);
+    write_byte(0x1555, 0xF0);
+    return t;
+  }
+
+  Serial.println("Flash identify failed; maybe not an SST39SF0x0");
+  return ChipType::UNKNOWN;
+}
+
+void wait_toggle_bit_sst39sf010() {
+  while (1) {
+    uint8_t a = read_byte(0) & (1<<6);
+    uint8_t b = read_byte(0) & (1<<6);
+    if (!(a ^ b)) {
+      break;
+    } else {
+      // Serial.println("waiting");
+    }
+  }
+}
+
+void erase_sst39sf010(uint16_t start) {
+  Serial.print("Erasing chunk starting ");
+  Serial.println(start);
+  write_byte(0x1555, 0xAA);
+  write_byte(0x2AAA, 0x55);
+  write_byte(0x1555, 0x80);
+  write_byte(0x1555, 0xAA);
+  write_byte(0x2AAA, 0x55);
+  write_byte(start, 0x30);
+  wait_toggle_bit_sst39sf010();
+  Serial.println("Erased");
+}
+
+void program_sst39sf010_byte(uint16_t A, uint8_t D) {
+  write_byte(0x1555, 0xAA);
+  write_byte(0x2AAA, 0x55);
+  write_byte(0x1555, 0xA0);
+  write_byte(A, D);
+  wait_toggle_bit_sst39sf010();
+}
+
+void program_sst39sf010(uint16_t start, uint16_t size) {
+  if (identify_chip() != ChipType::SST39SF010) {
+    Serial.println("don't know how to program this chip");
+    return;
+  }
+  // program now!
+  uint16_t chunk_size = 4096;
+  if (start % chunk_size) {
+    Serial.println("address does not start on a correct boundary");
+    return;
+  }
+  if (size % chunk_size) {
+    Serial.println("block size is not a multiple of the flash block size");
+    return;
+  }
+
+  Serial.print("Programming ");
+  Serial.print(size);
+  Serial.print(" bytes at ");
+  Serial.println(start);
+
+  for (uint16_t pos = start; pos < start + size; pos += chunk_size) {
+    erase_sst39sf010(pos);
+    for (uint16_t ptr = pos; ptr < pos + chunk_size; ++ptr) {
+      while (!Serial.available());
+      program_sst39sf010_byte(ptr, Serial.read());
+      Serial.write(read_byte(ptr));
+    }
+  }
+}
+
 extern void arduino_play_svf(int tms_pin, int tdi_pin, int tdo_pin, int tck_pin, int trst_pin);
+
+uint8_t serial_get_uint8() {
+  while (!Serial.available());
+  return (uint8_t)Serial.read();
+}
+
+uint16_t serial_read_addr() {
+  uint16_t addr = (uint16_t)serial_get_uint8() << 8;
+  addr |= (uint16_t)serial_get_uint8();
+  return addr;
+}
 
 void loop() {
 
@@ -157,6 +286,20 @@ void loop() {
         Serial.println("SEND SVF");
         arduino_play_svf(TMS_PIN, TDI_PIN, TDO_PIN, TCK_PIN, -1);
         Serial.println("SVF DONE");
+        break;
+      }
+      case 'I': {
+        // identify attached flash
+        Serial.println("IDENTIFY");
+        identify_chip();
+        Serial.println("ID DONE");
+        break;
+      }
+      case 'r': {
+        // single byte read
+        Serial.print("r");
+        uint16_t addr = serial_read_addr();
+        Serial.print((char)read_byte(addr));
         break;
       }
       case 'R': {
@@ -182,9 +325,65 @@ void loop() {
         Serial.print("\n\n");
         break;
       }
-      default:
-        Serial.println("?");
+      case 'S': {
+        // fast ROM readout
+        Serial.print("ROM[");
+        for (uint16_t addr = 0; addr < (uint16_t)32768; ++addr) {
+          uint8_t d = read_byte(addr);
+          Serial.write(d);
+        }
+        Serial.println("]ROM DONE");
         break;
+      }
+      case 'w': {
+        // single byte write
+        Serial.print("w");
+        uint16_t addr = serial_read_addr();
+        uint8_t data = serial_get_uint8();
+        write_byte(addr, data);
+        Serial.print(".");
+        break;
+      }
+      case 'W': {
+        // write ROM
+        Serial.println("WRITE ROM");
+        program_sst39sf010(0, 32768);
+        Serial.println("WRITE DONE");
+        break;
+      }
+      case 'Z': {
+        // USB test
+        Serial.println("USB TEST");
+        bool fail = false;
+        for (uint32_t i = 0; i < 128 * 1024L; ++i) {
+          // Serial.println(i);
+          unsigned long now = millis();
+          while (!Serial.available()) {
+            if (millis() - now > 1000) {
+              Serial.println("Failing b/c no input for 1000 ms");
+              fail = true;
+              break;
+            }
+          }
+          if (fail) {
+            Serial.println("fail");
+            break;
+          }
+
+          Serial.write(Serial.read());
+          if (i && !(i % 8192)) {
+            // simulate delay every 8k
+            delay(1000);
+          }
+        }
+        Serial.println("TEST DONE");
+        break;
+      }
+      default: {
+        Serial.print("Unknown: ");
+        Serial.println((char)c);
+        break;
+      }
     }
   }
 

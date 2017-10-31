@@ -12,28 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import glob
-import serial
+# Program a .svf file into the CPLD on the standalone_cartridge_programmer
+# board
+
+import standalone_programmer
 import sys
 import time
-
-def guess_port():
-    port = None
-    for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
-        matches = glob.glob(pattern)
-        if matches:
-            return matches[0]
 
 def main():
     svf_fn, = sys.argv[1:]
     svf = open(svf_fn).read() + "\n\x04"
 
-    port = guess_port()
-    if not port:
-        raise Exception("Could not guess serial port")
-
-    with serial.Serial(port, timeout=0) as ser:
-        print "Serial port opened:", ser
+    with standalone_programmer.Port() as ser:
+        # print "Serial port opened:", ser
 
         while 1:
             r = ser.read(1024)
@@ -55,27 +46,59 @@ def main():
                     break
             time.sleep(0.1)
 
+        svf_start_time = time.time()
         resp = ''
         SLEEP_TIME = 0.01
         sleep_count = 0
         svf_pos = 0
-        while 1: #len(svf):
-            print "  (write @ %d/%d)" % (svf_pos, len(svf))
-            n = ser.write(svf[svf_pos:svf_pos+100])
-            if n:
-                svf_pos += n
-                print "  (%d bytes written)" % n
-                print "  (sent: %s)" % `svf[svf_pos:svf_pos+100]`
-            r = ser.read(1024)
-            if r:
-                print "READ:\n%s\n" % r
-                resp += r
-                if resp.find("SVF DONE") != -1:
+        all_done = False
+        line_no = 1
+        stars = 0  # count of how many times we've seen *#, which means send another packet
+        while not all_done:
+            if stars < -3:
+                time.sleep(0.001)
+            else:
+                print "\r  (write @ line %d, %d/%d)" % (line_no, svf_pos, len(svf)),
+                sys.stdout.flush()
+
+                # always send 63 chars if we can
+                p = min(len(svf), svf_pos + 63)
+
+                n = ser.write(svf[svf_pos:p])
+                if n:
+                    stars -= 1
+                    #print "  (%d bytes written)" % n
+                    #print "  (sent: %s)" % `svf[svf_pos:p]`
+                    line_no += svf[svf_pos:p].count("\n")
+                    svf_pos += n
+
+            while 1:
+                r = ser.read(1024)
+                if not r:
                     break
+                #print r
+                resp += r
+                while 1:
+                    p = resp.find("\n")
+                    if p == -1: break
+                    line = resp[:p].strip()
+                    if line == "*#":
+                        stars += 1
+                    else:
+                        print "\r%s" % line
+                    resp = resp[p+1:]
+                    if line.find("SVF DONE") != -1:
+                        all_done = True
+                        print "all done"
             if not n:
                 time.sleep(SLEEP_TIME)
                 sleep_count += 1
-        print "slept for %.2f s total" % (SLEEP_TIME * sleep_count)
+        svf_delivery_time = time.time() - svf_start_time
+
+        print "SVF entirely sent, in %.2f s" % svf_delivery_time
+        total_sleep_time = SLEEP_TIME * sleep_count
+        if total_sleep_time > 0.3:
+            print "Slept for %.2f s total" % total_sleep_time
 
 if __name__ == '__main__':
     main()

@@ -276,7 +276,7 @@ cpld_jtag = Component(
 )
 
 regulator = Component(
-    footprint="TO_SOT_Packages_SMD:SOT89-3_Housing",
+    footprint="TO_SOT_Packages_SMD:SOT-89-3",
     identifier="U?",
     value="MCP1700T-3302E/MB",
     pins=[

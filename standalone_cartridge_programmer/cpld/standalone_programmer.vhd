@@ -39,11 +39,13 @@ entity standalone_programmer is
     avr_SCK,
     cpld_SS : in std_logic;
     avr_MISO : out std_logic
+    --DEBUG avr_MISO2 : in std_logic
   );
 end standalone_programmer;
 
 architecture Behavioural of standalone_programmer is
 
+  --DEBUG signal avr_MISO : std_logic; --DEBUG
   -- 
   signal CTL : std_logic_vector (6 downto 0);
   signal A : std_logic_vector (15 downto 0);
@@ -63,8 +65,10 @@ begin
   cart_ROMQA <= A(14);
   cart_A <= A(13 downto 0);
   cart_RnW <= read_nwrite;
-  cart_nINFC <= '1';
-  cart_nINFD <= '1';
+
+  -- nINFC and nINFD for when we're accessing &FCxx or &FDxx
+  cart_nINFC <= '0' when (memory_access = '1' and A(15 downto 8) = x"FC" and avr_SCK = '1') else '1';
+  cart_nINFD <= '0' when (memory_access = '1' and A(15 downto 8) = x"FD" and avr_SCK = '1') else '1';
 
   -- nOE for A(15:14) in "00", "01"
   cart_nOE <= '0' when (memory_access = '1' and A(15) = '0' and avr_SCK = '1') else '1';
@@ -82,7 +86,7 @@ begin
     -- SPI timing with AVR defaults: CPOL=0, CPHA=0
     -- Sample on SCK rising edge, setup on SCK falling edge.
 
-    --   SS \________________________
+    --   SS \_____________________________________________________________________________...
     --  SCK ___/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__/^^\__
     -- MOSI x00000111111222222333333444444555555666666777777000000111111222222333333444444...
     -- MISO x00000111111222222333333444444555555666666777777000000111111222222333333444444...
@@ -119,6 +123,9 @@ begin
       else
         -- reading or writing data; spi_bit_count(4 downto 3) = "11"
         D_from_SPI <= D_from_SPI(6 downto 0) & avr_MOSI;
+        if spi_bit_count = "11111" then
+          -- we've just received the last bit of the data byte, which means we should 
+        end if;
       end if;
     end if;
 
@@ -144,17 +151,22 @@ begin
       elsif spi_bit_count(4 downto 3) = "01" or spi_bit_count(4 downto 3) = "10" then
         -- reading A, outputting 0
         avr_MISO <= '0';
-        if spi_bit_count = "10110" then
+        if spi_bit_count = "10110" and read_nwrite = '1' then
           -- the AVR is setting up a 0 bit (it's finished sending us the address), so we set
           -- memory_access = '1', and the access will occur once avr_SCK goes high again.
           memory_access <= '1';
-        elsif spi_bit_count = "10111" then
+        elsif spi_bit_count = "10111" and read_nwrite = '1' then
           D_from_cart <= cart_D; -- actually perform the read
         end if;
       else
         -- reading out data register (happens even when nothing is going on)
         avr_MISO <= D_from_cart(7);
         D_from_cart <= D_from_cart(6 downto 0) & '0';
+        if spi_bit_count = "11111" and read_nwrite = '0' then
+          -- we're about to receive the last data bit, and we're doing a write, so we need
+          -- to get ready to enable nOE etc.
+          memory_access <= '1';
+        end if;
       end if;
 
     end if;

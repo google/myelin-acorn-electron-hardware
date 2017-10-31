@@ -12,15 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MODULE=standalone_programmer
-PART=xc9572xl-10-VQ44
+import standalone_programmer
+import time
 
-default: all
+def main():
+	data_to_write = "*" * 131072
+	with standalone_programmer.Port() as ser:
+		ser.write("Z")  # USB test mode
+		written = read = 0
+		to_write = len(data_to_write)
+		while written < to_write:
+			n = ser.write(data_to_write[written:written+63])
+			if n:
+				print "written %d: %d/%d (read %d)" % (n, written, to_write, read)
+				written += n
+			else:
+				time.sleep(0.01)
+			r = ser.read(1024)
+			if r:
+				read += len(r)
+				print "READ %d: %d total" % (len(r), read)
+				print `r`
 
-all:
-	make -f Makefile.remote clean
-	rsync -avrzu --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
-	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make -f Makefile.remote clean && make -f Makefile.remote MODULE=${MODULE} PART=${PART}" 2>&1 | tee out/build.log
-	rsync -avrzu xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" out/
-	open out/${MODULE}_html/fit/index.htm
-	python ../tools/program_cpld.py out/${MODULE}.svf
+if __name__ == '__main__':
+	main()
