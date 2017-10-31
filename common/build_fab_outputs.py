@@ -48,11 +48,6 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
     options.SetPlotMode(FILLED)
     options.SetLineWidth(FromMM(0.1))
 
-    # Generate drill file
-    drill = EXCELLON_WRITER(board)
-    drill.SetFormat(False, EXCELLON_WRITER.DECIMAL_FORMAT)
-    drill.CreateDrillandMapFilesSet(fab_output_path, True, False)
-
     # Plot everything needed for fabrication
     for file_suffix, layer, description in [
         ("F.Cu", F_Cu, "Top copper"),
@@ -65,6 +60,7 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
         ("B.SilkS", B_SilkS, "Bottom silkscreen"),
         ("Edge.Cuts", Edge_Cuts, "Board edge"),
     ]:
+        print "Plotting %s" % file_suffix
         plotter.SetLayer(layer)
         plotter.OpenPlotfile(file_suffix, PLOT_FORMAT_GERBER, description)
         plotter.PlotLayer()
@@ -104,6 +100,12 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
 
     # And we're done!
     plotter.ClosePlot()
+
+    # Generate drill file
+    drill = EXCELLON_WRITER(board)
+    drill.SetFormat(False, EXCELLON_WRITER.DECIMAL_FORMAT)
+    print "Writing drill file"
+    drill.CreateDrillandMapFilesSet(fab_output_path, True, False)
 
 if __name__ == '__main__':
     generate_outputs(sys.argv[1], 'gerber_tmp', '.')
