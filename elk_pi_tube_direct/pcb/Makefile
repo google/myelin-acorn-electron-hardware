@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: elk_pi_tube_direct.net
-
-elk_pi_tube_direct.net: elk_pi_tube_direct.py
-	python elk_pi_tube_direct.py
+NAME=elk_pi_tube_direct
+include ../../common/Makefile.pcb
