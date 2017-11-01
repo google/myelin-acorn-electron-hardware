@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from glob import glob
+import os
 from pcbnew import *
 import sys
 
@@ -66,39 +68,39 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
         plotter.PlotLayer()
 
     # Human-viewable previews
-    options.SetOutputDirectory(preview_output_path)
-    for file_suffix, description, layers, mirrored in [
-        [
-            "F.Preview",
-            "Front preview",
-            [
-                (F_Cu, RED),
-                (F_SilkS, WHITE),
-                (Edge_Cuts, YELLOW),
-            ],
-            False,
-        ],
-        [
-            "B.Preview",
-            "Back preview",
-            [
-                (B_Cu, GREEN),
-                (B_SilkS, WHITE),
-                (Edge_Cuts, YELLOW),
-            ],
-            True,
-        ],
-    ]:
-        options.SetMirror(mirrored)
-        plotter.OpenPlotfile(file_suffix, PLOT_FORMAT_SVG, description)
-        plotter.SetColorMode(True)
+    # options.SetOutputDirectory(preview_output_path)
+    # for file_suffix, description, layers, mirrored in [
+    #     [
+    #         "F.Preview",
+    #         "Front preview",
+    #         [
+    #             (F_Cu, RED),
+    #             (F_SilkS, WHITE),
+    #             (Edge_Cuts, YELLOW),
+    #         ],
+    #         False,
+    #     ],
+    #     [
+    #         "B.Preview",
+    #         "Back preview",
+    #         [
+    #             (B_Cu, GREEN),
+    #             (B_SilkS, WHITE),
+    #             (Edge_Cuts, YELLOW),
+    #         ],
+    #         True,
+    #     ],
+    # ]:
+    #     options.SetMirror(mirrored)
+    #     plotter.OpenPlotfile(file_suffix, PLOT_FORMAT_SVG, description)
+    #     plotter.SetColorMode(True)
 
-        for layer, color in layers:
-            options.SetColor(color)
-            plotter.SetLayer(layer)
-            plotter.PlotLayer()
+    #     for layer, color in layers:
+    #         options.SetColor(color)
+    #         plotter.SetLayer(layer)
+    #         plotter.PlotLayer()
 
-    # And we're done!
+    # Done with layer plots -- close the plotter so we can write drill files
     plotter.ClosePlot()
 
     # Generate drill file
