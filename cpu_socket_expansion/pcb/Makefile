@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: cpu_socket_expansion.net
-
-cpu_socket_expansion.net: cpu_socket_expansion.py
-	python cpu_socket_expansion.py
+NAME=cpu_socket_expansion
+include ../../common/Makefile.pcb
