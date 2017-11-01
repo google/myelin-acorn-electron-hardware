@@ -70,7 +70,7 @@ BBC Master 128 projects
 - [emulated_keyboard](emulated_keyboard/): Code and VHDL to allow an attached
   computer to act as a keyboard for a BBC Master 128.  (Code only, verified.)
 
-- [bbc_master_bringup](bbc_master_bringup/): Notes on getting a BBC Master 128
+- [new_master_bringup](new_master_bringup/): Notes on getting a BBC Master 128
   motherboard to run without a keyboard or standard power supply.
 
 Miscellaneous things that happened along the way
