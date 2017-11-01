@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: minus_one.net
-
-minus_one.net: minus_one.py
-	python minus_one.py
+NAME=minus_one
+include ../../common/Makefile.pcb
