@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: cpu_socket_minispartan_daughterboard.net
-
-cpu_socket_minispartan_daughterboard.net: cpu_socket_minispartan_daughterboard.py
-	python cpu_socket_minispartan_daughterboard.py
+NAME=cpu_socket_minispartan_daughterboard
+include ../../common/Makefile.pcb

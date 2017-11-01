@@ -1,4 +1,0 @@
-all:
-	rm -f cpu_socket_minispartan_daughterboard.zip
-	zip cpu_socket_minispartan_daughterboard cpu_socket_minispartan_daughterboard*
-	git add cpu_socket_minispartan_daughterboard*
