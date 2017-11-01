@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: master_updateable_megarom.net
-
-master_updateable_megarom.net: master_updateable_megarom.py
-	python master_updateable_megarom.py
+NAME=master_updateable_megarom
+include ../../common/Makefile.pcb

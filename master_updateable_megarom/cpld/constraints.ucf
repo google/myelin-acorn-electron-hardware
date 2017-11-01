@@ -67,5 +67,6 @@ NET flash_A<9> LOC = P52;
 NET flash_nCE LOC = P59;
 NET flash_nOE LOC = P57;
 NET flash_nWE LOC = P47;
-NET cpld_JP<1> LOC = P22;
+NET cpld_JP<1> LOC = P19;
 NET cpld_JP<2> LOC = P19;
+NET cpld_JP<0> LOC = P22;
