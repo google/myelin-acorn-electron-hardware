@@ -12,7 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: bbc_1mhz_serial_sd.net
-
-bbc_1mhz_serial_sd.net: bbc_1mhz_serial_sd.py
-	python bbc_1mhz_serial_sd.py
+NAME=bbc_1mhz_serial_sd
+include ../../common/Makefile.pcb
