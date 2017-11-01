@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-rebuild:
-	make -C ../pcb-mini rebuild
-	make -C ../pcb-standard rebuild
+NAME=flash_cartridge
+OUTPUT_NAME=flash_standard
+SCHEMATIC=../pcb-common/flash_cartridge.py
+include ../../common/Makefile.pcb

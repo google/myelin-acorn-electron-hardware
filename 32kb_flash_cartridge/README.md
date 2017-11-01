@@ -26,3 +26,15 @@ I've made various different PCBs for this:
   I have.
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=12730).
+
+Standard PCB:
+
+![standard front](pcb-standard/pcb-front.png)
+
+![standard back](pcb-standard/pcb-back.png)
+
+Mini PCB:
+
+![mini front](pcb-mini/pcb-front.png)
+
+![mini back](pcb-mini/pcb-back.png)
