@@ -1,3 +1,6 @@
+standalone_cartridge_programmer
+===============================
+
 This folder contains the PCB design, HDL, and firmware for a board
 that allows access to an Acorn Electron cartridge over USB.
 
@@ -14,3 +17,7 @@ xc3sprog)
 selecting the Arduino Leonardo board option)
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=12964).
+
+![PCB front](pcb/pcb-front.png)
+
+![PCB back](pcb/pcb-back.png)
