@@ -13,3 +13,7 @@ all the time, and with any luck it should be able to double as a JTAG
 programming interface.
 
 Sent to oshpark.com for fabrication 2017-10-29.
+
+![PCB front](pcb/pcb-front.png)
+
+![PCB back](pcb/pcb-back.png)
