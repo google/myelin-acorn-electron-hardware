@@ -19,6 +19,9 @@
 
 import os, stat, sys
 
+HERE = os.path.abspath(os.path.split(sys.argv[0])[0])
+print HERE
+
 def cmd(s):
 	print s
 	return os.system(s)
@@ -32,6 +35,7 @@ print>>open("out/file.inf", "w"), "$.%s\t%X\t%X\t%X" % (
     leaf, load, start, size)
 cmd("rm -f out/file.uef")
 cmd("python UEFtrans.py out/file.uef new Electron any")
+cmd("python UEFtrans.py out/file.uef append out/file")
 cmd("python UEFtrans.py out/file.uef append out/file")
 cmd("rm -f out/file.wav")
 cmd("python uef2wave.py out/file.uef out/file.wav")
