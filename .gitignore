@@ -1,6 +1,8 @@
+.dropbox
 *.pyc
 *-bak
 *~
 .DS_Store
 cpld/out
 gerber_tmp
+build-leonardo
