@@ -1,3 +1,4 @@
+In development.  PCB on order, CPLD design untested.
 
 ![PCB front](pcb/pcb-front.png)
 
