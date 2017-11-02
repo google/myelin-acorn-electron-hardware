@@ -1,4 +1,4 @@
-update=Monday, June 05, 2017 'PMt' 08:10:38 PM
+update=Tuesday, June 06, 2017 'PMt' 01:47:05 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -58,3 +58,4 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
+LibName30=scarab_mini_spartan_6_lx25

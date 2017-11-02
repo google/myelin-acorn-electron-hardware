@@ -28,6 +28,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
+LIBS:scarab_mini_spartan_6_lx25
 LIBS:acorn-electron-expansion-cache
 EELAYER 25 0
 EELAYER END
@@ -135,7 +136,7 @@ D3
 Text Label 4300 2500 0    60   ~ 0
 D1
 Text Label 4300 2600 0    60   ~ 0
-nRDY
+RDY
 Text Label 4300 2000 0    60   ~ 0
 16MHZ_DIV13
 $Comp
@@ -245,7 +246,7 @@ nNMI
 Text Label 2100 5550 2    60   ~ 0
 nIRQ
 Text Label 3200 5650 0    60   ~ 0
-nRDY
+RDY
 $Comp
 L 74hct125d U1
 U 1 1 58D0BE30
@@ -260,7 +261,7 @@ $EndComp
 Text Label 3200 5550 0    60   ~ 0
 GND
 Text Label 3200 5250 0    60   ~ 0
-GND
+RnW_OUT_3V
 Text Label 2100 5150 2    60   ~ 0
 GND
 Text Label 2100 5450 2    60   ~ 0
@@ -372,7 +373,7 @@ D3
 Text Label 1425 2500 2    60   ~ 0
 D1
 Text Label 1425 2600 2    60   ~ 0
-nRDY
+RDY
 Text Label 1425 2000 2    60   ~ 0
 16MHZ_DIV13
 $Comp
@@ -469,9 +470,9 @@ Text Label 7000 5500 0    60   ~ 0
 Text Label 5600 5900 2    60   ~ 0
 3V3
 Text Label 5600 4650 2    60   ~ 0
-3V3
+A_DIR
 Text Label 5600 3400 2    60   ~ 0
-3V3
+A_DIR
 $Comp
 L R0805 R4
 U 1 1 58D0D6B7
@@ -492,7 +493,7 @@ Wire Wire Line
 Text Label 2100 5050 2    60   ~ 0
 nASSERT_nNMI
 Text Label 3200 5450 0    60   ~ 0
-nASSERT_nRDY
+nDEASSERT_RDY
 Text Label 2100 5350 2    60   ~ 0
 nASSERT_nIRQ
 $Comp
@@ -541,15 +542,15 @@ Wire Wire Line
 Text Label 4175 5450 0    60   ~ 0
 3V3
 Text Label 5600 5000 2    60   ~ 0
-nRDY
+RDY
 Text Label 7000 5000 0    60   ~ 0
-nRDY_3V
+RDY_3V
 Text Label 5600 5600 2    60   ~ 0
-GND
+nIRQ
 Text Label 5600 5700 2    60   ~ 0
-GND
+nNMI
 Text Label 3200 5150 0    60   ~ 0
-5V
+RnW_nOE
 $Comp
 L C0805 C1
 U 1 1 58D21967
@@ -650,7 +651,7 @@ U 1 1 58D25E8C
 P 9775 4800
 F 0 "U6" H 9775 7300 60  0000 C CNN
 F 1 "scarab_mini_spartan_6_lx25" V 9775 6400 60  0000 C CNN
-F 2 "myelin-kicad:scarab_mini_spartan_6_lx25" H 9850 3300 60  0000 C CNN
+F 2 "myelin-kicad:scarab_mini_spartan_6_lx25" V 10075 6350 60  0000 C CNN
 F 3 "" H 8825 4650 60  0000 C CNN
 	1    9775 4800
 	1    0    0    -1  
@@ -678,14 +679,14 @@ Connection ~ 9725 1700
 Connection ~ 9725 1850
 Text Label 9725 800  2    60   ~ 0
 3V3
-Text Label 9925 4100 0    60   ~ 0
+Text Label 9925 4850 0    60   ~ 0
 GND
 Wire Wire Line
 	9725 2000 9725 800 
 Text Label 9725 2150 3    60   ~ 0
 5V_scarab
 Text Label 9075 800  2    60   ~ 0
-nASSERT_nRDY
+nDEASSERT_RDY
 Text Label 9075 950  2    60   ~ 0
 nASSERT_nIRQ
 Text Label 9075 1100 2    60   ~ 0
@@ -701,7 +702,7 @@ nRST_3V
 Text Label 9075 1250 2    60   ~ 0
 16MHZ_3V
 Text Label 9075 2000 2    60   ~ 0
-nRDY_3V
+RDY_3V
 Text Label 9075 3200 2    60   ~ 0
 D0_3V
 Text Label 9075 3050 2    60   ~ 0
@@ -769,4 +770,58 @@ F 3 "" H 4400 6725 50  0000 C CNN
 	1    4400 6725
 	-1   0    0    1   
 $EndComp
+Text Label 9075 6050 2    60   ~ 0
+A_DIR
+$Comp
+L R0805 R6
+U 1 1 59370791
+P 8500 6050
+F 0 "R6" V 8605 6050 50  0000 C CNN
+F 1 "10k" V 8500 6050 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 8430 6050 50  0001 C CNN
+F 3 "" H 8500 6050 50  0000 C CNN
+	1    8500 6050
+	0    -1   -1   0   
+$EndComp
+Text Label 8350 6050 2    60   ~ 0
+3V3
+Wire Wire Line
+	8650 6050 9075 6050
+Text Label 3200 5350 0    60   ~ 0
+RnW
+$Comp
+L R0805 R7
+U 1 1 59371B96
+P 4025 5150
+F 0 "R7" V 4105 5150 50  0000 C CNN
+F 1 "10k" V 4025 5150 50  0000 C CNN
+F 2 "Resistors_SMD:R_0805_HandSoldering" V 3955 5150 50  0001 C CNN
+F 3 "" H 4025 5150 50  0000 C CNN
+	1    4025 5150
+	0    -1   -1   0   
+$EndComp
+Text Label 4175 5150 0    60   ~ 0
+3V3
+Text Notes 2850 4875 0    60   ~ 0
+U1.4 drives RnW when the Electron's\n6502 is removed and the miniSpartan\nis providing the processor.  Otherwise\nRnW_nOE = 3V3 and RnW is not driven\nby U1.
+Text Notes 1650 6125 0    60   ~ 0
+nNMI, nIRQ, and RDY are all pulled up on the Electron\nmotherboard or inside the Electron ULA.  We only\never pull them down here.
+Text Notes 5025 1000 0    60   ~ 0
+U2 buffers the data bus from Elk->FPGA when DATA_READ=1, and\nFPGA->Elk when DATA_READ=0.  U3 and U4 buffer Elk->FPGA\nwhen A_DIR=1 (6502 fitted in Elk) and FPGA->Elk when A_DIR=0\n(6502 emulated in FPGA).
+Text Notes 5325 6375 0    60   ~ 0
+U5 buffers signals from ULA->FPGA, plus RnW, RDY,\nnNMI, and nIRQ, which can also be driven by U1.
+Wire Wire Line
+	3875 5150 3200 5150
+Text Label 7000 5600 0    60   ~ 0
+nIRQ_3V
+Text Label 7000 5700 0    60   ~ 0
+nNMI_3V
+Text Label 10575 3350 0    60   ~ 0
+nIRQ_3V
+Text Label 10575 3050 0    60   ~ 0
+nNMI_3V
+Text Label 10575 2750 0    60   ~ 0
+RnW_nOE
+Text Label 10575 2450 0    60   ~ 0
+RnW_OUT_3V
 $EndSCHEMATC
