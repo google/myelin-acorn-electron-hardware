@@ -69,7 +69,7 @@ architecture Behavioural of minus_one is
     signal A_low : std_logic_vector(3 downto 0);
 
     -- register: currently selected bank
-    signal bank : std_logic_vector(3 downto 0);
+    signal bank : std_logic_vector(3 downto 0) := "1101";
 
 begin
 

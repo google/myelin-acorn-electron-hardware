@@ -24,6 +24,13 @@
 # replace all discrete logic.  Implements all the cartridge signals except
 # nROMSTB, and maps the third cartridge in as banks 4-5.
 
+# For the next revision:
+# - use a 64 or 100 pin CPLD
+# - provide a separate nOE2 line for each cartridge
+# Wishlist:
+# - SD card slot
+# - Serial port (or atmega32u4 or lpc11u12 for USB serial + JTAG)
+
 import sys, os
 here = os.path.dirname(sys.argv[0])
 sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
