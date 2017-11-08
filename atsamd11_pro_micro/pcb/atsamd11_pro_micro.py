@@ -99,7 +99,10 @@ mcu = myelin_kicad_pcb.Component(
     ],
 )
 mcu_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C1")
+# SAM D11 has an internal pull-up, so this is optional
 mcu_reset_pullup = myelin_kicad_pcb.R0805("10k", "mcu_RESET", "3V3", ref="R1")
+# The SAM D11 datasheet says a 1k pullup on SWCLK is critical for reliability
+mcu_swclk_pullup = myelin_kicad_pcb.R0805("1k", "SWCLK", "3V3", ref="R2")
 
 # # The ATSAMD11D chip (larger SO-20 version, which I'll probably never use because ATSAMD21 is better and smaller)
 # mcu = myelin_kicad_pcb.Component(
