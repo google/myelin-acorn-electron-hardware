@@ -1,6 +1,7 @@
 rebuild:
 	make -C 32kb_flash_cartridge/pcb-common rebuild
 	make -C atsamd11_pro_micro/pcb rebuild
+	make -C atsamd21_usb/pcb rebuild
 	make -C cpu_socket_expansion/pcb rebuild
 	make -C cpu_socket_minispartan_daughterboard/pcb rebuild
 	make -C elk_pi_tube_direct/pcb rebuild
