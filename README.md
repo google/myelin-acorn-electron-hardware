@@ -79,6 +79,9 @@ Miscellaneous things that happened along the way
 - [atsamd11_pro_micro](atsamd11_pro_micro/): Tester board to experiment with
   USB on the Atmel ATSAMD11C14 chip.  (Untested.)
 
+- [atsamd21_usb_host](atsamd21_usb_host/): Tester board to experiment with
+  USB hosting on the Atmel ATSAMD21E18A chip.  (Untested.)
+
 - [cherry_mx_keyswitch_tester](cherry_mx_keyswitch_tester/): Tester board to
   verify my Cherry MX keyswitch footprint before I order anything expensive.
   (Untested.)
