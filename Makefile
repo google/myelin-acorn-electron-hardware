@@ -4,6 +4,7 @@ rebuild:
 	make -C atsamd21_usb_host/pcb rebuild
 	make -C cpu_socket_expansion/pcb rebuild
 	make -C cpu_socket_minispartan_daughterboard/pcb rebuild
+	make -C econet_from_scratch/pcb rebuild
 	make -C elk_pi_tube_direct/pcb rebuild
 	make -C master_updateable_megarom/pcb rebuild
 	make -C minus_one/pcb rebuild

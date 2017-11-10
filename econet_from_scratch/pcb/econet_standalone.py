@@ -51,7 +51,6 @@ econet_socket = myelin_kicad_pcb.Component(
 # Line driver
 # -----------
 
-#TODO decoupling?
 line_driver = myelin_kicad_pcb.Component(
     footprint="Housings_SOIC:SOIC-16W_5.3x10.2mm_Pitch1.27mm",
     identifier="U?",
@@ -77,6 +76,7 @@ line_driver = myelin_kicad_pcb.Component(
         Pin(16, "VCC", "5V"),
     ],
 )
+line_driver_cap = myelin_kicad_pcb.C0805("100n", "5V", "GND", ref="C7")
 
 # Collision detection
 # -------------------
@@ -201,7 +201,7 @@ myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, PATH_TO_CPLD
 
 cpld_jtag = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
-    identifier="CON?",
+    identifier="JTAG",
     value="jtag",
     pins=[
         Pin(1, "TCK", ["cpld_TCK"]), # top left
@@ -230,5 +230,22 @@ regulator = myelin_kicad_pcb.Component(
 reg_in_cap = myelin_kicad_pcb.C0805("1u", "5V", "GND", ref="C4")
 reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C5")
 
+output = myelin_kicad_pcb.Component(
+    footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
+    identifier="EXT",
+    value="ext",
+    pins=[
+        Pin(1, "", "ext0"),
+        Pin(2, "GND", "GND"),
+        Pin(3, "", "ext1"),
+        Pin(4, "5V", "5V"),
+        Pin(5, "", "ext2"),
+        Pin(6, "3V3", "3V3"),
+        Pin(7, "", "ext3"),
+        Pin(8, "", "ext4"),
+        Pin(9, "", "ext5"),
+        Pin(10, "", "ext6"),
+    ],
+)
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
