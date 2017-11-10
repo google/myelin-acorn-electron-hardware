@@ -61,6 +61,9 @@ BBC Model B projects
   interface.  Also, a board that attaches to a BBC using the 1MHz Bus and
   provides the same interfaces.  (Untested.)
 
+- [econet_from_scratch](econet_from_scratch/): USB Econet interface.
+  (Untested.)
+
 BBC Master 128 projects
 -----------------------
 

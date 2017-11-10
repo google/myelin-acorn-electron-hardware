@@ -6,6 +6,10 @@ Master Econet module or MC68B54 chip?
 
 This is a partial design, with an unfinished and very unproven PCB.
 
+![PCB front](pcb/pcb-front.png)
+
+![PCB back](pcb/pcb-back.png)
+
 Econet wire protocol
 --------------------
 
