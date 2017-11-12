@@ -1,0 +1,7 @@
+NET econet_clock_D LOC = P7;
+NET econet_clock_DE LOC = P5;
+NET econet_clock_R LOC = P8;
+NET econet_data_D LOC = P2;
+NET econet_data_DE LOC = P6;
+NET econet_data_R LOC = P3;
+NET collision_detect LOC = P1;

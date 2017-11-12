@@ -35,10 +35,11 @@ stopping the clock when its buffer is full. Because Econet is a half-duplex
 protocol, we should never need to transmit in both directions at once, so an
 interface like this should work well:
 
-- Econet transceiver->CPLD: clock
-- Econet transceiver<->CPLD: data
+- Econet transceiver->CPLD: clock (R, D, DE)
+- Econet transceiver<->CPLD: data (R, D, DE)
 - Econet transceiver->CPLD: collision detect
 - MCU->CPLD: 8MHz clock (or similar)
+- MCU->CPLD: Econet clock signal (if we want to act as a clock)
 - MCU->CPLD: data direction
 - CPLD->MCU: XCK (stopped when the CPLD's buffers are full)
 - MCU->CPLD: TXD (data to transmit to Econet)
@@ -99,7 +100,16 @@ The Econet module has a 17-pin interface to the host machine:
 There are 15 data pins: 7 are inputs to the module, and 8 are bidirectional,
 so two 74LVC245 chips or one XC9536XL CPLD would handle the level shifting.
 
+Physically, the module measures 94x58mm, with 53.5mm (probably 2.1" or 53.34mm)
+between the vertical centre of PL2 (which connects to the Econet socket) and PL1
+(which connects to the bus).  PL2 starts 9.5mm from the right edge of the board,
+and PL1 starts 4.5mm in.  PL2 pin 5 is vertically in line with PL1 pin 15.
+
 The MC68B54 has four 8-bit control registers, two status registers, and two
 3-byte FIFOs, for a total of 96 bits of RAM, plus probably a few shift
 registers.  This suggests that with an LCMXO256 chip (with 2048 bits of RAM) we
 could possibly expand the FIFOs a bit.
+
+Alternatively this might work with a small but fast MCU like the ATSAMD11C; one
+or two USRTs running at 24 MHz would allow queuing to happen in the MCU's RAM
+rather than the CPLD.
