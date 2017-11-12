@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+default:
+	make -C ../pcb-mini
+	make -C ../pcb-standard
+
 rebuild:
 	make -C ../pcb-mini rebuild
 	make -C ../pcb-standard rebuild
