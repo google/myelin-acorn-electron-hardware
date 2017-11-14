@@ -82,11 +82,11 @@ mcu = myelin_kicad_pcb.Component(
 
         # The 14-pin SO doesn't give us much choice for SERCOMs.  Only SERCOM0 is fully brought out.
 
-        Pin( 1, "PA05", ["mcu_SS"]),  # sercom0.1  SS
-        Pin( 2, "PA08", ["mcu_MOSI_TDI"]),  # sercom0.2  MOSI
-        Pin( 3, "PA09", ["mcu_SCK_TMS"]),  # sercom0.3  SCK
-        Pin( 4, "PA14", ["mcu_MISO"]),  # sercom0.0  MISO
-        Pin( 5, "PA15", ["mcu_GPIO_D18"]),  # sercom2.1
+        Pin( 1, "PA05", ["mcu_SS"]),  # sercom0.1/0.2
+        Pin( 2, "PA08", ["mcu_MOSI_TDI"]),  # sercom0.2/1.2
+        Pin( 3, "PA09", ["mcu_SCK_TMS"]),  # sercom0.3/1.3
+        Pin( 4, "PA14", ["mcu_MISO"]),  # sercom0.0/2.0
+        Pin( 5, "PA15", ["mcu_GPIO_D18"]),  # sercom0.1/2.1
         Pin( 6, "PA28_nRESET", ["mcu_RESET"]),
         Pin( 7, "PA30", ["SWCLK"]),
         Pin( 8, "PA31", ["SWDIO"]),
@@ -95,7 +95,7 @@ mcu = myelin_kicad_pcb.Component(
         Pin(11, "GND", ["GND"]),
         Pin(12, "VDD", ["3V3"]),
         Pin(13, "PA02", ["mcu_GPIO_D20"]),  # only gpio
-        Pin(14, "PA04", ["mcu_GPIO_D8"]),  # only gpio; make this one SD_SEL
+        Pin(14, "PA04", ["mcu_GPIO_D8"]),  # sercom0.2/0.0
     ],
 )
 mcu_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C1")
