@@ -2,6 +2,7 @@ default:
 	make -C 32kb_flash_cartridge/pcb-common
 	make -C atsamd11_pro_micro/pcb
 	make -C atsamd21_usb_host/pcb
+	make -C bbc_power_distribution/pcb
 	make -C cpu_socket_expansion/pcb
 	make -C cpu_socket_minispartan_daughterboard/pcb
 	make -C econet_from_scratch/pcb
@@ -15,6 +16,7 @@ rebuild:
 	make -C 32kb_flash_cartridge/pcb-common rebuild
 	make -C atsamd11_pro_micro/pcb rebuild
 	make -C atsamd21_usb_host/pcb rebuild
+	make -C bbc_power_distribution/pcb rebuild
 	make -C cpu_socket_expansion/pcb rebuild
 	make -C cpu_socket_minispartan_daughterboard/pcb rebuild
 	make -C econet_from_scratch/pcb rebuild
