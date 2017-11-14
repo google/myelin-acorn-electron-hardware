@@ -77,7 +77,7 @@ collision-detect circuit on the board, just in case.
 BBC Master interface
 --------------------
 
-The Econet module has a 17-pin interface to the host machine:
+The Econet module has a 17-pin interface (PL1) to the host machine (SK5):
 
 - 1 /NETINT
 - 2 RnW
@@ -97,13 +97,18 @@ The Econet module has a 17-pin interface to the host machine:
 - 16 0V
 - 17 5V
 
+Two extra pins, A and B, bring out A2 and A3 respectively, although are not
+present on the Econet module board.
+
 There are 15 data pins: 7 are inputs to the module, and 8 are bidirectional,
 so two 74LVC245 chips or one XC9536XL CPLD would handle the level shifting.
 
-Physically, the module measures 94x58mm, with 53.5mm (probably 2.1" or 53.34mm)
+Physically, the module measures 94x58mm, with 44mm
 between the vertical centre of PL2 (which connects to the Econet socket) and PL1
 (which connects to the bus).  PL2 starts 9.5mm from the right edge of the board,
 and PL1 starts 4.5mm in.  PL2 pin 5 is vertically in line with PL1 pin 15.
+
+PL1's 17 pins cover 40.5mm, so they appear to be spaced at 0.1".
 
 The MC68B54 has four 8-bit control registers, two status registers, and two
 3-byte FIFOs, for a total of 96 bits of RAM, plus probably a few shift
@@ -113,3 +118,13 @@ could possibly expand the FIFOs a bit.
 Alternatively this might work with a small but fast MCU like the ATSAMD11C; one
 or two USRTs running at 24 MHz would allow queuing to happen in the MCU's RAM
 rather than the CPLD.
+
+BBC B interface
+---------------
+
+Would it be possible to hook up to the BBC B as well?  All the pins from PL1 on
+the module go to the ADLC (68B54) chip.  The Econet data pins connect to pins
+12/13 on IC93 (SN75159), and the clock pins connect to R38 and R39.  Fitting 0R
+links in R38 and R39 would bring the clock signals to pins 9/10 on IC94 (LM319).
+So it would be fairly feasible to create an adapter to fit an Econet module to a
+BBC B.

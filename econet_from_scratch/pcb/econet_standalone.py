@@ -56,10 +56,10 @@ econet_socket = myelin_kicad_pcb.Component(
     pins=[
         # DIN-5 pins are numbered weirdly -- 1, 4, 2, 5, 3 around the circle
         Pin( 1, "D+", ["econet_data_line_P"]),
-        Pin( 4, "D-", ["econet_data_line_M"]),
+        Pin( 4, "D-", ["econet_data_line_N"]),
         Pin( 2, "GND", ["GND"]),
         Pin( 5, "C+", ["econet_clock_line_P"]),
-        Pin( 3, "C-", ["econet_clock_line_M"]),
+        Pin( 3, "C-", ["econet_clock_line_N"]),
     ],
 )
 
@@ -77,7 +77,7 @@ termination_r3 = myelin_kicad_pcb.R0805(
 termination_r4 = myelin_kicad_pcb.R0805(
     "56R", "bias_P", "econet_data_line_P", ref="R16")
 termination_r5 = myelin_kicad_pcb.R0805(
-    "56R", "bias_M", "econet_data_line_M", ref="R17")
+    "56R", "bias_M", "econet_data_line_N", ref="R17")
 
 # Line driver
 # -----------
@@ -90,18 +90,18 @@ line_driver = myelin_kicad_pcb.Component(
         # Designed for full duplex, with Y/Z as outputs and A/B as inputs.
         # D is the input to the driver, R is the output from the receiver.
         Pin( 1, "1B", "econet_data_line_P"),
-        Pin( 2, "1A", "econet_data_line_M"),
+        Pin( 2, "1A", "econet_data_line_N"),
         Pin( 3, "1R", "econet_data_R"),
         Pin( 4, "1DE", "econet_data_DE"),
         Pin( 5, "2R", "econet_clock_R"),
-        Pin( 6, "2A", "econet_clock_line_M"),
+        Pin( 6, "2A", "econet_clock_line_N"),
         Pin( 7, "2B", "econet_clock_line_P"),
         Pin( 8, "GND", "GND"),
         Pin( 9, "2D", "econet_clock_D"),
-        Pin(10, "2Y", "econet_clock_line_M"),
+        Pin(10, "2Y", "econet_clock_line_N"),
         Pin(11, "2Z", "econet_clock_line_P"),
         Pin(12, "2DE", "econet_clock_DE"),
-        Pin(13, "1Z", "econet_data_line_M"),
+        Pin(13, "1Z", "econet_data_line_N"),
         Pin(14, "1Y", "econet_data_line_P"),
         Pin(15, "1D", "econet_data_D"),
         Pin(16, "VCC", "5V"),
@@ -118,7 +118,7 @@ vdiv_2v_bot = myelin_kicad_pcb.R0805("1k", "cd_vdiv_2v", "GND", ref="R2")
 vdiv_2v_bot_c = myelin_kicad_pcb.R0805("10u", "cd_vdiv_2v", "GND", ref="C1")
 
 # D- and D+ are coupled in through 100k resistors and pulled to 2V with 10k
-dm_input = myelin_kicad_pcb.R0805("100k", "econet_data_line_M", "econet_dm_div", ref="R3")
+dm_input = myelin_kicad_pcb.R0805("100k", "econet_data_line_N", "econet_dm_div", ref="R3")
 dp_input = myelin_kicad_pcb.R0805("100k", "econet_data_line_P", "econet_dp_div", ref="R4")
 dm_2v_pull = myelin_kicad_pcb.R0805("10k", "econet_dm_div", "cd_vdiv_2v", ref="R5")
 dp_2v_pull = myelin_kicad_pcb.R0805("10k", "econet_dp_div", "cd_vdiv_2v", ref="R6")
@@ -180,73 +180,74 @@ cpld = myelin_kicad_pcb.Component(
     identifier="U4",
     value="XC9572XL",
     pins=[
-        Pin(39, "P1.2", [""]),
-        Pin(40, "P1.5", [""]),
-        Pin(41, "P1.6", [""]),
-        Pin(42, "P1.8", [""]),
-        Pin(43, "P1.9-GCK1", [""]),
-        Pin(44, "P1.11-GCK2", [""]),
-        Pin(1, "P1.14-GCK3", ["collision_detect"]),
-        Pin(2, "P1.15", ["econet_data_D"]),
-        Pin(3, "P1.17", ["econet_data_R"]),
+        Pin(39, "P1.2",       "PA22"),
+        Pin(40, "P1.5",       "PA19"),
+        Pin(41, "P1.6",       "PA18"),
+        Pin(42, "P1.8",       "PA16"),
+        Pin(43, "P1.9-GCK1",  "PA17"),
+        Pin(44, "P1.11-GCK2", "PA15"),
+        Pin( 1, "P1.14-GCK3", "PA14"),
+        Pin( 2, "P1.15",      "PA11"),
+        Pin( 3, "P1.17",      "PA10"),
+        Pin( 5, "P3.2",       "PA09"),
+        Pin( 6, "P3.5",       "PA08"),
+        Pin( 7, "P3.8",       "RnW"),
+        Pin( 8, "P3.9",       "nNETINT"),
+        Pin(12, "P3.11",      "nADLC"),
+        Pin(13, "P3.14",      "PHI2"),
+        Pin(14, "P3.15",      "A0"),
+        Pin(16, "P3.17",      "A1"),
+        Pin(18, "P3.16",      "D0"),
+        Pin(19, "P4.2",       "D1"),
+        Pin(20, "P4.5",       "D2"),
+        Pin(21, "P4.8",       "D3"),
+        Pin(22, "P4.11",      "D4"),
+        Pin(23, "P4.14",      "D5"),
+        Pin(27, "P4.15",      "D6"),
+        Pin(28, "P4.17",      "D7"),
+        Pin(29, "P2.2",       "nRESET"),
+        Pin(30, "P2.5",       "econet_clock_D"),
+        Pin(31, "P2.6",       "econet_clock_R"),
+        Pin(32, "P2.8",       "econet_clock_DE"),
+        Pin(33, "P2.9-GSR",   "econet_data_DE"),
+        Pin(34, "P2.11-GTS2", "econet_data_R"),
+        Pin(36, "P2.14-GTS1", "econet_data_D"),
+        Pin(37, "P2.15",      "collision_detect"),
+        Pin(38, "P2.17",      "PA23"),
+
         Pin(4, "GND", ["GND"]),
-        Pin(5, "P3.2", ["econet_clock_DE"]),
-        Pin(6, "P3.5", ["econet_data_DE"]),
-        Pin(7, "P3.8", ["econet_clock_D"]),
-        Pin(8, "P3.9", ["econet_clock_R"]),
         Pin(9, "TDI", ["cpld_TDI"]),
         Pin(10, "TMS", ["cpld_TMS"]),
         Pin(11, "TCK", ["cpld_TCK"]),
-        Pin(12, "P3.11", [""]),
-        Pin(13, "P3.14", [""]),
-        Pin(14, "P3.15", [""]),
         Pin(15, "VCCINT_3V3", ["3V3"]),
-        Pin(16, "P3.17", [""]),
         Pin(17, "GND", ["GND"]),
-        Pin(18, "P3.16", [""]),
-        Pin(19, "P4.2", [""]),
-        Pin(20, "P4.5", [""]),
-        Pin(21, "P4.8", [""]),
-        Pin(22, "P4.11", [""]),
-        Pin(23, "P4.14", [""]),
         Pin(24, "TDO", ["cpld_TDO"]),
         Pin(25, "GND", ["GND"]),
         Pin(26, "VCCIO_2V5_3V3", ["3V3"]),
-        Pin(27, "P4.15", [""]),
-        Pin(28, "P4.17", [""]),
-        Pin(29, "P2.2", [""]),
-        Pin(30, "P2.5", [""]),
-        Pin(31, "P2.6", [""]),
-        Pin(32, "P2.8", [""]),
-        Pin(33, "P2.9-GSR", [""]),
-        Pin(34, "P2.11-GTS2", [""]),
         Pin(35, "VCCINT_3V3", ["3V3"]),
-        Pin(36, "P2.14-GTS1", [""]),
-        Pin(37, "P2.15", [""]),
-        Pin(38, "P2.17", [""]),
     ],
 )
 cpld_cap1 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C2")
 cpld_cap2 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C3")
 myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, PATH_TO_CPLD, "constraints.ucf"))
 
-cpld_jtag = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
-    identifier="JTAG",
-    value="jtag",
-    pins=[
-        Pin(1, "TCK", ["cpld_TCK"]), # top left
-        Pin(2, "GND", ["GND"]), # top right
-        Pin(3, "TDO", ["cpld_TDO"]),
-        Pin(4, "3V3", ["3V3"]),
-        Pin(5, "TMS", ["cpld_TMS"]),
-        Pin(6, "NC"),
-        Pin(7, "NC"),
-        Pin(8, "NC"),
-        Pin(9, "TDI", ["cpld_TDI"]),
-        Pin(10, "GND", ["GND"]),
-    ],
-)
+# cpld_jtag = myelin_kicad_pcb.Component(
+#     footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
+#     identifier="JTAG",
+#     value="jtag",
+#     pins=[
+#         Pin(1, "TCK", ["cpld_TCK"]), # top left
+#         Pin(2, "GND", ["GND"]), # top right
+#         Pin(3, "TDO", ["cpld_TDO"]),
+#         Pin(4, "3V3", ["3V3"]),
+#         Pin(5, "TMS", ["cpld_TMS"]),
+#         Pin(6, "NC"),
+#         Pin(7, "NC"),
+#         Pin(8, "NC"),
+#         Pin(9, "TDI", ["cpld_TDI"]),
+#         Pin(10, "GND", ["GND"]),
+#     ],
+# )
 
 regulator = myelin_kicad_pcb.Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
@@ -262,27 +263,169 @@ reg_in_cap = myelin_kicad_pcb.C0805("1u", "5V", "GND", ref="C4")
 reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C5")
 
 #TODO do we need more than this?  how about bringing out every spare CPLD pin?
-output = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_2x07_Pitch2.54mm",
-    identifier="EXT",
-    value="ext",
-    pins=[
-        Pin(1, "", "ext0"),
-        Pin(2, "GND", "GND"),
-        Pin(3, "", "ext1"),
-        Pin(4, "5V", "5V"),
-        Pin(5, "", "ext2"),
-        Pin(6, "3V3", "3V3"),
-        Pin(7, "", "ext3"),
-        Pin(8, "", "ext4"),
-        Pin(9, "", "ext5"),
-        Pin(10, "", "ext6"),
-        Pin(11, "", "ext7"),
-        Pin(12, "", "ext8"),
-    ],
-)
+# output = myelin_kicad_pcb.Component(
+#     footprint="Pin_Headers:Pin_Header_Straight_2x07_Pitch2.54mm",
+#     identifier="EXT",
+#     value="ext",
+#     pins=[
+#         Pin(1, "", "ext0"),
+#         Pin(2, "GND", "GND"),
+#         Pin(3, "", "ext1"),
+#         Pin(4, "5V", "5V"),
+#         Pin(5, "", "ext2"),
+#         Pin(6, "3V3", "3V3"),
+#         Pin(7, "", "ext3"),
+#         Pin(8, "", "ext4"),
+#         Pin(9, "", "ext5"),
+#         Pin(10, "", "ext6"),
+#         Pin(11, "", "ext7"),
+#         Pin(12, "", "ext8"),
+#     ],
+# )
 
 #TODO atsamd11c pinout + usb micro?  or just as a fifo?
 #TODO make this pluggable in as a master module
+module = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:bbc_master_econet_module",
+    identifier="MOD",
+    value="bbc master econet module",
+    pins=[
+        # PL2; 5 pins that connect to the DIN socket
+        Pin("E1", "din_1_D+", "econet_data_line_P"),
+        Pin("E2", "din_4_D-", "econet_data_line_N"),
+        Pin("E3", "din_2_GND", "GND"),
+        Pin("E4", "din_5_C+", "econet_clock_line_P"),
+        Pin("E5", "din_3_C-", "econet_clock_line_N"),
+        # PL1; 17 pins that connect to the system bus + 2 extras
+        # Pin("B", "A2", ""),
+        # Pin("A", "A3", ""),
+        Pin( 1, "/NETINT", "nNETINT"),
+        Pin( 2, "RnW", "RnW"),
+        Pin( 3, "/ADLC", "nADLC"),
+        Pin( 4, "PHI2", "PHI2"),
+        Pin( 5, "A0", "A0"),
+        Pin( 6, "A1", "A1"),
+        Pin( 7, "D0", "D0"),
+        Pin( 8, "D1", "D1"),
+        Pin( 9, "D2", "D2"),
+        Pin(10, "D3", "D3"),
+        Pin(11, "D4", "D4"),
+        Pin(12, "D5", "D5"),
+        Pin(13, "D6", "D6"),
+        Pin(14, "D7", "D7"),
+        Pin(15, "/RST", "nRESET"),
+        Pin(16, "0V", "GND"),
+        Pin(17, "5V", "5V"),
+    ],
+)
+
+mcu = myelin_kicad_pcb.Component(
+    footprint="Housings_QFP:TQFP-32_7x7mm_Pitch0.8mm",
+    identifier="MCU",
+    value="ATSAMD21E18A",  # 256k flash, 32k sram, 32 pins
+    pins=[
+        # It looks like SECOM4 and SERCOM5 don't exist on the D21E, so we only
+        # have SERCOM0-3.
+        Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_TXD"),
+        Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_RXD"),
+        Pin(3, "PA02/AIN0/DAC_OUT"),
+        Pin(4, "PA03/ADC_VREFA/AIN1"),
+        Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"), # sercom0 is mcu comms
+        Pin(6, "PA05/SERCOM0.1/AIN5", "cpld_TCK"),
+        Pin(7, "PA06/SERCOM0.2/AIN6", "cpld_TMS"), # TXD0/RXD0
+        Pin(8, "PA07/SERCOM0.3/AIN7", "cpld_TDI"), # XCK0
+        Pin(9, "VDDANA", ["3V3"]),  # decouple to GND
+        Pin(10, "GND", ["GND"]),
+        Pin(11, "PA08/NMI/SERCOM2.0/0.0/AIN16", "PA08"), # TXRX0/2
+        Pin(12, "PA09/SERCOM2.1/0.1/AIN17", "PA09"), # XCK0/2
+        Pin(13, "PA10/SERCOM2.2/0.2/AIN18", "PA10"), # TXRX0/2
+        Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "PA11"), # XCK0/2
+        Pin(15, "PA14/XIN/SERCOM4.2/2.2", "PA14"), # TXRX2/4
+        Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "PA15"), # XCK2/4
+        Pin(17, "PA16/SERCOM1.0/3.0", "PA16"), # TXRX1/3
+        Pin(18, "PA17/SERCOM1.1/3.1", "PA17"), # XCK1/3
+        Pin(19, "PA18/SERCOM1.2/3.2", "PA18"), # TXRX1/3
+        Pin(20, "PA19/SERCOM1.3/3.3", "PA19"), # XCK1/3
+        Pin(21, "PA22/SERCOM3.0/5.0", "PA22"), # TXRX3/5
+        Pin(22, "PA23/SERCOM3.1/5.1/USBSOF", "PA23"), # XCK3/5
+        Pin(23, "PA24/USBDM", ["USBDM"]),
+        Pin(24, "PA25/USBDP", ["USBDP"]),
+        Pin(25, "PA27"),
+        Pin(26, "nRESET", ["mcu_RESET"]),
+        Pin(27, "PA28"),
+        Pin(28, "GND", ["GND"]),
+        Pin(29, "VDDCORE", ["VDDCORE"]),  # regulated output, needs cap to GND
+        Pin(30, "VDDIN", ["3V3"]),  # decouple to GND
+        Pin(31, "PA30/SWCLK", ["SWCLK"]),
+        Pin(32, "PA31/SWDIO", ["SWDIO"]),
+    ],
+)
+mcu_cap1 = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C10")
+mcu_cap2 = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C11")
+mcu_cap3 = myelin_kicad_pcb.C0805("1u", "GND", "VDDCORE", ref="C12")
+# SAM D21 has an internal pull-up, so this is optional
+mcu_reset_pullup = myelin_kicad_pcb.R0805("10k", "mcu_RESET", "3V3", ref="R18")
+# The SAM D21 datasheet says a 1k pullup on SWCLK is critical for reliability
+mcu_swclk_pullup = myelin_kicad_pcb.R0805("1k", "SWCLK", "3V3", ref="R19")
+
+# SWD header for programming and debug
+swd = myelin_kicad_pcb.Component(
+    footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch1.27mm_SMD",
+    identifier="SWD",
+    value="swd",
+    pins=[
+        # Pin numbers zig-zag:
+        # 1 VCC  2 SWDIO
+        # 3 GND  4 SWCLK
+        # 5 GND  6 NC
+        # 7 NC   8 NC
+        # 9 NC  10 /RESET
+        Pin(1, "VTref", ["3V3"]),
+        Pin(2, "SWDIO", ["SWDIO"]),
+        Pin(3, "GND", ["GND"]),
+        Pin(4, "SWCLK", ["SWCLK"]),
+        Pin(5, "GND", ["GND"]),
+        Pin(6, "TXD", ["mcu_TXD"]),
+        Pin(7, "NC"),
+        Pin(8, "RXD", ["mcu_RXD"]),
+        Pin(9, "GND", ["GND"]),
+        Pin(10, "RESET", ["mcu_RESET"]),
+    ],
+)
+
+# Micro USB socket
+micro_usb = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:micro_usb_b_smd_molex",
+    identifier="USB",
+    value="usb",
+    pins=[
+        Pin(1, "V", ["VUSB"]),
+        Pin(2, "-", ["USBDM"]),
+        Pin(3, "+", ["USBDP"]),
+        Pin(4, "ID", ["USB_ID"]),
+        Pin(5, "G", ["GND"]),
+    ],
+)
+
+# USB power jumper (to power the board from the micro USB)
+power_header = myelin_kicad_pcb.Component(
+    footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
+    identifier="JP1",
+    value="USB power",
+    pins=[
+        Pin(1, "", ["VUSB"]),
+        Pin(2, "", ["5V"]),
+    ],
+)
+
+
+# Ground plane stapling vias
+for n in range(30):
+    single_staple = myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:via_single",
+        identifier="staple_single%d" % (n+1),
+        value="",
+        pins=[Pin(1, "GND", ["GND"])],
+    )
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
