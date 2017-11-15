@@ -6,6 +6,7 @@ default:
 	make -C cpu_socket_expansion/pcb
 	make -C cpu_socket_minispartan_daughterboard/pcb
 	make -C econet_from_scratch/pcb
+	make -C econet_hub/pcb
 	make -C elk_pi_tube_direct/pcb
 	make -C master_updateable_megarom/pcb
 	make -C minus_one/pcb
@@ -20,6 +21,7 @@ rebuild:
 	make -C cpu_socket_expansion/pcb rebuild
 	make -C cpu_socket_minispartan_daughterboard/pcb rebuild
 	make -C econet_from_scratch/pcb rebuild
+	make -C econet_hub/pcb rebuild
 	make -C elk_pi_tube_direct/pcb rebuild
 	make -C master_updateable_megarom/pcb rebuild
 	make -C minus_one/pcb rebuild
