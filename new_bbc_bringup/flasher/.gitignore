@@ -1,0 +1,4 @@
+*.bin
+*.bin.uef
+*.bin.wav
+bank_to_program.inc
