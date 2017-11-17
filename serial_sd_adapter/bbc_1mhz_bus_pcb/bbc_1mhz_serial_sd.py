@@ -23,21 +23,11 @@
 # BBC Micro 1MHz Bus expansion to provide a fast serial port and SD card
 # interface.
 
-### TODO ###
+# TODO(rev2) Figure out if I need a pullup on MOSI (CMD) for the SD card, or if
+# that's just an MMC thing.
 
-# - Make a simple version of this that just has the CPLD, level shifter,
-#   and a bunch of GPIO, so I can prototype like I have been doing with
-#   the elk_pi_tube_direct boards.
-
-# - Wire everything up properly
-#   - Power: need 5V from somewhere external.  Add strain relief to socket.
-#   - Clocking
-#   - CPLD JTAG to AVR
-#   - CPLD SPI to AVR
-#   - CPLD to SD card
-
-# - Make a footprint for a micro SD socket, because the full sized socket
-#   isn't likely to fit on here at the same time as the Pro Micro
+# TODO(rev2) Replace the Pro Micro with a USB-capable ARM chip (ATSAMD21
+# probably, or maybe an ATSAMG55 to make it easy to implement HostFS)
 
 import sys, os
 here = os.path.dirname(sys.argv[0])
@@ -127,17 +117,15 @@ cpld = myelin_kicad_pcb.Component(
     # signal IDs like elk_D<0> in constraints.ucf:
     buses=["bbc_D", "bbc_A"],
     pins=[
-        # change ../cpld/constraints.ucf if any pinouts change
-
         Pin(39, "P1.2", ["bbc_RnW"]),
-        Pin(40, "P1.5", ["sd_SS"]),
+        Pin(40, "P1.5", ["sd_nSS"]),
         Pin(41, "P1.6", ["sd_MOSI"]),
         Pin(42, "P1.8", ["sd_SCK"]),
         Pin(43, "P1.9-GCK1", ["bbc_1MHZE"]),
         Pin(44, "P1.11-GCK2", ["sd_MISO"]),
         Pin(1, "P1.14-GCK3", ["avr_MISC1"]),
-        Pin(2, "P1.15", ["avr_SD_SEL"]),
-        Pin(3, "P1.17", ["avr_SS"]),
+        Pin(2, "P1.15", ["avr_nSD_SEL"]),
+        Pin(3, "P1.17", ["avr_nSS"]),
         Pin(4, "GND", ["GND"]),
         Pin(5, "P3.2", ["avr_SCK"]),
         Pin(6, "P3.5", ["avr_MISO"]),
@@ -177,7 +165,8 @@ cpld = myelin_kicad_pcb.Component(
 )
 cpld_cap1 = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C1")
 cpld_cap2 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C2")
-myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, "../cpld/constraints.ucf"))
+myelin_kicad_pcb.update_xilinx_constraints(
+    cpld, os.path.join(here, "../bbc_1mhz_bus_cpld/constraints.ucf"))
 
 # altera jtag header, like in the lc-electronics xc9572xl board
 # left column: tck tdo tms nc tdi
@@ -255,8 +244,8 @@ pro_micro = myelin_kicad_pcb.Component(
         Pin(8, "D5_nOC4A_PC6"),
         Pin(9, "D6_A7_OC4D_PD7", ["avr_MISC1"]),
         Pin(10, "D7_PE6"),
-        Pin(11, "D8_A8_PB4", ["avr_SD_SEL"]),
-        Pin(12, "D9_A9_nOC4B_PB5", ["avr_SS"]), # pull this one up
+        Pin(11, "D8_A8_PB4", ["avr_nSD_SEL"]),
+        Pin(12, "D9_A9_nOC4B_PB5", ["avr_nSS"]), # pull this one up
         Pin(13, "D10_A10_OC4B_PB6", ["avr_INT"]),
         Pin(14, "D16_MOSI_PB2", ["avr_MOSI"]),
         Pin(15, "D14_MISO_PB3", ["avr_MISO"]),
@@ -289,12 +278,14 @@ sd_card = myelin_kicad_pcb.Component(
         # Pin(3, "VSS"),  # full size SD only
         # Pin("CD", "CD"),  # full size SD only
         Pin(3, "CMD_MOSI", ["sd_MOSI"]),  # pin 3 on micro SD, 2 on full SD
-        Pin(2, "CD_DAT3_CS", ["sd_SS"]),  # pin 2 on micro SD, 1 on full SD
+        Pin(2, "CD_DAT3_CS", ["sd_nSS"]),  # pin 2 on micro SD, 1 on full SD
         Pin(1, "DAT2"),  # pin 1 on micro SD, 9 on full SD
         Pin("SH1", "GND"),
         Pin("SH2", "GND"),
     ],
 )
+#TODO figure out if this is necessary -- might only be with MMC cards
+#sd_cmd_pullup = myelin_kicad_pcb.R0805("10k", "3V3", "sd_MOSI")
 
 # In case we want to use an external SD adapter
 ext_sd = myelin_kicad_pcb.Component(
@@ -302,7 +293,7 @@ ext_sd = myelin_kicad_pcb.Component(
     identifier="EXTSD",
     value="ext sd",
     pins=[
-        Pin(1, "1", ["sd_SS"]),
+        Pin(1, "1", ["sd_nSS"]),
         Pin(2, "2", ["sd_MOSI"]),
         Pin(3, "3", ["3V3"]),
         Pin(4, "4", ["sd_SCK"]),
