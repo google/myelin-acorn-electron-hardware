@@ -46,6 +46,8 @@ Electron version, from [serial_sd_mcu/](serial_sd_mcu/).
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=14033).
 
+![Installed in a BBC B](bbc_1mhz_bus_pcb/2017-11-installed_in_bbc.jpeg)
+
 ![PCB front](bbc_1mhz_bus_pcb/pcb-front.png)
 
 ![PCB back](bbc_1mhz_bus_pcb/pcb-back.png)

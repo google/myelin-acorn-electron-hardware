@@ -16,6 +16,8 @@ implement some sideways ROM and RAM.
 socket (i.e. the address buffers are always pointed *away* from the
 CPU).
 
+![Installed in an Electron](2017-11-installed-in-electron.jpeg)
+
 ![PCB front](pcb/pcb-front.png)
 
 ![PCB back](pcb/pcb-back.png)
