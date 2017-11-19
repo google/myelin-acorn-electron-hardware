@@ -6,6 +6,8 @@ keyboard for a BBC Master 128.
 
 See: http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=13804
 
+![Messy prototype in action](2017-10-master_with_cpld_keyboard.jpeg)
+
 Master 128 keyboard connector
 -----------------------------
 
@@ -29,6 +31,7 @@ Interface hardware to 3.3V with a MachXO256 FPGA, without adding pins to the Mas
 - Open collector drivers for R0-7 and KBD SW (3 x 74HCT125, using 9/12 outputs)
 - Pullups for SHIFT LOCK, CAPS LOCK, and POWER LED, with 5V tolerant input
   (3 x resistor, 1 x 74LVC245)
+(10 direct IOs, 9 OC drivers, 3 pulled-up inputs)
 
 PL11
 - 1 - C6
@@ -75,6 +78,7 @@ Minimal interface hardware to 3.3V:
   (2 x 74LVC245 using 11/16 inputs, 3 x resistor)
 - OC driver for KBD SW (BREAK) and CMOS drivers for D7 and CA2 (1 x 74HCT125, using 3/4 outputs)
 - Ignore 1MHZE
+(8 5V inputs, 3 pulled-up IOs, 3 drivers)
 
 PL13
 - 1 - GND
@@ -104,8 +108,9 @@ BREAK is the CPU /RESET line, and CAPS LOCK is an LED driver, that is pulled
 down when active.
 
 Minimal interface hardware to 3.3V:
-- 5V tolerant input for 16 A lines and CAPS LOCK (3 x 74LVC245 using 17/24 inputs, 1 x resistor)
+- 5V tolerant input for 14 A lines and CAPS LOCK (2 x 74LVC245 using 15/16 inputs, 1 x resistor)
 - CMOS drivers for D0-3 and open collector driver for BREAK (2 x 74HCT125 using 5/8 outputs)
+(14 5V inputs, 1 pulled up input, 5 CMOS drivers)
 
 PL2
 - 1 - BREAK
@@ -134,10 +139,25 @@ PL2
 Minimal hardware for 3.3V compatibility for all keyboards
 ---------------------------------------------------------
 
-- 3 x 74HCT125 (9 outputs required = 18/24 I/O lines)
-- 3 x 74LVC245, with three lines pulled up for LED inputs (17 inputs required = 23/30 I/O lines)
+- Master: 10 direct IOs, 9 OC drivers, 3 pulled-up inputs, i.e. 9 CPLD IOs + 3 pulled-up IOs
+- Beeb: 8 5V inputs, 3 pulled-up IOs, 3 drivers, i.e. 11 CPLD IOs + 3 pulled-up IOs
+- Electron: 14 5V inputs, 1 pulled up input, 5 CMOS drivers, i.e. 19 CPLD IOs + 1 pulled-up IO, and four of the IOs are OK to put a pullup on, so this works out at 17 CPLD IOs + 3 pulled-up IOs
 
-Total I/O required for all keyboards: 41 (54 to fully wire up all the buffer chips).
+So our minimal configuration requires 20 CPLD pins, leaving 14 for communications with the FPGA.
+
+TODO check that LEDs work the same on all three.  Master appears to pull to 5V.
+
+- Master:   3-GGGGG33333333 3333GGG-PPP-G05
+- Beeb:     0G-GGGGGGGGPG5PP
+- Electron: GP05ggggGGGGGGGGGGGGGG
+
+G = CPLD gpio
+g = CPLD gpio, pullup ok
+P = CPLD gpio, needs pullup
+3 = FPGA gpio
+0 = GND
+5 = 5V
+- = NC
 
 Usage
 -----
