@@ -20,6 +20,12 @@ use IEEE.NUMERIC_STD.ALL;
 -- some code from spi_sd_card.vhd to support MMFS (bit-banged SD card interface)
 -- and UPURS (bit-banged serial)
 
+-- Addresses used:
+-- &FCA0 = serial TX/RX (for HostFS)
+-- &FCA1 = serial status (for HostFS)
+-- &FC71 = Plus 1 parallel data register (for MMFS)
+-- &FC72 = Plus 1 serial data register (for MMFS)
+
 entity serial_sd_adapter is
     Port (
         -- Pins that connect to the BBC 1MHz Bus
@@ -61,14 +67,17 @@ end serial_sd_adapter;
 
 architecture Behavioural of serial_sd_adapter is
 
+    -- 1MHz Bus helpers
+    signal latched_nPGFC : std_logic := '1';
+    signal latched_nPGFD : std_logic := '1';
+
     ---- Fast SPI port (slave, for AVR) ----
 
-    signal int_avr_MOSI : std_logic; -- input from AVR
     signal int_avr_MISO : std_logic; -- output to AVR
-    signal int_avr_SCK : std_logic; -- input from AVR
-    signal int_avr_nSS : std_logic; -- input from AVR
-    signal int_avr_INT : std_logic; -- output to AVR
-    signal int_avr_nSD_SEL : std_logic; -- input from AVR
+    signal avr_SCK : std_logic; -- input from AVR
+    signal avr_nSS : std_logic; -- input from AVR
+    signal avr_INT : std_logic; -- output to AVR
+    signal avr_nSD_SEL : std_logic; -- input from AVR
 
     signal nAVR_SPI_REG_ACCESS : std_logic; -- '0' when A = &FCA0;
     signal nAVR_SPI_STATUS_REG_ACCESS : std_logic; -- '0' when A = &FCA1;
@@ -86,12 +95,12 @@ architecture Behavioural of serial_sd_adapter is
     signal avr_RXD_state : std_logic := '0'; -- toggles whenever the CPLD receives a byte from the AVR
     signal avr_RXD_state_sync : std_logic := '0'; -- avr_RXD_state synchronized to bbc_1MHZE
     signal elk_RXD_state : std_logic := '0'; -- toggles when the elk reads a byte
-    signal elk_RXD_state_sync : std_logic := '0'; -- elk_RXD_state synchronized to int_avr_SCK
+    signal elk_RXD_state_sync : std_logic := '0'; -- elk_RXD_state synchronized to avr_SCK
 
     signal avr_TXD_state : std_logic := '0'; -- toggles whenever the CPLD sends a byte to the AVR
     signal avr_TXD_state_sync : std_logic := '0'; -- avr_TXD_state synchronized to bbc_1MHZE
     signal elk_TXD_state : std_logic := '0'; -- toggles when the elk writes a byte
-    signal elk_TXD_state_sync : std_logic := '0'; -- elk_TXD_state synchronized to int_avr_SCK
+    signal elk_TXD_state_sync : std_logic := '0'; -- elk_TXD_state synchronized to avr_SCK
 
     signal avr_RXD : std_logic_vector(7 downto 0); -- byte received from AVR
     signal avr_TXD : std_logic_vector(7 downto 0); -- next byte to transmit / being transmitted to AVR
@@ -116,38 +125,33 @@ architecture Behavioural of serial_sd_adapter is
 
 begin
 
-    -- mappings to actual pins
+    -- Multiplex MISO between SD card and avr SPI module
 
-    int_avr_MOSI <= avr_MOSI;
-    avr_MISO <= 'Z' when int_avr_nSS = '1' else
-        sd_MISO when int_avr_nSD_SEL = '0' else
+    avr_MISO <= 'Z' when avr_nSS = '1' else
+        sd_MISO when avr_nSD_SEL = '0' else
         int_avr_MISO;
-    int_avr_SCK <= avr_SCK;
-    int_avr_nSS <= avr_nSS;
-    int_avr_nSD_SEL <= avr_nSD_SEL;
-    avr_INT <= int_avr_INT;
 
-    sd_nSS <= int_avr_nSS when int_avr_nSD_SEL = '0' else bitbang_nSS;
-    sd_MOSI <= int_avr_MOSI when int_avr_nSD_SEL = '0' else bitbang_MOSI;
-    sd_SCK <= int_avr_SCK when int_avr_nSD_SEL = '0' else bitbang_SCK;
+    -- Multiplex SD card SPI port between AVR and BBC
+
+    sd_nSS <= avr_nSS when avr_nSD_SEL = '0' else bitbang_nSS;
+    sd_MOSI <= avr_MOSI when avr_nSD_SEL = '0' else bitbang_MOSI;
+    sd_SCK <= avr_SCK when avr_nSD_SEL = '0' else bitbang_SCK;
 
     ---- Fast SPI slave for AVR ---
 
-    nAVR_SPI_REG_ACCESS <= '0' when (bbc_nPGFC = '0' and bbc_A = x"A0") else '1';
-    nAVR_SPI_STATUS_REG_ACCESS <= '0' when (bbc_nPGFC = '0' and bbc_A = x"A1") else '1';
+    nAVR_SPI_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"A0") else '1';
+    nAVR_SPI_STATUS_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"A1") else '1';
 
-    int_avr_INT <= '1' when (elk_TXD_state /= avr_TXD_state_sync) else '0';
+    avr_INT <= '1' when (elk_TXD_state /= avr_TXD_state_sync) else '0';
 
     ---- Plus 1 parallel port emulation ----
 
-    nDATA_REG_ACCESS <= '0' when (bbc_nPGFC = '0' and bbc_A = x"71") else '1';
-    nSTATUS_REG_ACCESS <= '0' when (bbc_nPGFC = '0' and bbc_A = x"72") else '1';
+    nDATA_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"71") else '1';
+    nSTATUS_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"72") else '1';
 
     ---- Data bus ----
 
     bbc_D <=
-        -- test: return &49 when reading &FDA0
-        x"49" when (bbc_nPGFD = '0' and bbc_A = x"A0") else
         -- AVR SPI data
         avr_RXD when (nAVR_SPI_REG_ACCESS = '0' and bbc_RnW = '1') else
         -- AVR SPI status
@@ -159,16 +163,16 @@ begin
         "ZZZZZZZZ";
 
     -- AVR SPI clock domain
-    process (int_avr_nSS, int_avr_SCK)
+    process (avr_nSS, avr_SCK)
     begin
 
-        -- RISING EDGE of int_avr_SCK: read int_avr_MOSI
-        if int_avr_nSS = '1' then
+        -- RISING EDGE of avr_SCK: read avr_MOSI
+        if avr_nSS = '1' then
 
-            -- asynchronous reset (must not happen on an int_avr_SCK edge)
+            -- asynchronous reset (must not happen on an avr_SCK edge)
             avr_spi_bit_count <= x"0";
 
-        elsif rising_edge(int_avr_SCK) then
+        elsif rising_edge(avr_SCK) then
 
             -- increment the count each time
             avr_spi_bit_count <= std_logic_vector(unsigned(avr_spi_bit_count) + 1);
@@ -182,13 +186,13 @@ begin
                 -- SPI is big-endian, so we want to ignore incoming bits 0-5.
                 -- bit 6 (1) tells us if the remote wants to send a byte
                 avr_spi_receiving <= (
-                    int_avr_MOSI -- '1' if the remote has a byte for us
+                    avr_MOSI -- '1' if the remote has a byte for us
                     and (avr_RXD_state xnor elk_RXD_state_sync) -- '1' if we have room in our buffer
                 );
             elsif avr_spi_bit_count = x"7" then
                 -- bit 7 (0) tells us if the remote is capable of receiving a byte
                 avr_spi_transmitting <= (
-                    int_avr_MOSI -- '1' if the remote has buffer space
+                    avr_MOSI -- '1' if the remote has buffer space
                     and (avr_TXD_state xor elk_TXD_state_sync) -- '1' if we have a byte to transmit
                 );
                 -- copy avr_TXD into the shift register if it's safe
@@ -197,11 +201,11 @@ begin
                 end if;
             elsif avr_spi_bit_count(3) = '1' then
                 -- clock in a bit if we have buffer space
-                avr_spi_SHIFT <= avr_spi_SHIFT(6 downto 0) & int_avr_MOSI;
+                avr_spi_SHIFT <= avr_spi_SHIFT(6 downto 0) & avr_MOSI;
                 if avr_spi_bit_count = x"F" then
                     if avr_spi_receiving = '1' then
                         avr_RXD_state <= not avr_RXD_state;
-                        avr_RXD <= avr_spi_SHIFT(6 downto 0) & int_avr_MOSI;
+                        avr_RXD <= avr_spi_SHIFT(6 downto 0) & avr_MOSI;
                     end if;
                     if avr_spi_transmitting = '1' then
                         avr_TXD_state <= not avr_TXD_state;
@@ -211,12 +215,12 @@ begin
 
         end if;
 
-        -- FALLING EDGE of int_avr_SCK: write int_avr_MISO
-        if int_avr_nSS = '1' then
+        -- FALLING EDGE of avr_SCK: write int_avr_MISO
+        if avr_nSS = '1' then
 
-        elsif falling_edge(int_avr_SCK) then
+        elsif falling_edge(avr_SCK) then
 
-            -- We always update MISO on an int_avr_SCK falling edge.
+            -- We always update MISO on an avr_SCK falling edge.
 
             if avr_spi_bit_count = x"6" then
                 -- '1' if we have a byte to send to the AVR
@@ -234,6 +238,12 @@ begin
     -- Electron clock domain
     process (bbc_1MHZE)
     begin
+        -- The 1MHz Bus is glitchy, so we need to latch chip enables
+        if rising_edge(bbc_1MHZE) then
+            latched_nPGFC <= bbc_nPGFC;
+            latched_nPGFD <= bbc_nPGFD;
+        end if;
+
         if falling_edge(bbc_1MHZE) then
             -- AVR SPI registers
             avr_RXD_state_sync <= avr_RXD_state;

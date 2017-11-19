@@ -43,7 +43,8 @@
 #define cpld_MISO 14
 #define cpld_SCK 15
 
-// These two used to be A0/A1 so need to be moved on the Electron version before they'll work
+// These two used to be A0/A1 so need to be moved on the Electron version
+// before they'll work
 #define cpld_SS 9
 #define cpld_SD_SEL 8
 
