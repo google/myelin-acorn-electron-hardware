@@ -64,6 +64,9 @@ BBC Model B projects
 - [econet_from_scratch](econet_from_scratch/): USB Econet interface.
   (Untested.)
 
+- [econet_hub](econet_hub/): Clock and bias circuit, with five Econet sockets,
+  to connect a simple network together.
+
 BBC Master 128 projects
 -----------------------
 
