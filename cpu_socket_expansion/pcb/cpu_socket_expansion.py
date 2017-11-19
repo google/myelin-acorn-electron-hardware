@@ -49,7 +49,7 @@
 # which requires 6 pins on the CPLD.
 
 # CPLD pin usage (max 34):
-# - 16MHz tap from somewhere on the motherboard
+# - clk_16MHz tap from somewhere on the motherboard
 # - 13 GPIO on the connector
 # - 10 signals on the CPU
 # - 6: A13 x 2, A14 x 2, A15 x 2
@@ -125,7 +125,7 @@ cpu_1, cpu_2 = [
             Pin(20, "A11", ["cpu_A11"]),
             Pin(21, "VSS", ["GND"]),
             Pin(22, "A12", ["cpu_A12"]),
-            Pin(23, "A13", ["cpu_A13_%d" % (cpuid + 1)]),  
+            Pin(23, "A13", ["cpu_A13_%d" % (cpuid + 1)]),
             Pin(24, "A14", ["cpu_A14_%d" % (cpuid + 1)]),
             Pin(25, "A15", ["cpu_A15_%d" % (cpuid + 1)]),
             Pin(26, "D7", ["cpu_D7"]),
@@ -161,7 +161,7 @@ cpld_16MHz_port = myelin_kicad_pcb.Component(
     identifier="M16",
     value="16MHz",
     pins=[
-        Pin(1, "A", ["16MHz"]),
+        Pin(1, "A", ["clk_16MHz"]),
         Pin(2, "B", ["GND"]),
     ],
 )
@@ -312,6 +312,7 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="PLD",
     value="XC9572XL",
+    buses=["ext_GP"],
     pins=[
         Pin(39, "P1.2",          ["cpu_RDY"]),
         Pin(40, "P1.5",          ["dbuf_ext_to_cpu"]),
@@ -338,7 +339,7 @@ cpld = myelin_kicad_pcb.Component(
         Pin(17, "GND",           ["GND"]),
         Pin(18, "P3.16",         ["cpu_A13_1"]),
         Pin(19, "P4.2",          ["cpu_A13_2"]),
-        Pin(20, "P4.5",          ["16MHz"]),
+        Pin(20, "P4.5",          ["clk_16MHz"]),
         Pin(21, "P4.8",          ["ext_GP0"]),
         Pin(22, "P4.11",         ["ext_GP2"]),
         Pin(23, "P4.14",         ["ext_GP1"]),
