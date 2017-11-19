@@ -13,6 +13,8 @@ shows up in the Electron's memory (&FCE*) but doesn't do anything.
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=11325&start=720#p166961).
 
+![Action shot](2017-05-minus_one_and_elk_pi_tube_direct.jpeg)
+
 ![PCB front](pcb/pcb-front.png)
 
 ![PCB back](pcb/pcb-back.png)
