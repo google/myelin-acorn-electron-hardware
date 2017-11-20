@@ -180,7 +180,7 @@ begin
   -- enable DBUF when ext_GP3='0'.
   dbuf_nCE <= ext_GP3 when global_enable = '1' else '1';
 
-  -- ext_GP11='1' when the external device is driving the bus, '0' otherwise
+  -- ext_GP11='0' when the external device is driving the bus, '1' otherwise
   dbuf_ext_to_cpu <= not ext_GP11;
 
   -- ABUF is driven by the CPU (internal or external)

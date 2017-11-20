@@ -40,11 +40,11 @@ Acorn Electron projects
 
 - [cpu_socket_expansion](cpu_socket_expansion/): Mezzanine board that attaches
   to the CPU socket of a BBC and translates between 5V TTL and 3.3V CMOS levels.
-  (Untested.)
+  (Built, tested.)
 
 - [cpu_socket_minispartan_daughterboard](cpu_socket_minispartan_daughterboard/):
   Attaches to a cpu_socket_expansion board and connects a miniSpartan6+ FPGA
-  board and a Raspberry Pi Zero running PiTubeDirect.  (Untested.)
+  board and a Raspberry Pi Zero running PiTubeDirect.  (Built, tested.)
 
 - [spi_sd_card](spi_sd_card/): Experimental implementation of the interface
   used by MMFS to access SD cards, for the CPLD on an elk_pi_tube_direct board.

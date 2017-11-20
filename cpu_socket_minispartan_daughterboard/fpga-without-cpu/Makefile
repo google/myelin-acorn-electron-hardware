@@ -1,6 +1,7 @@
 default: all
 
 push:
+	rm -vf minispartan_expansion.bit
 	rsync -avrz --delete . xilinx:minispartan_basic/
 
 all: push
