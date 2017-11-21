@@ -1,0 +1,89 @@
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Stuff on the miniSpartan board
+
+#NET "MS_CLK50" PERIOD = 20 ns | LOC = "K3"; # IO_L42P_GCLK25_TRDY2_M3UDM
+#NET "MS_CLK32" PERIOD = 31.25 ns | LOC = "J4"; # IO_L42N_GCLK24_M3LDM_3
+NET "MS_LEDS<0>" LOC="P11";
+NET "MS_LEDS<1>" LOC="N9";
+NET "MS_LEDS<2>" LOC="M9";
+NET "MS_LEDS<3>" LOC="P9";
+NET "MS_LEDS<4>" LOC="T8";
+NET "MS_LEDS<5>" LOC="N8";
+NET "MS_LEDS<6>" LOC="P8";
+NET "MS_LEDS<7>" LOC="P7";
+
+NET MS_SERIAL_TX LOC="M7"; # FTDI_D0
+NET MS_SERIAL_RTS LOC="M6"; # FTDI_D2
+NET MS_SERIAL_RX LOC="N6"; # FTDI_D1
+NET MS_SERIAL_CTS LOC="P5"; # FTDI_D3
+
+-- miniSpartan SD card
+NET MS_SD_MOSI LOC="K11"; # SD_CMD
+NET MS_SD_MISO LOC="M10"; # SD_DAT0
+NET MS_SD_SCK LOC="L12"; # SD_CLK
+NET MS_SD_SS LOC="J11"; # SD_DAT2
+
+# Pin mappings, worked out by hand using the local schematic and the
+# miniSpartan6+ schematic, so possibly buggy.
+
+NET elk_16MHZ LOC = E8; # PORTA3
+NET elk_16MHZ_DIV13 LOC = B10; # PORTA6
+NET elk_PHI0 LOC = D9; # PORTA4
+NET elk_PHI0 CLOCK_DEDICATED_ROUTE = FALSE; # accidentally put PHI0 on a non-BUFG pin
+
+NET elk_nRST LOC = A10; # PORTA5
+
+NET elk_RDY LOC = E10; # PORTA8
+NET nDEASSERT_RDY LOC = E7; # PORTA0
+
+NET elk_nNMI LOC = A3; # PORTE3
+NET nASSERT_nNMI LOC = D8; # PORTA2
+
+NET elk_nIRQ LOC = A2; # PORTE5
+NET nASSERT_nIRQ LOC = C8; # PORTA1
+
+NET elk_RnW LOC = C10; # PORTA7
+NET RnW_out LOC = C5; # PORTD3
+NET RnW_nOE LOC = A4; # PORTE1
+
+NET elk_D<7> LOC = F9; # PORTA9
+NET elk_D<6> LOC = F10; # PORTA10
+NET elk_D<5> LOC = D11; # PORTA11
+NET elk_D<4> LOC = E11; # PORTB0
+NET elk_D<3> LOC = D14; # PORTB1
+NET elk_D<2> LOC = D12; # PORTB2
+NET elk_D<1> LOC = E12; # PORTB3
+NET elk_D<0> LOC = E13; # PORTB4
+NET DATA_nOE LOC = F13; # PORTB5
+NET DATA_READ LOC = F12; # PORTB6
+
+NET elk_A<15> LOC = F14; # PORTB7
+NET elk_A<14> LOC = G12; # PORTB8
+NET elk_A<13> LOC = G14; # PORTB9
+NET elk_A<12> LOC = H14; # PORTB10
+NET elk_A<11> LOC = J14; # PORTB11
+NET elk_A<10> LOC = J13; # PORTC0
+NET elk_A<9> LOC = J12; # PORTC1
+NET elk_A<8> LOC = P12; # PORTC10
+NET elk_A<7> LOC = N12; # PORTC9
+NET elk_A<6> LOC = M12; # PORTC8
+NET elk_A<5> LOC = N14; # PORTC7
+NET elk_A<4> LOC = M13; # PORTC6
+NET elk_A<3> LOC = M14; # PORTC5
+NET elk_A<2> LOC = L13; # PORTC4
+NET elk_A<1> LOC = L14; # PORTC3
+NET elk_A<0> LOC = K14; # PORTC2
+NET A_DIR LOC = M11; # PORTC11

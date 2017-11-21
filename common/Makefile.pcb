@@ -25,7 +25,11 @@ OUTPUT_NAME?=$(NAME)
 
 # -----
 
-ALL=$(NAME).net $(OUTPUT_NAME).zip
+ALL?=$(OUTPUT_NAME).zip
+
+ifndef SKIP_NETLIST
+	ALL += $(NAME).net
+endif
 
 default: all
 
@@ -34,7 +38,7 @@ rebuild: clean all
 all: setup $(ALL)
 
 clean:
-	rm -vf $(ALL)
+	rm -vf $(ALL) pcb-front.png pcb-back.png gerber_tmp
 
 setup:
 	NAME=$(NAME) OUTPUT_NAME=$(OUTPUT_NAME) python $(ROOT)/common/setup_defaults.py
