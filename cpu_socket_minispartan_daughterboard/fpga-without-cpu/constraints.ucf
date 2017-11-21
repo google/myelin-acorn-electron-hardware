@@ -31,10 +31,12 @@ NET MS_SERIAL_RX LOC="N6"; # FTDI_D1
 NET MS_SERIAL_CTS LOC="P5"; # FTDI_D3
 
 # miniSpartan SD card
-NET MS_SD_MOSI LOC="K11"; # SD_CMD
-NET MS_SD_MISO LOC="M10"; # SD_DAT0
-NET MS_SD_SCK LOC="L12"; # SD_CLK
-NET MS_SD_SS LOC="J11"; # SD_DAT2
+NET MS_SD_SCK LOC = L12; # SD_CLK
+NET MS_SD_MOSI LOC = K11; # SD_CMD
+NET MS_SD_MISO LOC = M10; # SD_DAT0
+# NET MS_SD_DAT1 LOC = L10; # SD_DAT1
+NET MS_SD_SS LOC = J11; # SD_DAT2
+# NET MS_SD_CD_DAT3 LOC = K12; # SD_CD/DAT3
 
 # Pin mappings, worked out by hand using the local schematic and the
 # miniSpartan6+ schematic, so possibly buggy.

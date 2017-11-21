@@ -54,7 +54,7 @@ entity minispartan_expansion is
         -- connections to the Raspberry Pi
         tube_PHI0 : out std_logic := '1';
         tube_D : inout std_logic_vector(7 downto 0);
-        tube_A : in std_logic_vector(2 downto 0);
+        tube_A : out std_logic_vector(2 downto 0);
         tube_RnW : out std_logic := '1';
         tube_nTUBE : out std_logic := '1';
         tube_nRST : out std_logic := '1'
@@ -83,6 +83,9 @@ architecture Behavioural of minispartan_expansion is
 
     -- '1' when ext_A = FC72 (parallel port status reg)
     signal EPP_STATUS : std_logic;
+
+    -- '1' when tube addresses are being accessed
+    signal tube_access : std_logic;
 
     -- currently selected memory bank, defaults to BASIC
     signal bank : std_logic_vector(3 downto 0) := x"A";
@@ -145,8 +148,17 @@ begin
     EPP_DATA <= '1' when ext_A = x"FC71" else '0';
     EPP_STATUS <= '1' when ext_A = x"FC72" else '0';
 
+    -- Tube (&FCEx)
+    tube_access <= '1' when ext_A(15 downto 4) = x"FCE" else '0';
+    tube_D <= ext_D when elk_RnW = '0' else "ZZZZZZZZ";
+    tube_A <= ext_A(2 downto 0);
+    tube_PHI0 <= elk_PHI0;
+    tube_RnW <= elk_RnW;
+    tube_nTUBE <= not tube_access;
+    tube_nRST <= elk_nRST;
+
     -- '1' when reading from the embedded ROM
-    reading_rom_zero <= '1' when SIDEWAYS = '1' and bank = x"0" else '0';
+    reading_rom_zero <= '0'; --'1' when SIDEWAYS = '1' and bank = x"0" else '0';
     reading_rom_upurs <= '1' when SIDEWAYS = '1' and bank = x"6" else '0';
     reading_rom_mmfs <= '1' when SIDEWAYS = '1' and bank = x"7" else '0';
 
@@ -180,7 +192,7 @@ begin
         -- drive when reading embedded rom
         '1' when reading_rom_zero = '1' or reading_rom_upurs = '1' or reading_rom_mmfs = '1' else
         -- drive when reading registers
-        '1' when DEBUG = '1' or EUP_SERIAL = '1' or EPP_STATUS = '1' else
+        '1' when DEBUG = '1' or EUP_SERIAL = '1' or EPP_STATUS = '1' or tube_access = '1' else
         -- we're not selected
         '0';
 
@@ -191,13 +203,12 @@ begin
         elk_PHI0 = '1' and (elk_RnW = '0' or driving_bus = '1')
         ) else '1';
 
-    -- data direction matches elk_RnW
-    --DATA_READ <= '0' when elk_RnW = '1' else '1';
-
     -- data bus
     ext_D <=
         -- failsafe: tristate when the buffers are pointing elk->fpga
         "ZZZZZZZZ" when (elk_PHI0 = '0' or elk_RnW = '0' or driving_bus = '0') else
+        -- reading from tube
+        tube_D when tube_access = '1' else
         -- reading data from the embedded ROM
         rom_zero_D when reading_rom_zero = '1' else
         rom_upurs_D when reading_rom_upurs = '1' else
@@ -212,17 +223,17 @@ begin
         -- default: this should never happen
         "10101010";
 
-    process (--elk_nRST,
-    elk_PHI0)
+    -- Micro SD port debugging
+    MS_LEDS(2) <= MS_SD_MISO;
+
+    process (elk_nRST, elk_PHI0)
     begin
-        -- TODO figure out why nRST is going low.
-        -- multimeter shows it at ~2.3V; is it shorted to PHI0?  PORTA5
-        --if elk_nRST = '0' then
-        --    -- default to BASIC ROM
-        --    bank <= x"A";
-        --    MS_LEDS <= x"55";
-        --els
-        if falling_edge(elk_PHI0) then
+        if elk_nRST = '0' then
+            -- default to BASIC ROM
+            bank <= x"A";
+            MS_LEDS(7 downto 3) <= "10101";
+            MS_LEDS(1 downto 0) <= "00";
+        elsif falling_edge(elk_PHI0) then
             -- set sideways bank
             if (
                 elk_RnW = '0' and
@@ -240,10 +251,11 @@ begin
             if elk_RnW = '0' and EPP_DATA = '1' then
                 MS_SD_MOSI <= ext_D(0);
                 MS_SD_SCK <= ext_D(1);
+                MS_LEDS(1 downto 0) <= ext_D(1 downto 0);
             end if;
             -- set leds on minispartan board by writing to FCFx
             if elk_RnW = '0' and DEBUG = '1' then
-                MS_LEDS <= ext_D;
+                MS_LEDS(7 downto 3) <= ext_D(7 downto 3);
                 debug_reg <= ext_D;
             end if;
         end if;
