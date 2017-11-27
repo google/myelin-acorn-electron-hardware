@@ -186,8 +186,8 @@ analyzer = myelin_kicad_pcb.Component(
         Pin( "L4", "GND", "GND"),
         Pin( "L5", "CLK"),
         Pin( "L6", "GND", "GND"),
-        Pin( "L7", "RDY0"),
-        Pin( "L8", "RDY1"),
+        Pin( "L7", "RDY0"),  # TODO tie to 3V3 via 1k resistor
+        Pin( "L8", "RDY1", "cpu_CLK_jumper"),  # TODO add jumper to cpu_CLK
         Pin( "L9", "GND", "GND"),
         Pin("L10", "GND", "GND"),
         Pin("L11", "GND", "GND"),
@@ -208,11 +208,11 @@ analyzer = myelin_kicad_pcb.Component(
         Pin( "R4", "PD1", "cpu_SYNC"),  # TODO add header for test clip
         Pin( "R5", "PD0", "cpu_RnW"),  # TODO add header to switch Elk/Master
         Pin( "R6", "PA7"),
-        Pin( "R7", "PA6"),
-        Pin( "R8", "PA5"),
-        Pin( "R9", "PA4"),
+        Pin( "R7", "PA6"),  # TODO tie to 3V3 via 1k resistor
+        Pin( "R8", "PA5"),  # TODO tie to 3V3 via 1k resistor
+        Pin( "R9", "PA4"),  # TODO tie to GND via 1k resistor
         Pin("R10", "PA3"),
-        Pin("R11", "PA2"),
+        Pin("R11", "PA2"),  # TODO tie to 3V3 via 1k resistor
         Pin("R12", "PA1"),
         Pin("R13", "PA0"),
         Pin("R14", "CTL2"),

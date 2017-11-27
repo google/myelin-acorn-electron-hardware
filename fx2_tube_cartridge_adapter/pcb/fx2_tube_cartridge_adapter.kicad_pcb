@@ -9,7 +9,7 @@
     (tracks 0)
     (zones 0)
     (modules 3)
-    (nets 29)
+    (nets 30)
   )
 
   (page A4)
@@ -127,6 +127,7 @@
   (net 26 cpu_READY)
   (net 27 cpu_nNMI)
   (net 28 cpu_SYNC)
+  (net 29 cpu_CLK_jumper)
 
   (net_class Default "This is the default net class."
     (clearance 0.1778)
@@ -146,6 +147,7 @@
     (add_net cpu_A5)
     (add_net cpu_A6)
     (add_net cpu_CLK)
+    (add_net cpu_CLK_jumper)
     (add_net cpu_D0)
     (add_net cpu_D1)
     (add_net cpu_D2)
@@ -322,7 +324,8 @@
       (net 2 GND))
     (pad L6 thru_hole circle (at 12.7 -2.54 90) (size 1.524 1.524) (drill 1.016) (layers *.Cu *.Mask)
       (net 2 GND))
-    (pad L8 thru_hole circle (at 12.7 0 90) (size 1.524 1.524) (drill 1.016) (layers *.Cu *.Mask))
+    (pad L8 thru_hole circle (at 12.7 0 90) (size 1.524 1.524) (drill 1.016) (layers *.Cu *.Mask)
+      (net 29 cpu_CLK_jumper))
     (pad L10 thru_hole circle (at 12.7 2.54 90) (size 1.524 1.524) (drill 1.016) (layers *.Cu *.Mask)
       (net 2 GND))
     (pad L12 thru_hole circle (at 12.7 5.08 90) (size 1.524 1.524) (drill 1.016) (layers *.Cu *.Mask))
@@ -470,10 +473,10 @@
       (net 2 GND))
   )
 
-  (gr_text "- check that it's OK\nto have the lcsoft\nboard below the flap\nin the plus 1\n\n- consider ditching\nthe tube interface,\notherwise wire up\n74hct00 and\n74hct08" (at 113.51 53.53) (layer F.Fab)
+  (gr_text "- check that it's OK\nto have the lcsoft\nboard below the flap\nin the plus 1\n\n- consider ditching\nthe tube interface,\notherwise wire up\n74hct00 and\n74hct08\n\n- check all TODO\nitems in python\nnetlist" (at 113.04 62.38) (layer F.Fab)
     (effects (font (size 1 1) (thickness 0.2)) (justify left))
   )
-  (gr_text "Electron cartridge / BBC Tube adapter\nfor FX2 logic analyzer + decode6502\n\nCopyright 2017 Google LLC\nDesigned by Phillip Pearson" (at 77.88 60.23) (layer B.SilkS)
+  (gr_text "Electron cartridge / BBC Tube adapter\nfor FX2 logic analyzer + decode6502\n\nhttp://myelin.nz/acorn/fx2tube\n\nCopyright 2017 Google LLC\nDesigned by Phillip Pearson" (at 77.88 60.23) (layer B.SilkS)
     (effects (font (size 1 1) (thickness 0.2)) (justify mirror))
   )
   (gr_line (start 107.25 32) (end 107.25 85.5) (layer Edge.Cuts) (width 0.1))
