@@ -9,7 +9,9 @@ The ATSAMD21 is a cheap ($1-2) microcontroller that can act as a USB host, which
 I plan to use to connect USB keyboards to my currently-keyboardless Master 128
 and Beeb motherboards.
 
-Sent to oshpark.com for fabrication 2017-11-06.
+r1: Sent to oshpark.com for fabrication 2017-11-06.  Assembled and
+tested; appears to work.  Functions fine as a USB CDC device.  USB
+host not tested yet.
 
 ![PCB front](pcb/pcb-front.png)
 
