@@ -86,7 +86,7 @@ mcu = myelin_kicad_pcb.Component(
         Pin( 2, "PA08", ["mcu_MOSI_TDI"]),  # sercom0.2/1.2
         Pin( 3, "PA09", ["mcu_SCK_TMS"]),  # sercom0.3/1.3
         Pin( 4, "PA14", ["mcu_MISO"]),  # sercom0.0/2.0
-        Pin( 5, "PA15", ["mcu_GPIO_D18"]),  # sercom0.1/2.1
+        Pin( 5, "PA15", ["mcu_GPIO_D18_TDO"]),  # sercom0.1/2.1 == JTAG TDO
         Pin( 6, "PA28_nRESET", ["mcu_RESET"]),
         Pin( 7, "PA30", ["SWCLK"]),
         Pin( 8, "PA31", ["SWDIO"]),
@@ -94,8 +94,8 @@ mcu = myelin_kicad_pcb.Component(
         Pin(10, "PA25", ["USBDP"]),
         Pin(11, "GND", ["GND"]),
         Pin(12, "VDD", ["3V3"]),
-        Pin(13, "PA02", ["mcu_GPIO_D20"]),  # only gpio
-        Pin(14, "PA04", ["mcu_GPIO_D8"]),  # sercom0.2/0.0
+        Pin(13, "PA02", ["mcu_GPIO_D20_TCK"]),  # only gpio == JTAG TCK
+        Pin(14, "PA04", ["mcu_GPIO_D8_nSD_SEL"]),  # sercom0.2/0.0 == /SD_SEL
     ],
 )
 mcu_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C1")
@@ -166,15 +166,15 @@ pro_micro = myelin_kicad_pcb.Component(
         Pin( 8, "D5_nOC4A_PC6",     ),
         Pin( 9, "D6_A7_OC4D_PD7",   ),
         Pin(10, "D7_PE6",           ),
-        Pin(11, "D8_A8_PB4",        ["mcu_GPIO_D8"]),  # /SD_SEL
+        Pin(11, "D8_A8_PB4",        ["mcu_GPIO_D8_nSD_SEL"]),  # /SD_SEL
         Pin(12, "D9_A9_nOC4B_PB5",  ["mcu_SS"]),   # /SS
         Pin(13, "D10_A10_OC4B_PB6", ),
         Pin(14, "D16_MOSI_PB2",     ["mcu_MOSI_TDI"]), # SPI (shared with JTAG)
         Pin(15, "D14_MISO_PB3",     ["mcu_MISO"]),     # SPI
         Pin(16, "D15_SCK_PB1",      ["mcu_SCK_TMS"]),  # SPI (shared with JTAG)
-        Pin(17, "D18_A0_PF7",       ["mcu_GPIO_D18"]), # JTAG TDO
+        Pin(17, "D18_A0_PF7",       ["mcu_GPIO_D18_TDO"]), # JTAG TDO
         Pin(18, "D19_A1_PF6",       ["mcu_SCK_TMS"]),  # JTAG (shared with SPI)
-        Pin(19, "D20_A2_PF5",       ["mcu_GPIO_D20"]), # JTAG TCK
+        Pin(19, "D20_A2_PF5",       ["mcu_GPIO_D20_TCK"]), # JTAG TCK
         Pin(20, "D21_A3_PF4",       ["mcu_MOSI_TDI"]), # JTAG (shared with SPI)
         Pin(21, "VCC",              ["3V3"]),
         Pin(22, "RST",              ["mcu_RESET"]),

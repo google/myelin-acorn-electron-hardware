@@ -12,7 +12,11 @@ quick USB interface for some CPLD based project, which is pretty much
 all the time, and with any luck it should be able to double as a JTAG
 programming interface.
 
-Sent to oshpark.com for fabrication 2017-10-29.
+r1: Sent to oshpark.com for fabrication 2017-10-29.  Assembled and
+tested, and appears to work.  Functions fine as a USB CDC device.
+
+r2: Added SWCLK pullup, and extended the micro USB socket pads a
+little to make them easier to solder.
 
 ![PCB front](pcb/pcb-front.png)
 
