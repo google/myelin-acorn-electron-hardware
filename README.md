@@ -38,9 +38,12 @@ Acorn Electron projects
   cartridge with two 16kB flash banks.  (Built, verified standard PCB.
   Mini PCB built but had a PCB error.)
 
+Cross-platform projects
+-----------------------
+
 - [cpu_socket_expansion](cpu_socket_expansion/): Mezzanine board that attaches
-  to the CPU socket of a BBC and translates between 5V TTL and 3.3V CMOS levels.
-  (Built, tested.)
+  to the CPU socket of a BBC or Electron and translates between 5V TTL and 3.3V
+  CMOS levels. (Built, tested.)
 
 - [cpu_socket_minispartan_daughterboard](cpu_socket_minispartan_daughterboard/):
   Attaches to a cpu_socket_expansion board and connects a miniSpartan6+ FPGA
@@ -50,8 +53,15 @@ Acorn Electron projects
   used by MMFS to access SD cards, for the CPLD on an elk_pi_tube_direct board.
   (Code only.)
 
+- [fx2_tube_cartridge_adapter](fx2_tube_cartridge_adapter/): Adapter to allow
+  connecting an FX2-based logic analyzer board to the BBC Tube interface or
+  as an Electron cartridge.  (Untested.)
+
 BBC Model B projects
 --------------------
+
+- [new_bbc_bringup](new_bbc_bringup/): Notes on modernizing a BBC Model B,
+  with flash and sideways RAM, and an emulated disk interface.
 
 - [upurs_usb_port](upurs_usb_port/): Code to run on an ATMEGA32U4 to
   use it as a USB to serial adapter for UPURS.  (Flaky.)
@@ -59,13 +69,14 @@ BBC Model B projects
 - [serial_sd_adapter](serial_sd_adapter/): VHDL that runs on an
   elk_pi_tube_direct board and provides a fast serial port and SD card
   interface.  Also, a board that attaches to a BBC using the 1MHz Bus and
-  provides the same interfaces.  (Untested.)
+  provides the same interfaces.  (Built, tested serial port.  SD card interface
+  untested.)
 
 - [econet_from_scratch](econet_from_scratch/): USB Econet interface.
   (Untested.)
 
 - [econet_hub](econet_hub/): Clock and bias circuit, with five Econet sockets,
-  to connect a simple network together.
+  to connect a simple network together.  (Untested.)
 
 BBC Master 128 projects
 -----------------------
@@ -90,7 +101,7 @@ Miscellaneous things that happened along the way
 
 - [cherry_mx_keyswitch_tester](cherry_mx_keyswitch_tester/): Tester board to
   verify my Cherry MX keyswitch footprint before I order anything expensive.
-  (Untested.)
+  (Built, verified.)
 
 Future project ideas
 --------------------
