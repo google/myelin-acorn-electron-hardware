@@ -4,7 +4,7 @@ Econet from scratch
 Can we implement an Econet interface from scratch, without having to use a BBC
 Master Econet module or MC68B54 chip?
 
-This is a partial design, with an unfinished and very unproven PCB.
+Untested.
 
 ![PCB front](pcb/pcb-front.png)
 
