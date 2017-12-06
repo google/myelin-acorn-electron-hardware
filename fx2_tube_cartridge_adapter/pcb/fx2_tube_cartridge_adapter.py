@@ -211,55 +211,55 @@ cpld = myelin_kicad_pcb.Component(
     value="XC9572XL",
     buses=["cpu_A", "cpu_D", "tube_D"],
     pins=[
-        Pin(39, "P1.2", "cpu_D3"),
+        Pin(39, "P1.2", "cpu_D4"),
         Pin(40, "P1.5", "cpu_D5"),
-        Pin(41, "P1.6", "cpu_RnW"),
-        Pin(42, "P1.8", "cpu_D7"),
-        Pin(43, "P1.9-GCK1", "cpu_D6"),
-        Pin(44, "P1.11-GCK2", "elk_16MHz"),
-        Pin( 1, "P1.14-GCK3", "cpu_CLK"),
-        Pin( 2, "P1.15", "cpu_D4"),
-        Pin( 3, "P1.17", "cpu_A7"),
+        Pin(41, "P1.6", "cpu_D6"),
+        Pin(42, "P1.8", "elk_nINFC"),
+        Pin(43, "P1.9-GCK1", "cpu_D7"),
+        Pin(44, "P1.11-GCK2", "cpu_A0"),
+        Pin( 1, "P1.14-GCK3", "elk_16MHz"),
+        Pin( 2, "P1.15", "cpu_A1"),
+        Pin( 3, "P1.17", "cpu_A2"),
         Pin( 4, "GND", "GND"),
-        Pin( 5, "P3.2", "cpu_A6"),
+        Pin( 5, "P3.2", "cpu_A4"),
         Pin( 6, "P3.5", "cpu_A5"),
-        Pin( 7, "P3.8", "cpu_A4"),
-        Pin( 8, "P3.9", "elk_nINFC"),
+        Pin( 7, "P3.8", "cpu_A6"),
+        Pin( 8, "P3.9", "tube_CLK"),
         Pin( 9, "TDI", "cpld_TDI"),
         Pin(10, "TMS", "cpld_TMS"),
         Pin(11, "TCK", "cpld_TCK"),
-        Pin(12, "P3.11", "cpu_A2"),
-        Pin(13, "P3.14", "cpu_A1"),
-        Pin(14, "P3.15", "cpu_A0"),
+        Pin(12, "P3.11", "tube_D0"),
+        Pin(13, "P3.14", "tube_D3"),
+        Pin(14, "P3.15", "tube_D1"),
         Pin(15, "VCCINT_3V3", "3V3"),
-        Pin(16, "P3.17", "cpu_D0"),
+        Pin(16, "P3.17", "tube_D7"),
         Pin(17, "GND", "GND"),
-        Pin(18, "P3.16", "cpu_D2"),
-        Pin(19, "P4.2", "cpu_D1"),
-        Pin(20, "P4.5", "tube_CLK"),
-        Pin(21, "P4.8", "tube_D3"),
-        Pin(22, "P4.11", "tube_D0"),
-        Pin(23, "P4.14", "tube_D1"),
+        Pin(18, "P3.16", "tube_D2"),
+        Pin(19, "P4.2", "tube_D6"),
+        Pin(20, "P4.5", "tube_D4"),
+        Pin(21, "P4.8", "tube_D5"),
+        Pin(22, "P4.11", "tube_A0"),
+        Pin(23, "P4.14", "tube_nTUBE"),
         Pin(24, "TDO", "cpld_TDO"),
         Pin(25, "GND", "GND"),
         Pin(26, "VCCIO_2V5_3V3", "3V3"),
-        Pin(27, "P4.15", "tube_D7"),
-        Pin(28, "P4.17", "tube_D2"),
-        Pin(29, "P2.2", "tube_D6"),
-        Pin(30, "P2.5", "tube_D4"),
-        Pin(31, "P2.6", "tube_D5"),
-        Pin(32, "P2.8", "tube_A0"),
-        Pin(33, "P2.9-GSR", "tube_nTUBE"),
-        Pin(34, "P2.11-GTS2", "tube_RnW"),
+        Pin(27, "P4.15", "tube_RnW"),
+        Pin(28, "P4.17", "tube_A2"),
+        Pin(29, "P2.2", "tube_A1"),
+        Pin(30, "P2.5", "cpu_RnW"),
+        Pin(31, "P2.6", "cpu_CLK"),
+        Pin(32, "P2.8", "bbc_nTUBE"),
+        Pin(33, "P2.9-GSR", "cpu_D0"),
+        Pin(34, "P2.11-GTS2", "cpu_D1"),
         Pin(35, "VCCINT_3V3", "3V3"),
-        Pin(36, "P2.14-GTS1", "bbc_nTUBE"),
-        Pin(37, "P2.15", "tube_A2"),
-        Pin(38, "P2.17", "tube_A1"),
+        Pin(36, "P2.14-GTS1", "cpu_A7"),
+        Pin(37, "P2.15", "cpu_D2"),
+        Pin(38, "P2.17", "cpu_D3"),
     ],
 )
-cpld_cap1 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C1")
-cpld_cap2 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C2")
-cpld_cap3 = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C3")
+cpld_cap1 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C1", handsoldering=False)
+cpld_cap2 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C2", handsoldering=False)
+cpld_cap3 = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C3", handsoldering=False)
 myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, "../cpld/constraints.ucf"))
 
 regulator = myelin_kicad_pcb.Component(
@@ -325,7 +325,7 @@ pi_zero = myelin_kicad_pcb.Component(
 		Pin(23, "GPIO11", ["tube_D3"]),
 		Pin(24, "GPIO8", ["tube_D0"]),
 		Pin(25, "GND", ["GND"]),
-		Pin(26, "GPIO7", ["tube_PHI0"]),
+		Pin(26, "GPIO7", ["tube_CLK"]),
 	],
 )
 
@@ -363,9 +363,9 @@ cpld_jtag = myelin_kicad_pcb.Component(
 
 # TODO extpwr header
 
-# TODO switch analyzer over to using 3v3 versions of all signals.
-
 # TODO reset level conversion using diode + pullup
+reset_3v3_pullup = myelin_kicad_pcb.R0805("10k", "3V3", "tube_nRST", ref="R5", handsoldering=False)
+reset_3v3_diode = myelin_kicad_pcb.DSOD323("BAT54", "cpu_nRST", "tube_nRST", ref="D1")
 
 # DONE lcsoft mini footprint.  need to flip it to look like this, so the lcsoft
 # mini board can plug in to the top of the cartridge.
@@ -385,8 +385,8 @@ analyzer = myelin_kicad_pcb.Component(
         # left side, top to bottom, left to right, with board face up
         # and USB socket upward
         Pin( "L1", "PD5", "cpu_nNMI"),  # TODO add header for BBC test clip  **not on pi
-        Pin( "L2", "PD6", "cpu_nRST"),
-        Pin( "L3", "PD7", "cpu_A0"),
+        Pin( "L2", "PD6", "tube_nRST"),
+        Pin( "L3", "PD7", "tube_A0"),
         Pin( "L4", "GND", "GND"),
         Pin( "L5", "CLK"),
         Pin( "L6", "GND", "GND"),
@@ -398,19 +398,19 @@ analyzer = myelin_kicad_pcb.Component(
         Pin("L12", "FCLK"),
         Pin("L13", "SCL"),
         Pin("L14", "SDA"),
-        Pin("L15", "PB0", "cpu_D0"),
-        Pin("L16", "PB1", "cpu_D1"),
-        Pin("L17", "PB2", "cpu_D2"),
-        Pin("L18", "PB3", "cpu_D3"),
+        Pin("L15", "PB0", "tube_D0"),
+        Pin("L16", "PB1", "tube_D1"),
+        Pin("L17", "PB2", "tube_D2"),
+        Pin("L18", "PB3", "tube_D3"),
         Pin("L19", "3V3", "3V3_FX2"),  # generated from USB
         Pin("L20", "3V3", "3V3_FX2"),  # generated from USB
 
         # right side, top to bottom, left to right
         Pin( "R1", "PD4", "cpu_nIRQ"),  # **not on pi
-        Pin( "R2", "PD3", "cpu_CLK"),
+        Pin( "R2", "PD3", "tube_CLK"),
         Pin( "R3", "PD2", "cpu_READY"),  # TODO add header for BBC test clip **not on pi
         Pin( "R4", "PD1", "cpu_SYNC"),  # TODO add header for test clip **not on pi
-        Pin( "R5", "PD0", "cpu_RnW"),  # TODO add header to switch Elk/Master
+        Pin( "R5", "PD0", "tube_RnW"),  # TODO add header to switch Elk/Master
         Pin( "R6", "PA7"),
         Pin( "R7", "PA6", "analyzer_PA6"),  # tie to 3V3 via 1k resistor
         Pin( "R8", "PA5", "analyzer_PA5"),  # tie to 3V3 via 1k resistor
@@ -422,10 +422,10 @@ analyzer = myelin_kicad_pcb.Component(
         Pin("R14", "CTL2"),
         Pin("R15", "CTL1"),
         Pin("R16", "CTL0"),
-        Pin("R17", "PB7", "cpu_D7"),
-        Pin("R18", "PB6", "cpu_D6"),
-        Pin("R19", "PB5", "cpu_D5"),
-        Pin("R20", "PB4", "cpu_D4"),
+        Pin("R17", "PB7", "tube_D7"),
+        Pin("R18", "PB6", "tube_D6"),
+        Pin("R19", "PB5", "tube_D5"),
+        Pin("R20", "PB4", "tube_D4"),
     ],
 )
 pull_resistors = [
