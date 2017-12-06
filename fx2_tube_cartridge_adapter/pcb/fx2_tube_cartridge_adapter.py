@@ -24,6 +24,23 @@
 # Acorn Electron via a Plus 1 cartridge slot, or a BBC Micro or BBC Master via
 # the Tube connector, to run Sigrok and David Banks' decode6502 software.
 
+# This also allows connecting a Raspberry Pi running PiTubeDirect to a BBC or
+# Electron.  When connected to an Electron, it drives the /TUBE line low on the
+# Pi when &FCEx addresses are being accessed (i.e. nINFC='0' and A7:4 = x"E").
+# When connected to a BBC, it just buffers the /TUBE line from the Tube
+# connetor.
+
+
+# DONE add a second tube header so BBC folks can pass signals through to a 5V
+# tube device and debug the Tube connection.  DECISION: skip this, because a
+# two-drive IDE cable will allow putting the board inline with a Tube device
+# anyway.
+
+# DONE hook up both bbc_nTUBE and tube_nTUBE to the CPLD, to allow using a Pi on
+# a BBC or Master.
+
+# TODO add jumpers from 3V3_PI and 3V3_FX2 to 3V3, to allow not populating the regulator
+
 # TODO put a resistor in series with the /TUBE line, in case the CPLD is driving
 # it when we're connected to a BBC.  Also add in a jumper to disconnect it
 # entirely.
@@ -143,7 +160,7 @@ tube = myelin_kicad_pcb.Component(
         Pin( 5, "0V", "GND"),
         Pin( 6, "/IRQ", "cpu_nIRQ"),
         Pin( 7, "0V", "GND"),
-        Pin( 8, "/TUBE", "tube_nTUBE"),
+        Pin( 8, "/TUBE", "bbc_nTUBE"),
         Pin( 9, "0V", "GND"),
         Pin(10, "/RST", "cpu_nRST"),
         Pin(11, "0V", "GND"),
@@ -182,6 +199,169 @@ tube = myelin_kicad_pcb.Component(
 # TODO cpld.  take elk_pi_tube_direct cpld pinout and remove the two /RESET
 # pins, and add A3.  not sure what to do with that yet, but it should come in
 # handy.
+
+    # 25 pins from the cartridge + tube port
+    # minus IRQ, NMI, READY, /RESET, /TUBE = 20
+    # 14 pins to the Raspberry Pi
+    # total 34, which is exactly what we have
+
+cpld = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:xilinx_vqg44",
+    identifier="PL1",
+    value="XC9572XL",
+    buses=["cpu_A", "cpu_D", "tube_D"],
+    pins=[
+        Pin(39, "P1.2", "cpu_D3"),
+        Pin(40, "P1.5", "cpu_D5"),
+        Pin(41, "P1.6", "cpu_RnW"),
+        Pin(42, "P1.8", "cpu_D7"),
+        Pin(43, "P1.9-GCK1", "cpu_D6"),
+        Pin(44, "P1.11-GCK2", "elk_16MHz"),
+        Pin( 1, "P1.14-GCK3", "cpu_CLK"),
+        Pin( 2, "P1.15", "cpu_D4"),
+        Pin( 3, "P1.17", "cpu_A7"),
+        Pin( 4, "GND", "GND"),
+        Pin( 5, "P3.2", "cpu_A6"),
+        Pin( 6, "P3.5", "cpu_A5"),
+        Pin( 7, "P3.8", "cpu_A4"),
+        Pin( 8, "P3.9", "elk_nINFC"),
+        Pin( 9, "TDI", "cpld_TDI"),
+        Pin(10, "TMS", "cpld_TMS"),
+        Pin(11, "TCK", "cpld_TCK"),
+        Pin(12, "P3.11", "cpu_A2"),
+        Pin(13, "P3.14", "cpu_A1"),
+        Pin(14, "P3.15", "cpu_A0"),
+        Pin(15, "VCCINT_3V3", "3V3"),
+        Pin(16, "P3.17", "cpu_D0"),
+        Pin(17, "GND", "GND"),
+        Pin(18, "P3.16", "cpu_D2"),
+        Pin(19, "P4.2", "cpu_D1"),
+        Pin(20, "P4.5", "tube_CLK"),
+        Pin(21, "P4.8", "tube_D3"),
+        Pin(22, "P4.11", "tube_D0"),
+        Pin(23, "P4.14", "tube_D1"),
+        Pin(24, "TDO", "cpld_TDO"),
+        Pin(25, "GND", "GND"),
+        Pin(26, "VCCIO_2V5_3V3", "3V3"),
+        Pin(27, "P4.15", "tube_D7"),
+        Pin(28, "P4.17", "tube_D2"),
+        Pin(29, "P2.2", "tube_D6"),
+        Pin(30, "P2.5", "tube_D4"),
+        Pin(31, "P2.6", "tube_D5"),
+        Pin(32, "P2.8", "tube_A0"),
+        Pin(33, "P2.9-GSR", "tube_nTUBE"),
+        Pin(34, "P2.11-GTS2", "tube_RnW"),
+        Pin(35, "VCCINT_3V3", "3V3"),
+        Pin(36, "P2.14-GTS1", "bbc_nTUBE"),
+        Pin(37, "P2.15", "tube_A2"),
+        Pin(38, "P2.17", "tube_A1"),
+    ],
+)
+cpld_cap1 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C1")
+cpld_cap2 = myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C2")
+cpld_cap3 = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C3")
+myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, "../cpld/constraints.ucf"))
+
+regulator = myelin_kicad_pcb.Component(
+    footprint="TO_SOT_Packages_SMD:SOT-89-3",
+    identifier="U1",
+    value="MCP1700T-3302E/MB",
+    pins=[
+        Pin(2, "VIN", ["5V"]),
+        Pin(3, "VOUT", ["3V3"]),
+        Pin(1, "GND", ["GND"]),
+    ],
+)
+reg_in_cap = myelin_kicad_pcb.C0805("1u", "GND", "5V", ref="C4")
+reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C5")
+
+pi_power_jumper = myelin_kicad_pcb.Component(
+	footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
+	identifier="PIPWR",
+	value="Power from Pi",
+	pins=[
+		Pin(1, "", "3V3_PI"),
+		Pin(2, "", "3V3"),
+	],
+)
+
+fx2_power_jumper = myelin_kicad_pcb.Component(
+	footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
+	identifier="FX2PWR",
+	value="Power from FX2",
+	pins=[
+		Pin(1, "", "3V3_FX2"),
+		Pin(2, "", "3V3"),
+	],
+)
+
+pi_zero = myelin_kicad_pcb.Component(
+	footprint="myelin-kicad:raspberry_pi_zero_flipped",
+	identifier="PI1",
+	value="Raspberry Pi Zero",
+	pins=[
+		Pin(1, "3V3"),  # left unconnected here because we generate 3v3 onboard
+		Pin(2, "5V", ["5V_PI"]),  # TODO remove this?
+		Pin(3, "GPIO0-2", ["tube_A1"]),
+		Pin(4, "5V", ["5V_PI"]),
+		Pin(5, "GPIO1-3", ["tube_A2"]),
+		Pin(6, "ser_GND", ["pi_serial_GND"]),
+		Pin(7, "GPIO4", ["tube_nRST"]),
+		Pin(8, "ser_TX", ["pi_serial_TX"]),
+		Pin(9, "GND", ["GND"]),
+		Pin(10, "ser_RX", ["pi_serial_RX"]),
+		Pin(11, "GPIO17", ["tube_nTUBE"]),
+		Pin(12, "GPIO18", ["tube_RnW"]),
+		Pin(13, "GPIO21-27", ["tube_A0"]),
+		Pin(14, "GND", ["GND"]),
+		Pin(15, "GPIO22", ["tube_D4"]),
+		Pin(16, "GPIO23", ["tube_D5"]),
+		Pin(17, "3V3", ["3V3_PI"]),
+		Pin(18, "GPIO24", ["tube_D6"]),
+		Pin(19, "GPIO10", ["tube_D2"]),
+		Pin(20, "GND", ["GND"]),
+		Pin(21, "GPIO9", ["tube_D1"]),
+		Pin(22, "GPIO25", ["tube_D7"]),
+		Pin(23, "GPIO11", ["tube_D3"]),
+		Pin(24, "GPIO8", ["tube_D0"]),
+		Pin(25, "GND", ["GND"]),
+		Pin(26, "GPIO7", ["tube_PHI0"]),
+	],
+)
+
+serial_port = myelin_kicad_pcb.Component(
+	footprint="Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm",
+	identifier="SERIAL1",
+	value="Pi Serial",
+	pins=[
+		Pin(1, "GND", ["pi_serial_GND"]),
+		Pin(2, "TX", ["pi_serial_TX"]),
+		Pin(3, "RX", ["pi_serial_RX"]),
+	],
+)
+
+# altera jtag header, like in the lc-electronics xc9572xl board
+# left column: tck tdo tms nc tdi
+# right column: gnd vcc nc nc gnd
+cpld_jtag = myelin_kicad_pcb.Component(
+    footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
+    identifier="JTAG1",
+    value="jtag",
+    pins=[
+        Pin(1, "TCK", ["cpld_TCK"]), # top left
+        Pin(2, "GND", ["GND"]), # top right
+        Pin(3, "TDO", ["cpld_TDO"]),
+        Pin(4, "3V3", ["3V3"]),
+        Pin(5, "TMS", ["cpld_TMS"]),
+        Pin(6, "NC"),
+        Pin(7, "NC"),
+        Pin(8, "NC"),
+        Pin(9, "TDI", ["cpld_TDI"]),
+        Pin(10, "GND", ["GND"]),
+    ],
+)
+
+# TODO extpwr header
 
 # TODO switch analyzer over to using 3v3 versions of all signals.
 
@@ -222,8 +402,8 @@ analyzer = myelin_kicad_pcb.Component(
         Pin("L16", "PB1", "cpu_D1"),
         Pin("L17", "PB2", "cpu_D2"),
         Pin("L18", "PB3", "cpu_D3"),
-        Pin("L19", "3V3", "3V3"),  # generated from USB
-        Pin("L20", "3V3", "3V3"),  # generated from USB
+        Pin("L19", "3V3", "3V3_FX2"),  # generated from USB
+        Pin("L20", "3V3", "3V3_FX2"),  # generated from USB
 
         # right side, top to bottom, left to right
         Pin( "R1", "PD4", "cpu_nIRQ"),  # **not on pi
