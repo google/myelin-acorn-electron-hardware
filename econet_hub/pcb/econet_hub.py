@@ -31,13 +31,28 @@ Pin = myelin_kicad_pcb.Pin
 # Power
 # -----
 
+# Micro USB
+micro_usb = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:micro_usb_b_smd_molex",
+    identifier="USB",
+    value="usb",
+    pins=[
+        Pin(1, "V", ["5V"]),
+        Pin(5, "G", ["GND"]),
+    ],
+)
+
 ext_power = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
+    footprint="Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm",
     identifier="EXTPWR",
     value="ext pwr",
     pins=[
         Pin(1, "", ["GND"]),
         Pin(2, "", ["5V"]),
+        Pin(3, "", ["GND"]),
+        Pin(4, "", ["5V"]),
+        Pin(5, "", ["GND"]),
+        Pin(6, "", ["5V"]),
     ],
 )
 power_cap = myelin_kicad_pcb.C0805("10u", "5V", "GND", ref="C2")
@@ -136,7 +151,7 @@ econet_sockets = [myelin_kicad_pcb.Component(
 ) for socket_id in range(5)]
 
 # Ground plane stapling vias
-for n in range(4):
+for n in range(5):
     single_staple = myelin_kicad_pcb.Component(
         footprint="myelin-kicad:via_single",
         identifier="staple_single%d" % (n+1),
