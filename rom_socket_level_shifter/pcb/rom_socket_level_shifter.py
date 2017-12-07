@@ -237,7 +237,7 @@ staples = [
         value="",
         pins=[Pin(1, "GND", ["GND"])],
     )
-    for n in range(33)
+    for n in range(7)
 ]
 
 myelin_kicad_pcb.dump_netlist("rom_socket_level_shifter.net")
