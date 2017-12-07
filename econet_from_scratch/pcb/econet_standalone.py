@@ -262,7 +262,7 @@ regulator = myelin_kicad_pcb.Component(
 reg_in_cap = myelin_kicad_pcb.C0805("1u", "5V", "GND", ref="C4")
 reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C5")
 
-#TODO do we need more than this?  how about bringing out every spare CPLD pin?
+#DONE do we need more than this?  how about bringing out every spare CPLD pin?
 # output = myelin_kicad_pcb.Component(
 #     footprint="Pin_Headers:Pin_Header_Straight_2x07_Pitch2.54mm",
 #     identifier="EXT",
@@ -283,8 +283,8 @@ reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C5")
 #     ],
 # )
 
-#TODO atsamd11c pinout + usb micro?  or just as a fifo?
-#TODO make this pluggable in as a master module
+#DONE atsamd11c pinout + usb micro?  or just as a fifo?
+#DONE make this pluggable in as a master module
 module = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:bbc_master_econet_module",
     identifier="MOD",
