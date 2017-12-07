@@ -127,7 +127,7 @@ ext_5v = myelin_kicad_pcb.Component(
 ext_gnd = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x06_Pitch2.54mm",
     identifier="EXTGND",
-    value="gnd",
+    value="0v",
     pins=[
         Pin(1, "", ["GND"]),
         Pin(2, "", ["GND"]),

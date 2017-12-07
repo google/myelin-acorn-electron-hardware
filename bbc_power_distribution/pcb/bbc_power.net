@@ -20,7 +20,7 @@
  (footprint Pin_Headers:Pin_Header_Straight_1x06_Pitch2.54mm)
 )
  (comp (ref EXTGND)
- (value gnd)
+ (value 0v)
  (footprint Pin_Headers:Pin_Header_Straight_1x06_Pitch2.54mm)
 )
  (comp (ref L1)
