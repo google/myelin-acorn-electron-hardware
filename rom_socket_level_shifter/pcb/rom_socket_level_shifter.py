@@ -184,6 +184,52 @@ addr_buf_hi = myelin_kicad_pcb.Component(
 )
 addr_buf_hi_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C6", handsoldering=False)
 
+# 3.3V connectors
+conns = [
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:header_2x07_100mil",
+        identifier="CON1",
+        value="3.3V #1",
+        pins=[
+            Pin( "1", "", ["3V3"]),
+            Pin( "2", "", ["ext_nCS"]),
+            Pin( "3", "", ["GND"]),
+            Pin( "4", "", ["ext_A9"]),
+            Pin( "5", "", ["ext_A8"]),
+            Pin( "6", "", ["ext_A13"]),
+            Pin( "7", "", ["ext_A12"]),
+            Pin( "8", "", ["ext_A7"]),
+            Pin( "9", "", ["ext_A6"]),
+            Pin("10", "", ["ext_A5"]),
+            Pin("11", "", ["ext_D1"]),
+            Pin("12", "", ["ext_A4"]),
+            Pin("13", "", ["5V"]),
+            Pin("14", "", ["ext_D2"]),
+        ]
+    ),
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:header_2x07_100mil",
+        identifier="CON2",
+        value="3.3V #2",
+        pins=[
+            Pin( "1", "", ["ext_dbuf_nCE"]),
+            Pin( "2", "", ["ext_A10"]),
+            Pin( "3", "", ["ext_D3"]),
+            Pin( "4", "", ["ext_nOE"]),
+            Pin( "5", "", ["ext_D4"]),
+            Pin( "6", "", ["ext_A11"]),
+            Pin( "7", "", ["ext_A3"]),
+            Pin( "8", "", ["ext_D5"]),
+            Pin( "9", "", ["ext_A2"]),
+            Pin("10", "", ["ext_D6"]),
+            Pin("11", "", ["ext_D0"]),
+            Pin("12", "", ["ext_D7"]),
+            Pin("13", "", ["ext_A0"]),
+            Pin("14", "", ["ext_A1"]),
+        ]
+    ),
+]
+
 staples = [
     myelin_kicad_pcb.Component(
         footprint="myelin-kicad:via_single",
