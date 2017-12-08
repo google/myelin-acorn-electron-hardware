@@ -125,6 +125,8 @@ data_buf = myelin_kicad_pcb.Component(
     ],
 )
 dbuf_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C4", handsoldering=False)
+dbuf_nCE_pullup = myelin_kicad_pcb.R0805("19k", "ext_dbuf_nCE", "3V3", ref="R1", handsoldering=False)
+
 
 addr_buf_lo = myelin_kicad_pcb.Component(
     footprint="Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm",
