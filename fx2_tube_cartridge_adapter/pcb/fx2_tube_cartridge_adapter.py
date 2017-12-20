@@ -208,7 +208,7 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="PL1",
     value="XC9572XL",
-    buses=["cpu_A", "cpu_D", "tube_D"],
+    buses=["cpu_D", "tube_D"],
     pins=[
         Pin(39, "P1.2", "cpu_D4"),
         Pin(40, "P1.5", "cpu_D5"),

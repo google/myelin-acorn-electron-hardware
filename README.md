@@ -55,7 +55,7 @@ Cross-platform projects
 
 - [fx2_tube_cartridge_adapter](fx2_tube_cartridge_adapter/): Adapter to allow
   connecting an FX2-based logic analyzer board to the BBC Tube interface or
-  as an Electron cartridge.  (Untested.)
+  as an Electron cartridge.  (Partly tested.)
 
 BBC Model B projects
 --------------------
