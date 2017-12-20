@@ -58,15 +58,23 @@ architecture Behavioural of fx2_tube_cartridge_adapter is
     -- '0' when A = &FCEx: Tube memory space
     signal nTUBE : std_logic;
 
+    -- true when the Pi can drive the bus
+    signal pi_may_drive_bus : boolean;
+
     -- Reconstructed clock
     signal out_CLK : std_logic := '0';
     signal out_CLK_ignore : std_logic := '0';
+
+    -- Flag to say we should wait to drive the bus until the next rising clock edge
+    signal wait_for_pi_to_drop_bus : boolean := false;
 
 begin
 
     -- tube /CE signal: A = &FCEx
     nTUBE <= '0' when (elk_nINFC = '0' and cpu_A7 = '1' and cpu_A6 = '1' and cpu_A5 = '1' and cpu_A4 = '0') else '1';
     tube_nTUBE <= nTUBE;
+
+    pi_may_drive_bus <= (nTUBE = '0' and cpu_RnW = '1');
 
     -- copy across other signals
     tube_RnW <= cpu_RnW;
@@ -75,21 +83,24 @@ begin
     tube_A1 <= cpu_A1;
     tube_A2 <= cpu_A2;
 
-    -- For logic analyzer: ALWAYS buffer to the FX2
-    -- TODO replace this with the logic below after verifying that my read of tubevc.s is correct
-    tube_D <= cpu_D;
-    cpu_D <= "ZZZZZZZZ";
-
     -- For PiTubeDirect: data goes both ways
     -- See http://stardot.org.uk/forums/viewtopic.php?f=3&t=11325&p=189382#p189382
-    -- tube_D <=
-    --     -- Drop the bus when the Pi might be driving it
-    --     "ZZZZZZZZ" when (nTUBE = '0' and cpu_RnW = '1') else
-    --     -- Otherwise copy over the CPU bus for the FX2 to monitor
-    --     cpu_D;
-    -- cpu_D <=
-    --     tube_D when (nTUBE = '0' and cpu_RnW = '1') else
-    --     "ZZZZZZZZ";
+    tube_D <=
+        -- Drop the bus when the Pi might be driving it
+        "ZZZZZZZZ" when wait_for_pi_to_drop_bus or pi_may_drive_bus else
+        -- Otherwise copy over the CPU bus for the FX2 to monitor
+        cpu_D;
+    cpu_D <=
+        tube_D when pi_may_drive_bus else
+        "ZZZZZZZZ";
+
+    -- Track when PiTubeDirect might possibly be still driving the bus
+    process (out_CLK)
+    begin
+        if rising_edge(out_CLK) then
+            wait_for_pi_to_drop_bus <= pi_may_drive_bus;
+        end if;
+    end process;
 
     -- clean up cpu_CLK by ignoring falling edges for a while after a rising edge
     process (elk_16MHz)
@@ -99,13 +110,15 @@ begin
         -- So our process should be to set out_CLK high as soon as cpu_CLK goes high, and
         -- ignore any high-to-low transitions that happen in the next 16MHz clock cycle.
 
-        if out_CLK_ignore = '1' then
-            out_CLK_ignore <= '0';
-        else
-            if out_CLK = '0' and cpu_CLK = '1' then
-                out_CLK_ignore <= '1';
+        if rising_edge(elk_16MHz) then
+            if out_CLK_ignore = '1' then
+                out_CLK_ignore <= '0';
+            else
+                if out_CLK = '0' and cpu_CLK = '1' then
+                    out_CLK_ignore <= '1';
+                end if;
+                out_CLK <= cpu_CLK;
             end if;
-            out_CLK <= cpu_CLK;
         end if;
     end process;
 

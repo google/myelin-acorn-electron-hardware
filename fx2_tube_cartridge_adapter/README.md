@@ -6,9 +6,9 @@ http://myelin.nz/acorn/fx2tube
 An adapter board to make it easy to monitor your Electron, BBC Micro, or BBC
 Master's bus using a cheap logic analyzer.
 
-Tested on an Electron with just an FX2 fitted, and works well.
-Untested: BBC Tube interface, PiTubeDirect level shifting, BBC Master
-cartridge.
+Tested on an Electron with just an FX2 fitted, and with an FX2 +
+PiTubeDirect fitted, and it works well in both cases.  Untested: BBC
+Tube interface, BBC Master cartridge.
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=13882&p=186574#p186574)
 
