@@ -16,13 +16,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity spi_sd_card is 
+entity spi_sd_card is
     Port (
         elk_D : inout std_logic_vector(7 downto 0);
-        -- D5 = /SS
-        -- D6 = MOSI
-        -- D7 = SCK
-        -- D0 = MISO
 
         elk_nINFC : in std_logic;
         elk_A7 : in std_logic;
@@ -42,6 +38,10 @@ entity spi_sd_card is
         tube_A2 : in std_logic; -- serial RXD
 
         tube_D : inout std_logic_vector(7 downto 0);
+        -- D5 = /SS
+        -- D6 = MOSI
+        -- D7 = SCK
+        -- D0 = MISO
 
         tube_nRST : out std_logic; -- serial RTS
         tube_nTUBE : out std_logic;
