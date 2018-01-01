@@ -10,14 +10,14 @@ in [MMFS](https://github.com/hoglet67/MMFS/).
 
 For a multi-purpose design which implements a fast serial port as well as the
 parallel port SD card interface used here, see
-[../serial_sd_adapter](../serial_sd_adapter).
+the [serial_sd_adapter](../serial_sd_adapter) project.
 
 ![Picture of the prototype in action](2017-05-elk_pi_tube_direct_sd_mmfs.jpeg)
 
 It also contains an experimental version of the memory-mapped SPI port
 as seen in MMC_MemoryMapped.asm, except at &FCD0 rather than &FE18.
 
-The first prototype (pictured above) was an [../elk_pi_tube_direct](elk_pi_tube_direct) cartridge with an
+The first prototype (pictured above) was an [elk_pi_tube_direct](../elk_pi_tube_direct) cartridge with an
 SD socket taped to the top, and jumper wires everywhere, drawing
 power from the minus_one's 3.3V pin.
 
