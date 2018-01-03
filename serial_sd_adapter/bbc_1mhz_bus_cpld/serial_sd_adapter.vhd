@@ -74,10 +74,6 @@ architecture Behavioural of serial_sd_adapter is
     ---- Fast SPI port (slave, for AVR) ----
 
     signal int_avr_MISO : std_logic; -- output to AVR
-    signal avr_SCK : std_logic; -- input from AVR
-    signal avr_nSS : std_logic; -- input from AVR
-    signal avr_INT : std_logic; -- output to AVR
-    signal avr_nSD_SEL : std_logic; -- input from AVR
 
     signal nAVR_SPI_REG_ACCESS : std_logic; -- '0' when A = &FCA0;
     signal nAVR_SPI_STATUS_REG_ACCESS : std_logic; -- '0' when A = &FCA1;
