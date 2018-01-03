@@ -12,6 +12,23 @@ Tube interface, BBC Master cartridge.
 
 [Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=13882&p=186574#p186574)
 
+### Bill of materials
+
+- R1, R2, R3, R4, R6 - 1k 0805 resistor
+- R5 - 10k 0805 resistor
+- D1 - BAT54 SOD323 diode
+- C1, C2 - 100nF 0805 capacitor
+- C3, C4, C5 - 1uF 0805 capacitor
+- PL1 - [XC9572XL-xxVQG44 CPLD](https://www.digikey.com/product-detail/en/xilinx-inc/XC9572XL-10VQG44I/122-1981-ND/1957201)
+- U1 - [MCP1700T-3302E/MB voltage regulator](https://www.digikey.com/product-detail/en/microchip-technology/MCP1700T-3302E-MB/MCP1700T3302EMBCT-ND/652679)
+- Female 0.1" headers for FX2 and Raspberry Pi Zero
+- JTAG1 - [Male 2x5 0.1" header](https://www.digikey.com/products/en?keywords=ED1543-ND)
+- Male 0.1" headers for PIPWR, EXTPWR, SERIAL1, TUBE, and the jumper
+  block
+- Several 0.1" jumpers
+
+### Renders of the PCB
+
 ![PCB front](pcb/pcb-front.png)
 
 ![PCB back](pcb/pcb-back.png)
