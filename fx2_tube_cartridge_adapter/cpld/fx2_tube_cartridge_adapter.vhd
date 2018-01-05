@@ -91,7 +91,7 @@ begin
         -- Otherwise copy over the CPU bus for the FX2 to monitor
         cpu_D;
     cpu_D <=
-        tube_D when pi_may_drive_bus else
+        tube_D when pi_may_drive_bus and out_CLK = '1' else
         "ZZZZZZZZ";
 
     -- Track when PiTubeDirect might possibly be still driving the bus
