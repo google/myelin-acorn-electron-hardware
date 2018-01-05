@@ -7,6 +7,8 @@ An adapter board to make it easy to monitor your Electron, BBC Micro, or BBC
 Master's bus using a cheap logic analyzer.  It also functions as an adapter
 for PiTubeDirect.
 
+[Support thread on the Stardot forums](http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=14319)
+
 On the Electron, it plugs into a cartridge slot on the Plus 1.  It can
 monitor the bus when an FX2 board is connected, and when a Raspberry
 Pi running PiTubeDirect is attached, it will perform voltage
@@ -34,8 +36,6 @@ Tested combinations:
 Not yet tested:
 - BBC Model B via Tube port, with FX2 and/or Raspberry Pi Zero
 - BBC Master via cartridge slot, with FX2
-
-[Discussion on the Stardot forums](http://stardot.org.uk/forums/viewtopic.php?f=3&t=13882&p=186574#p186574)
 
 ### Bill of materials
 
