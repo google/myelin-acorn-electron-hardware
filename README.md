@@ -57,6 +57,11 @@ Cross-platform projects
   connecting an FX2-based logic analyzer board to the BBC Tube interface or
   as an Electron cartridge.  (Partly tested.)
 
+- [bbc_power_distribution](bbc_power_distribution/): Small board to
+  make it easy to power a Model B or Master motherboard from a 5V
+  power supply with a barrel jack or Micro USB output.  Uses an
+  LTC1983 to generate -5V, so you don't need to provide it externally.
+
 BBC Model B projects
 --------------------
 
