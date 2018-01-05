@@ -19,6 +19,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity fx2_tube_cartridge_adapter is 
@@ -62,23 +63,33 @@ architecture Behavioural of fx2_tube_cartridge_adapter is
     signal pi_may_drive_bus : boolean;
 
     -- Reconstructed clock
-    signal out_CLK : std_logic := '0';
-    signal out_CLK_ignore : std_logic := '0';
+    signal out_CLK : std_logic;
+    signal clean_CLK : std_logic := '0';
+    signal clean_CLK_ignore : std_logic := '0';
 
     -- Flag to say we should wait to drive the bus until the next rising clock edge
     signal wait_for_pi_to_drop_bus : boolean := false;
 
+    -- Small counter to check for presence of 16MHz clock on the cartridge port
+    signal cart_detect_count : std_logic_vector(2 downto 0) := (others => '0');
+
+    -- Indicates cartridge port being used, rather than tube interface
+    signal cart_detect : std_logic;
+
 begin
 
     -- tube /CE signal: A = &FCEx
-    nTUBE <= '0' when (elk_nINFC = '0' and cpu_A7 = '1' and cpu_A6 = '1' and cpu_A5 = '1' and cpu_A4 = '0') else '1';
+    nTUBE <= '0' when cart_detect = '1' and elk_nINFC = '0' and cpu_A7 = '1' and cpu_A6 = '1' and cpu_A5 = '1' and cpu_A4 = '0' else
+             '0' when cart_detect = '0' and bbc_nTUBE = '0' else
+             '1';
+
     tube_nTUBE <= nTUBE;
 
     pi_may_drive_bus <= (nTUBE = '0' and cpu_RnW = '1');
 
     -- copy across other signals
     tube_RnW <= cpu_RnW;
-    tube_CLK <= out_CLK;  -- TODO mux with cpu_CLK if elk_16MHz isn't present
+    tube_CLK <= out_CLK;
     tube_A0 <= cpu_A0;
     tube_A1 <= cpu_A1;
     tube_A2 <= cpu_A2;
@@ -107,19 +118,26 @@ begin
     begin
         -- 16MHz clock has period 62.5 ns, so two clocks = 125 ns and three clocks = 187.5 ns
         -- Electron clock has min high time 250ns, and glitches for about 100ns sometimes.
-        -- So our process should be to set out_CLK high as soon as cpu_CLK goes high, and
+        -- So our process should be to set clean_CLK high as soon as cpu_CLK goes high, and
         -- ignore any high-to-low transitions that happen in the next 16MHz clock cycle.
 
         if rising_edge(elk_16MHz) then
-            if out_CLK_ignore = '1' then
-                out_CLK_ignore <= '0';
+            if cart_detect = '0' then
+                cart_detect_count <= cart_detect_count + 1;
+            end if;
+            if clean_CLK_ignore = '1' then
+                clean_CLK_ignore <= '0';
             else
-                if out_CLK = '0' and cpu_CLK = '1' then
-                    out_CLK_ignore <= '1';
+                if clean_CLK = '0' and cpu_CLK = '1' then
+                    clean_CLK_ignore <= '1';
                 end if;
-                out_CLK <= cpu_CLK;
+                clean_CLK <= cpu_CLK;
             end if;
         end if;
     end process;
+
+    cart_detect <= cart_detect_count(cart_detect_count'high);
+
+    out_CLK <= clean_CLK when cart_detect = '1' else cpu_CLK; -- mux with cpu_CLK if elk_16MHz isn't present
 
 end Behavioural;
