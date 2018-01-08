@@ -36,7 +36,7 @@
  (footprint myelin-kicad:pro_micro)
 )
  (comp (ref U2)
- (value XC9572XL)
+ (value XC9572XL-10VQG44C)
  (footprint myelin-kicad:xilinx_vqg44)
 )
  (comp (ref U3)

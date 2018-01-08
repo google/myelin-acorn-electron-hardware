@@ -90,14 +90,15 @@
 
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(sys.argv[0]), "../../third_party/myelin-kicad.pretty"))
-from myelin_kicad_pcb import dump_netlist, Component, Pin, C0805, R0805
+from myelin_kicad_pcb import dump_bom, dump_netlist, Component, Pin, C0805, R0805
 
 # Socket to match the 44-pin edge connector in an Electron cartridge
 # http://www.mouser.com/ProductDetail/TE-Connectivity-AMP/5530843-4/
 cartridge_port = Component(
 	footprint="myelin-kicad:acorn_electron_cartridge_socket",
-	identifier="CON?",
+	identifier="CON1",
 	value="cartridge port",
+	desc="Socket to match the 44-pin edge connector in an Electron cartridge, e.g. TE 5530843-4 / Digikey A31717-ND",
 	pins=[
         Pin("A1", "5V", ["5V"]),
         Pin("A2", "nOE", ["cart_nOE"]), # essential
@@ -149,8 +150,9 @@ cartridge_port = Component(
 # Sparkfun Pro Micro
 pro_micro = Component(
 	footprint="myelin-kicad:pro_micro",
-	identifier="U?",
+	identifier="U1",
 	value="Pro Micro 5V",
+	desc="Sparkfun Pro Micro or eBay/Aliexpress clone, with ATMEGA32U4 MCU and micro USB socket (NOT ATMEGA328 or mini USB)",
 	pins=[
 		# two rows of 12 pins, counter clockwise with pin 1 at top left
 		Pin(1, "D1_TX_PD3"),
@@ -182,8 +184,9 @@ pro_micro = Component(
 
 avr_isp = Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm",
-    identifier="CON?",
+    identifier="CON2",
     value="AVR ISP",
+	desc="2x3 0.1 inch header for AVR programming (OPTIONAL)",
     pins=[
         Pin(1, "MISO", ["avr_MISO"]),
         Pin(2, "VCC", ["5V"]),
@@ -199,8 +202,9 @@ avr_isp = Component(
 # VQ44 package: https://www.xilinx.com/support/documentation/package_specs/vq44.pdf
 cpld = Component(
     footprint="myelin-kicad:xilinx_vqg44",
-    identifier="U?",
-    value="XC9572XL",
+    identifier="U2",
+    value="XC9572XL-10VQG44C",
+	desc="Xilinx XC9572XL in 44-pin 0.8mm TQFP package.  Any speed or temperature grade is OK.",
     pins=[
         # change ../cpld/constraints.ucf if any pinouts change
         Pin(39, "P1.2", ["cart_A7"]),
@@ -259,8 +263,9 @@ cpld_cap3 = C0805("100n", "3V3", "GND", ref="C5")
 # right column: gnd vcc nc nc gnd
 cpld_jtag = Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
-    identifier="CON?",
+    identifier="CON3",
     value="jtag",
+	desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
     pins=[
         Pin(1, "TCK", ["cpld_TCK"]), # top left
         Pin(2, "GND", ["GND"]), # top right
@@ -277,8 +282,9 @@ cpld_jtag = Component(
 
 regulator = Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
-    identifier="U?",
+    identifier="U3",
     value="MCP1700T-3302E/MB",
+	desc="3.3V LDO regulator.  Search for the exact part number because there are many variants.",
     pins=[
         Pin(2, "VIN", ["5V"]),
         Pin(3, "VOUT", ["3V3"]),
@@ -289,3 +295,4 @@ reg_in_cap = C0805("1u", "5V", "GND", ref="C3")
 reg_out_cap = C0805("1u", "3V3", "GND", ref="C4")
 
 dump_netlist("standalone_programmer.net")
+dump_bom("bill_of_materials.txt")
