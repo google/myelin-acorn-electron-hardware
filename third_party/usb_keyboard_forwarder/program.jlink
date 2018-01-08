@@ -1,0 +1,5 @@
+device atsamd21e18a
+loadbin build/usb_keyboard_forwarder.ino.bin, 0
+r
+go
+q
