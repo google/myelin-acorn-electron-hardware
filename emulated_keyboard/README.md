@@ -8,6 +8,30 @@ See: http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=13804
 
 ![Messy prototype in action](2017-10-master_with_cpld_keyboard.jpeg)
 
+Usage
+-----
+
+- Program an XC9572XL with the code in prototype_cpld/
+- Program a Pro Micro with the code in prototype_firmware/
+- Run prototype_keyboard_sender.py on your computer (only tested on a MacBook Pro, so YMMV with anything else)
+
+Wiring
+------
+
+- The CPLD needs to be connected to PL11, PL24, and PL7 on the Master 128 motherboard.  PL7 is probably not populated, so you'll have to solder a header in there.  See new_master_bringup/README.md for the pinout, and see cpld/constraints.ucf for how the pins connect to the CPLD.
+- The CPLD needs to be connected to the Pro Micro's SPI port.  Pinout in new_master_bringup/README.md.
+- The Pro Micro should be connected to your computer's USB port before running listen_pygame.py.
+
+Future plans
+------------
+
+- Make a board with an ATSAMD21 USB host, a MachXO CPLD, and a buffer chip, to allow connecting a USB keyboard straight to the Master 128.
+- Maybe make the board compatible with the Beeb and Electron too.
+- Make a whole new keyboard from scratch, with something like this project on board, or with a USB device chip to give it a USB interface, that connects to the ATSAMD21 board.
+
+Keyboard connector details
+==========================
+
 Master 128 keyboard connector
 -----------------------------
 
@@ -158,24 +182,3 @@ P = CPLD gpio, needs pullup
 0 = GND
 5 = 5V
 - = NC
-
-Usage
------
-
-- Program an XC9572XL with the code in cpld/
-- Program a Pro Micro with the code in emu_keyboard_mcu/
-- Run listen_pygame.py on your computer (only tested on a MacBook Pro, so YMMV with anything else)
-
-Wiring
-------
-
-- The CPLD needs to be connected to PL11, PL24, and PL7 on the Master 128 motherboard.  PL7 is probably not populated, so you'll have to solder a header in there.  See new_master_bringup/README.md for the pinout, and see cpld/constraints.ucf for how the pins connect to the CPLD.
-- The CPLD needs to be connected to the Pro Micro's SPI port.  Pinout in new_master_bringup/README.md.
-- The Pro Micro should be connected to your computer's USB port before running listen_pygame.py.
-
-Future plans
-------------
-
-- Make a board with an ATSAMD21 USB host, a MachXO CPLD, and a buffer chip, to allow connecting a USB keyboard straight to the Master 128.
-- Maybe make the board compatible with the Beeb and Electron too.
-- Make a whole new keyboard from scratch, with something like this project on board, or with a USB device chip to give it a USB interface, that connects to the ATSAMD21 board.
