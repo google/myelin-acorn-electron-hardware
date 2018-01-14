@@ -42,7 +42,7 @@ fpga = myelin_kicad_pcb.Component(
         Pin("A2",  "", "C1_11"),
         Pin("A3",  "", "C1_9"),
         Pin("A4",  "", "C1_14"),
-        Pin("A5",  "", "C1_19"),
+        Pin("A5",  "", "C1_19"),  # failed on first board?  nc
         Pin("A6",  "", "C1_17"),
         Pin("A7",  "", "C1_23"),
         Pin("A8",  "", "C1_16"),
@@ -52,16 +52,16 @@ fpga = myelin_kicad_pcb.Component(
         Pin("A12", "", "C1_30"),
 #        Pin("N2",  "", "IO11"),
 #        Pin("N3",  "", "IO12"),
-        Pin("N4",  "", "C4_17"),
+        Pin("N4",  "", "C4_17"),  # failed on first board?  nc
         Pin("N5",  "", "C4_19"),
         Pin("N6",  "", "C4_24"),
         Pin("N7",  "", "C4_25"),
         Pin("N8",  "", "C4_22"),
-        Pin("N9",  "", "C4_28"),
+        Pin("N9",  "", "C4_28"),  # failed on first board?  low drive / poor connection?
         Pin("N10", "", "C4_26"),
         Pin("N11", "", "C4_31"),
         Pin("N12", "", "C4_36"),
-        Pin("B1",  "", "C1_2"),
+        Pin("B1",  "", "C1_2"),  # failed on first board?  nc
         Pin("C1",  "", "C1_1"),
         Pin("D1",  "", "C2_1"),
         Pin("E1",  "", "C2_5"),
@@ -78,7 +78,7 @@ fpga = myelin_kicad_pcb.Component(
         Pin("J13", "", "C3_10"),
         Pin("K13", "", "C4_35"),
         Pin("L13", "", "C4_37"),
-        Pin("M13", "", "C4_39"),
+        Pin("M13", "", "C4_39"),  # failed on first board?  nc
 
         # Next ring in -
         Pin("B2",  "", "C1_6"),
@@ -94,7 +94,7 @@ fpga = myelin_kicad_pcb.Component(
         Pin("M4",  "", "C4_14"),
         Pin("M5",  "", "C4_20"),
         Pin("M7",  "", "C4_21"),
-        Pin("M8",  "", "C4_23"),
+        Pin("M8",  "", "C4_23"),  # failed on first board?  nc
         Pin("M9",  "", "C4_33"),
         Pin("M10", "", "C4_27"),
         Pin("M11", "", "C4_30"),
@@ -133,7 +133,7 @@ fpga = myelin_kicad_pcb.Component(
         # Pin("G10", "CLK2n", "CLK2n"),
         # Pin("G9", "CLK2p", "CLK2p"),
         Pin("E13", "CLK3n", "C3_2_CLK3n"),
-        Pin("F13", "CLK3p", "C3_3_CLK3p"),
+        Pin("F13", "CLK3p", "C3_5_CLK3p"),
         Pin("N2", "DPCLK0", "C4_16_DPCLK0"),
         Pin("N3", "DPCLK1", "C4_15_DPCLK1"),
         Pin("F10", "DPCLK2", "DPCLK2"),
@@ -146,13 +146,13 @@ fpga = myelin_kicad_pcb.Component(
         Pin("G2",  "TCK",        "fpga_TCK"),
         Pin("F5",  "TDI",        "fpga_TDI"),
         Pin("F6",  "TDO",        "fpga_TDO"),
-        Pin("B9",  "DEV_CLRn",   "fpga_DEV_CLRn"),
+        Pin("B9",  "DEV_CLRn",   "fpga_DEV_CLRn"),  # measures high on first soldered board
         Pin("D8",  "DEV_OE",     "fpga_DEV_OE"),
         Pin("D7",  "CONFIG_SEL", "GND"),  # unused, so connected to GND
         Pin("E7",  "nCONFIG",    "3V3"),  # can be connected straight to VCCIO
         Pin("D6",  "CRC_ERROR",  "GND"),  # WARNING: disable Error Detection CRC option
-        Pin("C4",  "nSTATUS",    "fpga_nSTATUS"),
-        Pin("C5",  "CONF_DONE",  "fpga_CONF_DONE"),
+        Pin("C4",  "nSTATUS",    "fpga_nSTATUS"),  # measures high on first soldered board
+        Pin("C5",  "CONF_DONE",  "fpga_CONF_DONE"),  # measures high on first soldered board
 
         # Signals used as power/ground to enable vias
         Pin("E4",  "",     "GND"),
@@ -317,7 +317,7 @@ connectors = [
             Pin( 2, "", "C3_2_CLK3n"),
             Pin( 3, "", "C3_3"),
             Pin( 4, "", "C3_4"),
-            Pin( 5, "", "C3_3_CLK3p"),
+            Pin( 5, "", "C3_5_CLK3p"),
             Pin( 6, "", "C3_6"),
             Pin( 7, "", "C3_7"),
             Pin( 8, "", "C3_8"),
