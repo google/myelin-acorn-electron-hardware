@@ -127,7 +127,7 @@ begin
     end process;
 
     c1_1 <= slow_clk;
-    c1_2 <= slow_clk;
+    c1_2 <= 'Z';  -- poor solder connection, tristate so we can patch
     c1_3 <= slow_clk;
     c1_5 <= slow_clk;
     c1_6 <= slow_clk;
@@ -141,7 +141,7 @@ begin
     c1_16 <= slow_clk;
     c1_17 <= slow_clk;
     c1_18 <= slow_clk;
-    c1_19 <= slow_clk;
+    c1_19 <= 'Z';  -- poor solder connection, tristate so we can patch
     c1_20 <= slow_clk;
     c1_22 <= slow_clk;
     c1_23 <= slow_clk;
@@ -191,18 +191,18 @@ begin
     c4_14 <= slow_clk;
     c4_15_DPCLK1 <= slow_clk;
     c4_16_DPCLK0 <= slow_clk;
-    c4_17 <= slow_clk;
+    c4_17 <= 'Z';  -- poor solder connection, tristate so we can patch
     c4_18 <= slow_clk;
     c4_19 <= slow_clk;
     c4_20 <= slow_clk;
     c4_21 <= slow_clk;
     c4_22 <= slow_clk;
-    c4_23 <= slow_clk;
+    c4_23 <= 'Z';  -- poor solder connection, tristate so we can patch
     c4_24 <= slow_clk;
     c4_25 <= slow_clk;
     c4_26 <= slow_clk;
     c4_27 <= slow_clk;
-    c4_28 <= slow_clk;
+    c4_28 <= 'Z';  -- poor solder connection, tristate so we can patch
     c4_30 <= slow_clk;
     c4_31 <= slow_clk;
     c4_32 <= slow_clk;
@@ -212,7 +212,7 @@ begin
     c4_36 <= slow_clk;
     c4_37 <= slow_clk;
     c4_38 <= slow_clk;
-    c4_39 <= slow_clk;
+    c4_39 <= 'Z';  -- poor solder connection, tristate so we can patch
     c4_40 <= slow_clk;
 	
 end rtl;
