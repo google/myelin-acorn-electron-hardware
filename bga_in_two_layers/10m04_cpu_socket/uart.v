@@ -46,14 +46,6 @@ always @(posedge clock) begin
   // decrements shift_count, but that only happens on divider expiry and this happens
   // every clock, so having it out here only slows it down 12 ns!
 
-  // transmit a bit on divider expiry
-  if (divider == 0 && shift_count != 0) begin
-    txd <= shifter[0];
-    // shift right
-    shifter <= {1'b1, shifter[29:1]};
-    shift_count <= shift_count - 5'd1;
-  end
-
   // accept a new byte to send
   if (tx_empty == 1'b1 && transmit == 1'b1) begin
     $display("accept new byte from tx_data");
@@ -65,7 +57,16 @@ always @(posedge clock) begin
 
   // divider divides clock down to the serial bit rate (x 4 for reception?)
   if (divider == divide_count) begin
-    divider <= 0;
+    divider <= 1;
+
+    // transmit a bit on divider expiry
+    if (shift_count != 0) begin
+      txd <= shifter[0];
+      // shift right
+      shifter <= {1'b1, shifter[29:1]};
+      shift_count <= shift_count - 5'd1;
+    end
+
   end else begin
     divider <= divider + 10'd1;
   end
