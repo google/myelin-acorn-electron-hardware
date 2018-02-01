@@ -14,12 +14,18 @@ Notes
 I'm using the free version of Intel's Quartus Prime software, programming in
 VHDL.
 
-To program the design into the chip, I generate an .svf file from the Quartus
-Prime Programmer, then use OpenOCD and my J-Link to download it.  See
-openocd.cfg for a working command set.
+To program the design into the chip, I generate an .svf file from the
+Quartus Prime Programmer, then use OpenOCD and my J-Link or Bus
+Blaster to download it.  See openocd.cfg for a working command set.
 
-The [10m04_blink](10m04_blink/) project just toggles all pins between 0 and 1
-at ~1Hz.
+The 10m04_blink project (not checked in yet) just toggles all pins
+between 0 and 1 at ~1Hz.
+
+The [10m04_cpu_socket](10m04_cpu_socket/) project tries to do
+something useful when attached to a cpu_socket_expansion board.  Join
+the [thread on
+Stardot](http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=13253)
+if you're trying to reproduce this, because it's a bit of a mess.
 
 Status
 ------
@@ -45,6 +51,12 @@ board with IPA, applying solder paste, and reflowing.
 I'm going to try using the first attempt board by setting all the bad pins as
 high-Z, and bridging them over to known-good pins.  This is documented in
 [first_attempt.pdf](first_attempt.pdf).
+
+SECOND ASSEMBLY ATTEMPT -- This worked way better.  The first board
+was super flaky, and I never managed to get all the address pins
+working properly.  The second one appears to behave correctly.  I used
+solder paste and a lower reflow temperature, and fitted a lot of
+decoupling capacitors.
 
 ![PCB front](pcb/pcb-front.png)
 
