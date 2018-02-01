@@ -27,6 +27,8 @@ entity main_to_elk is
     debug_uart_txd : out std_logic;
     debug_a : out std_logic;
     debug_b : out std_logic;
+    ext_uart_rxd : in std_logic;
+    ext_uart_txd : out std_logic;
 
     -- connections to the cpu_socket_expansion board
     ext_A : in std_logic_vector(15 downto 0);
@@ -55,6 +57,8 @@ architecture rtl of main_to_elk is
       debug_uart_txd : out std_logic;
       debug_a : out std_logic;
       debug_b : out std_logic;
+      ext_uart_rxd : in std_logic;
+      ext_uart_txd : out std_logic;
       fast_clock : in std_logic; -- pass through for FPGA's internal flash
       elk_A : in std_logic_vector(15 downto 0);
       elk_D : inout std_logic_vector(7 downto 0);
@@ -79,6 +83,8 @@ begin
     debug_uart_txd => debug_uart_txd,
     debug_a => debug_a,
     debug_b => debug_b,
+    ext_uart_txd => ext_uart_txd,
+    ext_uart_rxd => ext_uart_rxd,
     fast_clock => fast_clock,
     elk_A => ext_A,
     elk_D => ext_D,

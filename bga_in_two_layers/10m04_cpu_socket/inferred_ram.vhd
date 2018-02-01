@@ -12,6 +12,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+-- simple 16k single port block RAM that runs as fast as you like
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -19,9 +21,9 @@ use IEEE.numeric_std.all;
 entity sideways_ram is
   port (
     clock: in std_logic;
-    fast_clock: in std_logic;
     data: in std_logic_vector(7 downto 0);
     address: in std_logic_vector(13 downto 0);
+    -- TODO add a read enable
     we: in std_logic;
     q: out std_logic_vector(7 downto 0)
 );
@@ -32,48 +34,18 @@ architecture rtl of sideways_ram is
   type ramblock is array(0 TO 16383) of std_logic_vector(7 downto 0);
   signal ram: ramblock;
 
-  signal address_sync : integer range 0 to 16383;
-  signal we_sync : std_logic := '0';
-  signal sync_clk : std_logic_vector(2 downto 0) := "000";
-  signal debug_reg : std_logic_vector(7 downto 0) := x"23";
-
 begin
 
-  -- The 6502 expects us to latch data on the falling clock edge, but
-  -- most block ram expects it on the rising edge instead, so we sync
-  -- everything to fast_clock.
-
-  process (fast_clock)
+  process (clock)
   begin
-    if rising_edge(fast_clock) then
-      sync_clk <= sync_clk(1 downto 0) & clock;
+    if rising_edge(clock) then
+      q <= ram(to_integer(unsigned(address)));
 
-      if sync_clk(2) = '0' and sync_clk(1) = '1' then
-        -- rising edge on clock: latch address and provide data
-        address_sync <= to_integer(unsigned(address));
-        we_sync <= we;
-      end if;
-
-      -- update q on every rising fast_clock edge
-      --q <= debug_reg;
-      q <= ram(address_sync);
-
-      -- write on falling clock edge
-      if we_sync = '1' and sync_clk(2) = '1' and sync_clk(1) = '0' then
-        ram(address_sync) <= data;
-        debug_reg <= data;
+      if we = '1' then
+        ram(to_integer(unsigned(address))) <= data;
       end if;
       
     end if;
   end process;
-
-  --process (clock)
-  --begin
-  --  if falling_edge(clock) then
-  --    if we = '1' then
-  --      debug_reg <= data;
-  --    end if;
-  --  end if;
-  --end process;
 
 end rtl;

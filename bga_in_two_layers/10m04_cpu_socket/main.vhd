@@ -94,10 +94,10 @@ entity cpu_socket_fpga is
     c4_25 : inout std_logic;
     c4_26 : inout std_logic;
     c4_27 : inout std_logic;
-    c4_28 : inout std_logic;
+    c4_28 : out std_logic;  -- ext_uart_txd (plug in white cable from Adafruit adapter)
     c4_30 : inout std_logic;
     c4_31 : inout std_logic;  -- ext_A11 on first try board, which has bad c4_39
-    c4_32 : inout std_logic;
+    c4_32 : in std_logic;  -- ext_uart_rxd (plug in green cable from Adafruit adapter)
     c4_33 : in std_logic;  -- ext_A14
     c4_34 : in std_logic;  -- ext_A12
     c4_35 : in std_logic;  -- ext_A10
@@ -116,6 +116,8 @@ architecture rtl of cpu_socket_fpga is
       debug_uart_txd : out std_logic;
       debug_a : out std_logic;
       debug_b : out std_logic;
+      ext_uart_rxd : in std_logic;
+      ext_uart_txd : out std_logic;
       fast_clock : in std_logic; -- pass through for FPGA's internal flash
 
       -- connections to the cpu_socket_expansion board
@@ -156,6 +158,9 @@ begin
     debug_uart_txd => c2_1,
     debug_a => c2_3,
     debug_b => c2_5,
+
+    ext_uart_txd => c4_28,
+    ext_uart_rxd => c4_32,
 
     fast_clock => clk,
     -- fast_clock => clk_div_count(0),
@@ -295,10 +300,10 @@ begin
   c4_25 <= slow_clk;
   c4_26 <= slow_clk;
   c4_27 <= slow_clk;
-  c4_28 <= 'Z';  -- poor solder connection, tristate so we can patch
+  -- c4_28 <= 'Z';  -- poor solder connection, tristate so we can patch
   c4_30 <= slow_clk;
   c4_31 <= 'Z';  -- patched over c4_39 on first try board; leaving Z in case i program the old board by mistake
-  c4_32 <= slow_clk;
+  -- c4_32 <= slow_clk;
   -- c4_33 <= slow_clk;
   -- c4_34 <= slow_clk;
   -- c4_35 <= slow_clk;

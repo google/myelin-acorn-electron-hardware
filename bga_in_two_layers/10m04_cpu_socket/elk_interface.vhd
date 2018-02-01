@@ -32,6 +32,8 @@ entity elk_interface is
     debug_uart_txd : out std_logic;
     debug_a : out std_logic;
     debug_b : out std_logic;
+    ext_uart_rxd : in std_logic;
+    ext_uart_txd : out std_logic;
 
     fast_clock : in std_logic; -- pass through for FPGA's internal flash
     elk_A : in std_logic_vector(15 downto 0);
@@ -75,6 +77,14 @@ architecture rtl of elk_interface is
   signal accessing_sideways_ram : std_logic;
   signal sideways_ram_D : std_logic_vector(7 downto 0);
 
+  -- synchronous sideways ram signals
+  signal sideways_ram_data : std_logic_vector(7 downto 0) := (others => '0');
+  signal sideways_ram_address : std_logic_vector(13 downto 0) := (others => '0');
+  signal sideways_ram_rd : std_logic := '0';
+  signal sideways_ram_rd2 : std_logic := '0';
+  signal sideways_ram_we : std_logic := '0';
+  signal sideways_ram_q : std_logic_vector(7 downto 0);
+
   component uart is
     generic (
       divide_count : integer
@@ -88,10 +98,36 @@ architecture rtl of elk_interface is
     );
   end component;
 
+  component uart_rx is
+    generic (
+      divide_count : integer
+    );
+    port (
+      clock : in std_logic;  -- main clock
+      rxd : in std_logic := '1';
+      rx_data : out std_logic_vector(7 downto 0);
+      rx_full : out std_logic; -- '1' when rx_data is valid
+      ack : in std_logic -- pulse '1' when rx_data has been read
+    );
+  end component;
+
+  -- 2MHz debug uart
   signal uart_txd : std_logic;
   signal uart_tx_data : std_logic_vector(23 downto 0);
   signal uart_tx_empty : std_logic;
   signal uart_transmit : std_logic;
+
+  -- byte received from external uart to fill sideways ram
+  signal uart_rx_data : std_logic_vector(7 downto 0);
+  signal uart_rx_full : std_logic;
+  signal uart_rx_ack : std_logic := '1';
+  -- when loading ram via the uart, keep track of the address
+  signal uart_rx_address : unsigned(13 downto 0) := (others => '1');
+
+  -- 115k2 debug uart
+  signal ext_uart_tx_data : std_logic_vector(23 downto 0) := x"644266";
+  signal ext_uart_tx_empty : std_logic;
+  signal ext_uart_tx_transmit : std_logic := '0';
 
   signal sync_PHI0 : std_logic_vector(2 downto 0) := "000";
   type three_word_array is array(2 downto 0) of std_logic_vector(15 downto 0);
@@ -134,7 +170,6 @@ architecture rtl of elk_interface is
   -- this resets when we start a new transfer.
   signal n_words_sent_to_uart : unsigned(31 downto 0) := x"00000000";
 
-
 begin
 
   -- global settings
@@ -161,10 +196,12 @@ begin
   --DEBUG: put it in &FDxx instead
   --reading_rom_zero <= '1' when elk_A(15 downto 8) = x"FD" else '0';
 
-  -- sideways ram in bank 7
+  -- sideways ram in bank 7 (or bank 0, depending)
   --accessing_sideways_ram <= '1' when SIDEWAYS = '1' and bank = x"7" else '0';
-  --DEBUG: put it in &FDxx instead
-  accessing_sideways_ram <= '1' when elk_A(15 downto 8) = x"FD" else '0';
+  --DEBUG: put it in &FDxx as well
+  accessing_sideways_ram <= '1' when
+    (SIDEWAYS = '1' and bank = x"7") or (elk_A(15 downto 8) = x"FD")
+    else '0';
 
   -- debug register
   DEBUG <= '1' when sampled_A(15 downto 4) = x"FCF" else '0';
@@ -200,6 +237,7 @@ begin
     sideways_ram_D when accessing_sideways_ram = '1' else
     -- reading debug register
     debug_reg when DEBUG = '1' and elk_A(3 downto 0) = x"0" else
+    "0000" & bank when DEBUG = '1' and elk_A(3 downto 0) = x"1" else
     elk_A(3 downto 0) & elk_A(3 downto 0) when DEBUG = '1' else
     -- -- reading SPI status
     -- MS_SD_MISO & "0000000" when EPP_STATUS = '1' else
@@ -244,21 +282,14 @@ begin
     en => '1',
     data_out => rom_zero_D
   );
-  -- rom_rom_zero0: entity work.RomZero port map (
-  --   CLK => elk_PHI0,
-  --   A => elk_A(13 downto 0),
-  --   D => rom_zero_D
-  -- );
 
-  -- sideways ram
+  -- 16k synchronous block ram
   ram0: entity work.sideways_ram port map (
-    clock => elk_PHI0,
-    fast_clock => fast_clock,
-    data => elk_D, --sync_D(2),
-    address => debug_reg(5 downto 0) & elk_A(7 downto 0), -- debug: use FD00 for ram
-    --address => elk_A(13 downto 0), -- normal operation
-    we => accessing_sideways_ram and not elk_RnW,
-    q => sideways_ram_D
+    clock => fast_clock,
+    data => sideways_ram_data,
+    address => sideways_ram_address,
+    we => sideways_ram_we,
+    q => sideways_ram_q
   );
 
   -- debug uart
@@ -276,6 +307,30 @@ begin
       transmit => uart_transmit
     );
   debug_uart_txd <= uart_txd;
+
+  ext_uart_rx0: component uart_rx
+    generic map (
+      divide_count => 178 -- 115200 bps or so
+    )
+    port map (
+      clock => fast_clock,
+      rxd => ext_uart_rxd,
+      rx_data => uart_rx_data,
+      rx_full => uart_rx_full,
+      ack => uart_rx_ack
+    );
+
+  ext_uart_tx0: component uart
+    generic map (
+      divide_count => 712 -- 115200 bps or so
+    )
+    port map (
+      clock => fast_clock,
+      txd => ext_uart_txd,
+      tx_data => ext_uart_tx_data,
+      tx_empty => ext_uart_tx_empty,
+      transmit => ext_uart_tx_transmit
+    );
 
   uart_fifo_inst : uart_fifo PORT MAP (
     clock  => fast_clock,
@@ -301,15 +356,9 @@ begin
   --debug_b <= '1' when sampled_A(15 downto 8) = x"FE" else '0';
   debug_b <= '1' when elk_A(15 downto 4) = x"FCF" else '0';
 
-  -- fifo-filling and uart-feeding process
   process (fast_clock)
   begin
     if rising_edge(fast_clock) then
-      -- default: don't send a byte to the uart
-      uart_transmit <= '0';
-      -- default: don't read or write fifo
-      uart_fifo_read_req <= '0';
-      uart_fifo_write_req <= '0';
 
       -- detect PHI0 rising and falling edge and capture data bus in time
       sync_PHI0 <= sync_PHI0(1 downto 0) & elk_PHI0;
@@ -324,6 +373,73 @@ begin
       if sync_PHI0(2) = '0' and sync_PHI0(1) = '1' then
         sampled_A <= elk_A;
       end if;
+
+      ---------------------------------------------------
+      -- sideways ram, incl reading data from ext_uart --
+      ---------------------------------------------------
+
+      sideways_ram_rd <= '0';
+      sideways_ram_rd2 <= '0';
+      sideways_ram_we <= '0';
+      uart_rx_ack <= '0';
+      ext_uart_tx_transmit <= '0';
+
+      -- latch byte from read started in previous clock cycle
+      if sideways_ram_rd = '1' then
+        sideways_ram_rd2 <= '1';
+      end if;
+      if sideways_ram_rd2 = '1' then
+        sideways_ram_D <= sideways_ram_q;
+      end if;
+
+      -- rising PHI0
+      if sync_PHI0(2) = '0' and sync_PHI0(1) = '1' then
+
+        -- trigger read
+        if accessing_sideways_ram = '1' then
+          sideways_ram_address <= elk_A(13 downto 0);
+          sideways_ram_rd <= '1';
+        end if;
+
+      -- falling PHI0
+      elsif sync_PHI0(2) = '1' and sync_PHI0(1) = '0' then
+
+        -- trigger write
+        if accessing_sideways_ram = '1' and elk_RnW = '0' then
+          sideways_ram_address <= sampled_A(13 downto 0);
+          sideways_ram_we <= '1';
+          sideways_ram_data <= elk_D;
+        end if;
+
+        -- reset RAM load address on writes to &FC90
+        if elk_RnW = '0' and elk_A = x"FC90" then
+          uart_rx_address <= (others => '0');
+        end if;
+
+      -- not on a clock edge: poll uart_rx_full
+      elsif uart_rx_full = '1' and uart_rx_ack = '0' then
+
+        -- write a byte from the uart into sideways ram
+        sideways_ram_address <= std_logic_vector(uart_rx_address);
+        uart_rx_address <= uart_rx_address + 1;
+        sideways_ram_we <= '1';
+        sideways_ram_data <= uart_rx_data;
+        uart_rx_ack <= '1';
+
+        -- send something out the debug uart too
+        ext_uart_tx_data <= "00" & std_logic_vector(uart_rx_address) & uart_rx_data;
+        ext_uart_tx_transmit <= '1';
+      end if;
+
+      -----------------------------------
+      -- fifo-filling and uart-feeding --
+      -----------------------------------
+
+      -- default: don't send a byte to the uart
+      uart_transmit <= '0';
+      -- default: don't read or write fifo
+      uart_fifo_read_req <= '0';
+      uart_fifo_write_req <= '0';
 
       -- Capture data bus on falling PHI0 edge
       if sync_PHI0(2) = '1' and sync_PHI0(1) = '0' then
