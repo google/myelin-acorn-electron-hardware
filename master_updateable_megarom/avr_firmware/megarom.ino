@@ -72,6 +72,9 @@ uint32_t range_start = 0L, range_end = 0L; // range left to program
 int range_chunk_size = 0; // how many bytes to expect in the buffer
 
 void reset() {
+  // reset SPI
+  digitalWrite(SPI_SS_PIN, HIGH);
+  SPI.transfer(0);  // synchronous reset
   // reset state machine
   state = READING_COMMAND;
   // reset read buffer

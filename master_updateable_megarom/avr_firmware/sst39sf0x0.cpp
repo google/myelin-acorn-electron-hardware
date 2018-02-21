@@ -43,6 +43,12 @@ static inline uint8_t spi_transfer(uint8_t b) {
   return b;
 }
 
+static void spi_reset() {
+  // synchronous reset -- clock SCK while SS is high
+  spi_deselect();
+  SPI.transfer(0);
+}
+
 // write a single byte and leave the chip locked for more SPI access
 static void write_byte(uint32_t address, uint8_t data) {
   // 19 address bits, rnw bit, 8 data bits, 4 zeros
@@ -168,6 +174,7 @@ void wait_toggle(uint32_t address) {
 // returns 0 on failure, or the chip ID: B5/B6/B7 for SST39SF010A/020A/040
 // (actually whatever reads back from address 1 if address 0 == 0xbf)
 uint8_t identify_chip() {
+  reset_spi();
   Serial.print("test: *0 = ");
   Serial.println(read_byte(0), HEX);
   Serial.print("test: *1 = ");
@@ -204,6 +211,7 @@ uint32_t chip_size() {
 
 // wipe the entire chip
 void erase_entire_chip() {
+  reset_spi();
   write_byte((uint32_t)0x5555L, 0xAA);
   write_byte((uint32_t)0x2AAAL, 0x55);
   write_byte((uint32_t)0x5555L, 0x80);
@@ -215,6 +223,7 @@ void erase_entire_chip() {
 
 // wipe a single sector of SECTOR_SIZE bytes
 void erase_sector(uint32_t address) {
+  reset_spi();
   write_byte((uint32_t)0x5555L, 0xAA);
   write_byte((uint32_t)0x2AAAL, 0x55);
   write_byte((uint32_t)0x5555L, 0x80);
@@ -235,6 +244,7 @@ void program_byte(uint32_t address, uint8_t data) {
 
 // check that the range from start_addr to end_addr-1 is blank
 bool is_range_blank(uint32_t start_addr, uint32_t end_addr) {
+  reset_spi();
   for (uint32_t addr = start_addr; addr < end_addr; ++addr) {
     if (read_byte_and_unlock(addr) != 0xff) {
       return false;

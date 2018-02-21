@@ -71,7 +71,7 @@ assign flash_nWE = !(!allowing_bbc_access && writing_memory);
 // drive D when writing
 assign D = (allowing_bbc_access == 1'b0 && (driving_bus == 1'b1 && rnw == 1'b0)) ? spi_D : 8'bZZZZZZZZ;
 
-always @(posedge cpld_SCK or posedge cpld_SS) begin
+always @(posedge cpld_SCK) begin
 
   if (cpld_SS == 1'b1) begin
     accessing_memory <= 1'b0;
@@ -145,10 +145,8 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
   end
 end
 
-always @(negedge cpld_SCK or posedge cpld_SS) begin
-  if (cpld_SS == 1'b1) begin
-    cpld_MISO <= 1'b0;
-  end else if (spi_bit_count < 19) begin
+always @(negedge cpld_SCK) begin
+  if (spi_bit_count < 19) begin
     cpld_MISO <= spi_bit_count[0];  // should toggle and result in data & ffffe00 == 55554000
   end else begin
     cpld_MISO <= spi_D[7];
