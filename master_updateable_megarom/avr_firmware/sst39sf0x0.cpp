@@ -48,9 +48,24 @@ static void write_byte(uint32_t address, uint8_t data) {
   // 19 address bits, rnw bit, 8 data bits, 4 zeros
   // A18:11, A10:3, {A2:0, rnw, D7:4}, {D3:0, 0000}
   spi_select();
-  spi_transfer((uint8_t)(address >> 11));
-  spi_transfer((uint8_t)(address >> 3));
-  spi_transfer((uint8_t)(address << 5) | (data >> 4));
+  uint8_t i = spi_transfer((uint8_t)(address >> 11));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 0 == 55 but got ");
+    Serial.println(i, HEX);
+    return;
+  }
+  i = spi_transfer((uint8_t)(address >> 3));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 1 == 55 but got ");
+    Serial.println(i, HEX);
+    return;
+  }
+  i = spi_transfer((uint8_t)(address << 5) | (data >> 4));
+  if ((i & 0xe0) != 0x40) {
+    Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
+    Serial.println(i, HEX);
+    return;
+  }
   spi_transfer(data << 4);
   spi_deselect();
 #ifdef VERBOSE_FLASH_DEBUG
@@ -66,9 +81,24 @@ uint8_t read_byte(uint32_t address) {
   // 19 address bits, rnw bit, 8 data bits, 4 zeros
   // A18:11, A10:3, A2:0, rnw, D7:4, D3:0, 0000
   spi_select();
-  spi_transfer((uint8_t)(address >> 11));
-  spi_transfer((uint8_t)(address >> 3));
-  spi_transfer((uint8_t)(address << 5) | 0x10);
+  uint8_t i = spi_transfer((uint8_t)(address >> 11));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 0 == 55 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
+  i = spi_transfer((uint8_t)(address >> 3));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 1 == 55 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
+  i = spi_transfer((uint8_t)(address << 5) | 0x10);
+  if ((i & 0xe0) != 0x40) {
+    Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
   uint8_t r = spi_transfer(0);
   spi_deselect();
 #ifdef VERBOSE_FLASH_DEBUG
@@ -85,9 +115,24 @@ uint8_t read_byte_and_unlock(uint32_t address) {
   // 19 address bits, rnw bit, 8 data bits, 0001
   // A18:11, A10:3, A2:0, rnw, D7:4, D3:0, 0001
   spi_select();
-  spi_transfer((uint8_t)(address >> 11));
-  spi_transfer((uint8_t)(address >> 3));
-  spi_transfer((uint8_t)(address << 5) | (uint8_t)0x10);
+  uint8_t i = spi_transfer((uint8_t)(address >> 11));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 0 == 55 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
+  i = spi_transfer((uint8_t)(address >> 3));
+  if (i != 0x55) {
+    Serial.print("SPI error; expected byte 1 == 55 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
+  i = spi_transfer((uint8_t)(address << 5) | (uint8_t)0x10);
+  if ((i & 0xe0) != 0x40) {
+    Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
+    Serial.println(i, HEX);
+    return 0;
+  }
   uint8_t r = spi_transfer((uint8_t)0x01);
   spi_deselect();
 #ifdef VERBOSE_FLASH_DEBUG
@@ -114,6 +159,14 @@ void wait_toggle(uint32_t address) {
 // returns 0 on failure, or the chip ID: B5/B6/B7 for SST39SF010A/020A/040
 // (actually whatever reads back from address 1 if address 0 == 0xbf)
 uint8_t identify_chip() {
+  Serial.print("test: *0 = ");
+  Serial.println(read_byte(0), HEX);
+  Serial.print("test: *1 = ");
+  Serial.println(read_byte(1), HEX);
+  Serial.print("test: *2 = ");
+  Serial.println(read_byte(2), HEX);
+  Serial.print("test: *3 = ");
+  Serial.println(read_byte(3), HEX);
   write_byte((uint32_t)0x5555L, 0xAA);
   write_byte((uint32_t)0x2AAAL, 0x55);
   write_byte((uint32_t)0x5555L, 0x90);

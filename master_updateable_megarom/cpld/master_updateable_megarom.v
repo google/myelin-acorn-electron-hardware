@@ -40,8 +40,9 @@ reg allowing_bbc_access_int = 1'b1;
 wire allowing_bbc_access;
 
 // 1 to drive flash_nOE or flash_nWR
-reg reading_memory = 1'b0;
-reg writing_memory = 1'b0;
+reg accessing_memory = 1'b0;
+wire reading_memory;
+wire writing_memory;
 
 // 1 for read (drive flash_nOE), 0 for write (drive flash_nWR)
 reg rnw = 1'b0;
@@ -49,30 +50,31 @@ reg rnw = 1'b0;
 // 1 to pass spi_D through to D
 reg driving_bus = 1'b0;
 
-// counts up to 50; need 6 bits
-reg [5:0] spi_bit_count = 6'b000000;
+// counts up to 31
+reg [4:0] spi_bit_count = 5'b0;
 
 
-
-// disallow bbc access during SPI transactions, and when we've set the sticky
-// bit.
 assign allowing_bbc_access = allowing_bbc_access_int && cpld_SS;
 
 // We're either passing bbc_A through to flash_A, with D tristated, or we're
 // controlling both and ignoring bbc_A.
 assign flash_A = (allowing_bbc_access == 1'b1) ? {flash_bank, bbc_A} : spi_A;
+
 // assert OE
+assign reading_memory = accessing_memory && rnw;
 assign flash_nOE = !(allowing_bbc_access || reading_memory);
+
 // assert WE and D when the BBC is disabled and we're doing a memory write
+assign writing_memory = accessing_memory && !rnw;
 assign flash_nWE = !(!allowing_bbc_access && writing_memory);
+
 // drive D when writing
 assign D = (allowing_bbc_access == 1'b0 && (driving_bus == 1'b1 && rnw == 1'b0)) ? spi_D : 8'bZZZZZZZZ;
 
 always @(posedge cpld_SCK or posedge cpld_SS) begin
 
   if (cpld_SS == 1'b1) begin
-    reading_memory <= 1'b0;
-    writing_memory <= 1'b0;
+    accessing_memory <= 1'b0;
     driving_bus <= 1'b0;
     spi_bit_count <= 6'b000000;
   end else begin
@@ -81,7 +83,7 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
     // SPI is big-endian; send the MSB first and clock into the LSB.
 
     // to block out the BBC and enable flash access: send ffffff00. to reenable
-    // the BBC, send 32 bits of ones.  the final bit sets 'allowing_bbc_access'.
+    // the BBC, send 32 bits of ones.  the final bit sets 'allowing_bbc_access_int'.
 
     // message format for a WRITE that blocks the BBC after: 19 address bits,
     // rnw, 8 data bits, 4 zeros, with the write happening during the six zeros.
@@ -105,10 +107,10 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
       // 0-18 address, 19 rnw, 20-23 access, 24-31 data out
       if (spi_bit_count == 20) begin
         // start read
-        reading_memory <= 1'b1;
+        accessing_memory <= 1'b1;
       end else if (spi_bit_count == 23) begin
         // end read
-        reading_memory <= 1'b0;
+        accessing_memory <= 1'b0;
         spi_D <= D;
       end else if (spi_bit_count >= 24) begin
         spi_D <= {spi_D[6:0], 1'b0};
@@ -117,21 +119,17 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
       // 0-18 address, 19 rnw, 20-27 data in, 28-31 access
       if (spi_bit_count < 28) begin
         spi_D <= {spi_D[6:0], cpld_MOSI};
-      end
-      if (spi_bit_count == 27) begin
         driving_bus <= 1'b1;
       end
       if (spi_bit_count == 28) begin
-        writing_memory <= 1'b1;
+        accessing_memory <= 1'b1;
       end
       if (spi_bit_count == 30) begin
-        writing_memory <= 1'b0;
-      end
-      if (spi_bit_count == 31) begin
-        driving_bus <= 1'b0;
+        accessing_memory <= 1'b0;
       end
     end
     if (spi_bit_count == 31) begin
+      driving_bus <= 1'b0;
       allowing_bbc_access_int <= cpld_MOSI;
     end
     spi_bit_count <= spi_bit_count + 1;
@@ -142,7 +140,7 @@ always @(negedge cpld_SCK or posedge cpld_SS) begin
   if (cpld_SS == 1'b1) begin
     cpld_MISO <= 1'b0;
   end else if (spi_bit_count < 19) begin
-    cpld_MISO <= spi_A[18]; // clock out last address
+    cpld_MISO <= spi_bit_count[0];  // should toggle and result in data & ffffe00 == 55554000
   end else begin
     cpld_MISO <= spi_D[7];
   end

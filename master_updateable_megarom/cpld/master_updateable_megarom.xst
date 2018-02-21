@@ -7,7 +7,7 @@ run
 -ofmt NGC
 -p xc9500xl
 -top master_updateable_megarom
--opt_mode Area
+-opt_mode Speed
 -opt_level 1
 -iuc NO
 -keep_hierarchy Yes
