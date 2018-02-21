@@ -22,7 +22,7 @@ entity master_updateable_megarom is
         bbc_A : in std_logic_vector(16 downto 0);
         bbc_nCS : in std_logic;
         flash_A : out std_logic_vector(18 downto 0);
-        flash_nCE : out std_logic;
+        --flash_nCE : out std_logic;
         flash_nOE : out std_logic;
         flash_nWE : out std_logic;
         cpld_SCK : in std_logic;
@@ -50,7 +50,7 @@ architecture Behavioural of master_updateable_megarom is
     -- flag to say if we're clocking through D/A/RnW or not (so we don't mess with them during the flash access period)
     signal clocking_spi_data : std_logic := '0';
     -- counts up to 50; need 6 bits
-    signal spi_bit_count : std_logic_vector(5 downto 0) := "000000";
+    signal spi_bit_count : unsigned(5 downto 0) := "000000";
 
 begin
 
@@ -61,10 +61,12 @@ begin
     -- assert OE
     flash_nOE <= '0' when (allowing_bbc_access = '1'
                            or (accessing_memory = '1' and rnw = '1')) else '1';
+    -- leave flash enabled all the time (TODO maybe just enable when /OE or /WE is active)
     flash_nCE <= '0';
     -- assert WE and D when the BBC is disabled and we're doing a memory write
     flash_nWE <= '0' when (allowing_bbc_access = '0'
                            and (accessing_memory = '1' and rnw = '0')) else '1';
+    -- drive D when writing
     D <= Dout when (allowing_bbc_access = '0'
                     and (accessing_memory = '1' and rnw = '0')) else "ZZZZZZZZ";
 
@@ -107,19 +109,22 @@ begin
             end if;
 
             -- stop clocking after the 26th bit, i.e. when count=25, and start again after bit 32
-            if unsigned(spi_bit_count) = 25 then
+            if spi_bit_count = 25 then
                 clocking_spi_data <= '0';
                 accessing_memory <= '1';
             end if;
-            if unsigned(spi_bit_count) = 32 then
+            if spi_bit_count = 32 then
                 allowing_bbc_access <= cpld_MOSI;
                 accessing_memory <= '0';
                 clocking_spi_data <= '1';
             end if;
 
-            spi_bit_count <= std_logic_vector(unsigned(spi_bit_count) + 1);
+            spi_bit_count <= spi_bit_count + 1;
         end if;
+    end process;
 
+    process (cpld_SS, cpld_SCK)
+    begin
         if cpld_SS = '1' then
         elsif falling_edge(cpld_SCK) then
             if clocking_spi_data = '1' then
@@ -132,6 +137,3 @@ begin
     end process;
 
 end Behavioural;
-
-
--- count=0 SCK HIGH

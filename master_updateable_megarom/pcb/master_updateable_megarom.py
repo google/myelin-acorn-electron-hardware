@@ -23,6 +23,11 @@
 # A board that replaces the 128KB ROM in the BBC with a flash chip and some
 # buffers, to allow it to be updated without removing it from the machine.
 
+# This won't work if you plug it into a normal ROM socket, but you can fix that
+# by soldering a wire between pin 20 (/CE) of the ROM socket and one of the
+# jumper pins (pin 2 or 3 of JP).  This will need the CPLD to be configured
+# differently, of course.
+
 # Size constraints
 # ----------------
 

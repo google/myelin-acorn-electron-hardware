@@ -15,7 +15,7 @@
 all:
 	xst -intstyle ise -ifn $$(pwd)/${MODULE}.xst -ofn $$(pwd)/${MODULE}.syr
 	ngdbuild -intstyle ise -dd _ngo -uc constraints.ucf -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
-	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize speed -htmlrpt -loc on -slew fast -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
+	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize density -htmlrpt -loc on -slew fast -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
 	XSLTProcess ${MODULE}_build.xml
 	tsim -intstyle ise ${MODULE} ${MODULE}.nga
 	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
