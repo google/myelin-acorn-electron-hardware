@@ -52,18 +52,21 @@ static void write_byte(uint32_t address, uint8_t data) {
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 0 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return;
   }
   i = spi_transfer((uint8_t)(address >> 3));
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 1 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return;
   }
   i = spi_transfer((uint8_t)(address << 5) | (data >> 4));
   if ((i & 0xe0) != 0x40) {
     Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return;
   }
   spi_transfer(data << 4);
@@ -85,18 +88,21 @@ uint8_t read_byte(uint32_t address) {
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 0 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   i = spi_transfer((uint8_t)(address >> 3));
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 1 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   i = spi_transfer((uint8_t)(address << 5) | 0x10);
   if ((i & 0xe0) != 0x40) {
     Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   uint8_t r = spi_transfer(0);
@@ -119,18 +125,21 @@ uint8_t read_byte_and_unlock(uint32_t address) {
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 0 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   i = spi_transfer((uint8_t)(address >> 3));
   if (i != 0x55) {
     Serial.print("SPI error; expected byte 1 == 55 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   i = spi_transfer((uint8_t)(address << 5) | (uint8_t)0x10);
   if ((i & 0xe0) != 0x40) {
     Serial.print("SPI error; expected byte 2 & e0 == 40 but got ");
     Serial.println(i, HEX);
+    spi_deselect();
     return 0;
   }
   uint8_t r = spi_transfer((uint8_t)0x01);

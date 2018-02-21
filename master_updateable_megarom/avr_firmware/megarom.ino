@@ -241,6 +241,7 @@ void loop() {
           chip_end = chip_size();
           Serial.print("Size = ");
           Serial.println(chip_end);
+          read_byte_and_unlock(0);
           reset();
           break;
         }
@@ -250,6 +251,7 @@ void loop() {
           Serial.print("Program whole chip.  Size = ");
           Serial.println(chip_end);
           program_range(0, chip_end);
+          read_byte_and_unlock(0);
           reset();
           break;
         }
@@ -267,6 +269,7 @@ void loop() {
             // read a byte from flash and send it to the remote host
             Serial.write(read_byte_and_unlock(addr));
           }
+          read_byte_and_unlock(0);
           reset();
           break;
         }
@@ -296,11 +299,13 @@ void loop() {
           Serial.print(" to ");
           Serial.println(start_addr + range, HEX);
           program_range(start_addr, start_addr + range);
+          read_byte_and_unlock(0);
           reset();
           break;
         }
 
         Serial.println("ERR Unknown command");
+        read_byte_and_unlock(0);
         reset();
         break;
       } // READING_COMMAND
