@@ -54,7 +54,7 @@ reg driving_bus = 1'b0;
 reg [4:0] spi_bit_count = 5'b0;
 
 
-assign allowing_bbc_access = allowing_bbc_access_int && cpld_SS;
+assign allowing_bbc_access = allowing_bbc_access_int;
 
 // We're either passing bbc_A through to flash_A, with D tristated, or we're
 // controlling both and ignoring bbc_A.
@@ -103,6 +103,15 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
       spi_A <= {spi_A[17:0], cpld_MOSI};
     end else if (spi_bit_count == 19) begin
       rnw <= cpld_MOSI;
+
+      // Disable BBC access if it's enabled.  We do this here rather than just
+      // masking it with cpld_SS, so the board will run in ROM mode when the
+      // microcontroller is disconnected.  If we got 19 clocks on cpld_SCK
+      // with cpld_SS=0, it's pretty safe to say that a microcontroller is
+      // indeed connected and active.
+
+      allowing_bbc_access_int <= 1'b0;
+
     end else if (rnw == 1'b1) begin
       // 0-18 address, 19 rnw, 20-23 access, 24-31 data out
       if (spi_bit_count == 20) begin
