@@ -68,7 +68,8 @@ Pin = myelin_kicad_pcb.Pin
 cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_vqg64",
     identifier="CPLD",
-    value="XC957XL-64VQG",
+    value="XC9572XL-64VQG",
+    desc="Xilinx XC9572XL in 64-pin 0.5mm TQFP package.  Any speed or temperature grade is OK.",
     buses=["bbc_A", "flash_A", "D", "cpld_JP"],
     pins=[
         # 52 user pins
@@ -164,6 +165,7 @@ cpld_jtag = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
     identifier="JTAG1",
     value="jtag",
+    desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
     pins=[
         Pin(1, "TCK", ["cpld_TCK"]), # top left
         Pin(2, "GND", ["GND"]), # top right
@@ -182,6 +184,7 @@ cpld_spi = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm",
     identifier="SPI",
     value="spi",
+    desc="1x3 0.1 inch male header",
     pins=[
         Pin(1, "GND", ["GND"]),
         Pin(2, "SCK", ["cpld_SCK"]),
@@ -196,6 +199,7 @@ cpld_jumpers = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm",
     identifier="JP",
     value="jumpers",
+    desc="1x4 0.1 inch male header",
     pins=[
         Pin(1, "GND", ["GND"]),
         Pin(2, "JP0", ["cpld_JP0"]),
@@ -210,6 +214,7 @@ regulator = myelin_kicad_pcb.Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
     identifier="REG",
     value="MCP1700T-3302E/MB",
+    desc="3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.",
     pins=[
         Pin(2, "VIN", ["5V"]),
         Pin(3, "VOUT", ["3V3"]),
@@ -224,6 +229,7 @@ ext_power = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm",
     identifier="EXTPWR",
     value="ext pwr",
+    desc="1x3 0.1 inch male header",
     pins=[
         Pin(1, "A", ["GND"]),
         Pin(2, "B", ["3V3"]),
@@ -234,7 +240,8 @@ ext_power = myelin_kicad_pcb.Component(
 flash = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:sst_plcc32_nh",
     identifier="MEM",
-    value="SST39SF010A",
+    value="SST39SF010A/020A/040",
+    desc="128kB/256kB/512kB flash chip in SST 'NH' PLCC-32 package: SST39SF040-XX-XX-NHE, SST39SF020A-XX-XX-NHE, or SST39SF010A-XX-XX-NHE",
     pins=[
         Pin(1, "A18",  ["flash_A18"]),
         Pin(2, "A16",  ["flash_A16"]),
@@ -277,6 +284,7 @@ connector = myelin_kicad_pcb.Component(
     footprint="Housings_DIP:DIP-28_W15.24mm",
     identifier="ROM",
     value="MOS ROM",
+    desc="Adapter to emulate a 600mil 28-pin DIP, e.g. Digikey 1175-1525-5-ND",
     pins=[
         Pin( "1", "A15", ["bbc_A15"]),
         Pin( "2", "A12", ["bbc_A12"]),
@@ -320,6 +328,8 @@ staples = [
 ]
 
 myelin_kicad_pcb.dump_netlist("master_updateable_megarom.net")
+myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
+                          "readable_bill_of_materials.txt")
 
 
 # Keeping these around just in case I do decide to switch over to using a
