@@ -1,5 +1,5 @@
-Upgradeable BBC Master MegaROM
-==============================
+Updateable BBC Master MegaROM
+=============================
 
 http://myelin.nz/acorn/megarom
 
@@ -61,6 +61,68 @@ like this:
     P%=&1000
     [SEI:.A JMP A
     CALL &1000
+
+Building a ROM image
+--------------------
+
+For more info on the MOS ROM layout, see [J.G.Harston's "Replacing the Master
+System ROM"](http://mdfs.net/Info/Comp/BBC/SROMs/MegaROM.htm).  The MOS itself
+occupies the first 16kB of the chip, but also various other spots, depending on
+the version, so building an image that will function correctly is a little
+tricky.
+
+[build_rom.py](tools/build_rom.py) will combine a bunch of individual ROM images
+and fragments into a single 128kB image.  You'll either need a 3.20 or 3.50 ROM
+image (distributed with various emulators -- b-em, jsbeeb, etc) or J.G.Harston's
+MOS321.rom, from the link above), and all the ROM images you want to patch into
+the image.  Patch ROMs can be any size, so if you just want to replace a few
+bytes in the middle of another image, that's OK.
+
+Practically, with MOS 3.20, you can replace DFS, ADFS, ViewSheet, EDIT, and
+BASIC with any 16kB ROM image, and VIEW with any image up to 14848 bytes. JGH's
+MOS321.rom replaces EDIT with ANFS, ViewSheet with HADFS, and adds mouse, Y2K,
+and IDE compatibility.
+
+For MOS 3.50, ADFS and DFS share code so they come as a pair, and MOS code
+occupies space in both images, as well as the Terminal/Tube image (as in 3.20).
+This means you can replace ViewSheet, EDIT, BASIC, and VIEW with any 16kB ROM
+image, and if you don't want floppy disk compatibility, you can replace DFS with
+a ROM up to 12032 bytes long, and ADFS with a ROM up to 16720 bytes long.
+
+Some more links:
+
+- [BBC Master and Y2K](http://www.adsb.co.uk/bbc/bbc_master.html): Y2K patches
+  for 3.20 and 3.50.
+
+- A [thread on Stardot discussing mixing and matching these and the 3.20/3.50
+  versions](http://stardot.org.uk/forums/viewtopic.php?t=8115).  It sounds like
+  Mark Haysman of [RetroClinic](https://www.facebook.com/RetroClinic/) has made
+  ROM images with all these patches, although you may need to buy a
+  [MultiOS](https://www.facebook.com/RetroClinic/posts/567921580048712) to get a
+  copy.
+
+- The [Raf Giaccio Collection](http://8bs.com/submit/subry2kfix.htm) looks
+  worth trying out also.
+
+Similar projects
+----------------
+
+I don't believe anyone else has made an in-system-updateable MOS ROM
+replacement, but these projects allow you to program a flash/EEPROM chip with
+multiple images and select between them with a physical switch:
+
+- RetroClinic
+  [DualOS](http://chrisacorns.computinghistory.org.uk/New4Old/RetroClinic_DualOS.html)
+  and [MultiOS](https://www.facebook.com/RetroClinic/posts/567921580048712).
+
+- [Sundby/System DIY BBC Master quad OS ROM
+  switch](http://www.sundby.com/index.php/diy-bbc-master-quad-os-rom-switch/).
+
+- [IFEL/ctorwy31 Switchable Master 128 MOS OS ROM
+  3.20/3.50](http://chrisacorns.computinghistory.org.uk/New4Old/ctorwy31_MasterOS.html).
+
+Pictures
+--------
 
 ![PCB front](pcb/pcb-front.png)
 
