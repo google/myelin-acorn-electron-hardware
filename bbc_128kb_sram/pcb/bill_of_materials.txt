@@ -1,0 +1,11 @@
+Identifier	Value	Description	KiCad package
+C1	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+C2	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+C3	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+C4	10u	10u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+CS1			myelin-kicad:pin_32_60mil
+EXTPWR	ext pwr	1x2 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+LEADS	flying leads	1x4 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
+RAM	IS62C1024 128kB SRAM		myelin-kicad:issi_32l_450mil_sop
+ROM	ROM chip	Adapter to emulate a 600mil 28-pin DIP, e.g. Digikey 1175-1525-5-ND	Housings_DIP:DIP-28_W15.24mm
+U1	74HCT00		Housings_SOIC:SOIC-14_3.9x8.7mm_Pitch1.27mm

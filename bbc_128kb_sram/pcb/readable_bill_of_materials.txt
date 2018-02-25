@@ -1,0 +1,53 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+C1
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C2
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C3
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C4
+- Value: 10u
+- Description: 10u capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+CS1
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:pin_32_60mil
+
+EXTPWR
+- Value: ext pwr
+- Description: 1x2 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+
+LEADS
+- Value: flying leads
+- Description: 1x4 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
+
+RAM
+- Value: IS62C1024 128kB SRAM
+- Description: 
+- KiCad package: myelin-kicad:issi_32l_450mil_sop
+
+ROM
+- Value: ROM chip
+- Description: Adapter to emulate a 600mil 28-pin DIP, e.g. Digikey 1175-1525-5-ND
+- KiCad package: Housings_DIP:DIP-28_W15.24mm
+
+U1
+- Value: 74HCT00
+- Description: 
+- KiCad package: Housings_SOIC:SOIC-14_3.9x8.7mm_Pitch1.27mm
+
