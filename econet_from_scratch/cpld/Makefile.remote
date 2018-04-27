@@ -1,0 +1,26 @@
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+all:
+	xst -intstyle ise -ifn $$(pwd)/${MODULE}.xst -ofn $$(pwd)/${MODULE}.syr
+	ngdbuild -intstyle ise -dd _ngo -uc constraints.ucf -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
+	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize density -htmlrpt -loc on -slew slow -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
+	XSLTProcess ${MODULE}_build.xml
+	tsim -intstyle ise ${MODULE} ${MODULE}.nga
+	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
+	impact -batch impact.cmd
+
+clean:
+	rm -rf *.mfd *.nga *.ngc *.ngd *.xrpt *.ngr *.pad *.csv *.svf *.pnx *.rpt *.vm6 *.xml *.jed *.lso *.gyd *.bld *.err _xmsgs xlnx* _ngo *.syr *_html *_xdb xst *.log *.cmd_log *~ *.html *.stx *.tim *.tspec *.xsvf *.gise *.ise out
+	mkdir xst xst/projnav.tmp xst/work out
