@@ -236,6 +236,12 @@ module econet_test;
 
         wait (test_bits_to_shift_into_econet == 0);
 
+        $display("TODO test reception of bad frame");
+
+        $display("TODO test turnaround back to sending");
+
+        $display("TODO test bad serial input");
+
         $display("econet_test done");
         #1000 $finish;
     end
