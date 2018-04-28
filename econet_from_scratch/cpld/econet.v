@@ -41,31 +41,21 @@
 // 01111110 = flag
 // 1111111 = abort (and line idles at 1)
 
+
 // We communicate with the MCU over a synchronous serial interface, which in
 // practice is half-duplex because there's no need to transmit information in
 // the opposite direction from the Econet line.
 
-// TODO add a 'direction' indicator from the MCU.  When it wants to transmit,
-// it sets direction=1, and otherwise it sets direction=0.  This sets the
-// function of the uart shift register, and avoids confusion in general.
-// 'direction' probably shouldn't drive econet_data_DE because we probably
-// want to start listening as soon as we finish transmitting the final '0' of
-// the trailing flag... it makes most sense as a direction indicator for the
-// serial port.  (How *do* we handle the final flag then?  The MCU should
-// probably hold direction=1 until it's completely done driving mcu_rxd.)
+// mcu_is_transmitting line selects the direction.  When it transitions,
+// everything gets reset.
 
-
-// TODO thinking through the half duplex uart...
-
-// when mcu_is_transmitting transitions, we reset the bit counter (because it'll
-// be reused by the other mode).  that means we'll stop transmitting the current
-// byte immediately.
+// Right now this uses 64/72 MCs in an XC9572XL device.
 
 
 module econet(
 	// to MCU
 	input wire clock,  // 24 MHz serial clock
-	output reg mcu_txd,  // USRT txd (connect to MCU's rxd)
+	output reg mcu_txd = 1'b1,  // USRT txd (connect to MCU's rxd)
 	input wire mcu_rxd,  // USRT rxd (connect to MCU's txd)
 	input wire mcu_is_transmitting,  // direction select for the USRT; 1=mcu transmitting, 0 = cpld can transmit
 	output reg outputting_frame = 1'b0,  // 1 when we're sending a frame, 0 when idle or underrun
@@ -85,12 +75,13 @@ module econet(
 
 // --- INPUT SYNC ---
 
-reg [3:0] econet_clock_sync = 3'b0;
-reg [3:0] econet_data_sync = 3'b0;
+reg [2:0] econet_clock_sync = 3'b0;
+reg [2:0] econet_data_sync = 3'b0;
+reg [2:0] mcu_is_transmitting_sync = 3'b0;
 
 // --- SERIAL PORT ---
 
-reg [8:0] serial_shifter = 10'b0;  // Start bit + 9 data bits
+reg [9:0] serial_shifter = 10'b1111111111;  // Start bit + 9 data bits
 reg [3:0] serial_bit_count = 4'b0;  // Send/receive countdown from 11 (start + 9 + stop)
 reg serial_input_buffer_full = 1'b0;
 assign serial_buffer_empty = !serial_input_buffer_full && (serial_bit_count == 0);
@@ -108,20 +99,18 @@ assign serial_buffer_empty = !serial_input_buffer_full && (serial_bit_count == 0
 // flag that is sent as a 9th bit from the MCU.
 
 reg [2:0] econet_bit_count = 0;  // Bit # we're currently sending or receiving
-reg [2:0] econet_ones_count = 0;  // # of ones seen in a row
+reg [2:0] econet_ones_count = 0;  // # of ones seen in a row (0-7)
 reg [7:0] econet_shifter = 0;  // 8-bit output shift register
 reg econet_output_raw = 1'b0;  // If 1, don't bit stuff
 reg econet_transmitting = 1'b0;  // Flag to say we're currently outputting from the shift register
 reg econet_initiate_abort = 1'b0;  // Something went wrong: send an abort (raw 0xFF)
 
-wire receiving_frame;
-assign receiving_frame = !mcu_is_transmitting;
-
 assign econet_data_DE = outputting_frame;
 
 always @(negedge clock) begin
 	// FALLING edge of serial clock: update value on mcu_txd
-	mcu_txd <= serial_shifter[0];
+	mcu_txd <= mcu_is_transmitting_sync[2] ? 1'b1 : serial_shifter[0];
+	// if (!mcu_is_transmitting && serial_bit_count != 0) $display("outputting bit to serial port: %b", serial_shifter[0]);
 end
 
 always @(posedge clock) begin
@@ -135,8 +124,17 @@ always @(posedge clock) begin
 	// and our clock period is 42ns, so we'll have a tight enough sample.
 	econet_clock_sync <= {econet_clock_sync[1:0], econet_clock_R};
 	econet_data_sync <= {econet_data_sync[1:0], econet_data_R};
+	mcu_is_transmitting_sync <= {mcu_is_transmitting_sync[1:0], mcu_is_transmitting};
 
-	if (mcu_is_transmitting == 1'b1) begin  // RECEIVE FROM MCU, TRANSMIT TO ECONET
+	if (mcu_is_transmitting_sync[2] != mcu_is_transmitting_sync[1]) begin  // DIRECTION CHANGE
+
+		serial_bit_count <= 0;
+		serial_shifter[0] <= 1'b1;
+		econet_transmitting <= 1'b0;
+		econet_bit_count <= 0;
+		econet_ones_count <= 7;
+
+	end else if (mcu_is_transmitting_sync[2] == 1'b1) begin  // RECEIVE FROM MCU, TRANSMIT TO ECONET
 
 		// TODO figure out if we need to synchronize mcu_is_transmitting, or
 		// if it's already synchronous w.r.t the USRT clock
@@ -248,38 +246,46 @@ always @(posedge clock) begin
 
 			// RISING ECONET CLOCK EDGE: SAMPLE INPUT
 
-			if (receiving_frame == 1'b1) begin
-				if (econet_ones_count == 6 && econet_data_sync[2] == 1'b0) begin
-					// Just received a flag
-					// Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
-					serial_shifter <= {1'b1, econet_shifter, 1'b0};
-					serial_bit_count <= 11;
-					econet_ones_count <= 1'b0;
-					econet_bit_count <= 0;
-				end else if (econet_ones_count == 5 && econet_data_sync[2] == 1'b0) begin
-					// Reset ones count and skip this bit because we just read a stuffed zero
-					econet_ones_count <= 0;
+			if (econet_ones_count == 7 && econet_data_sync[2] == 1'b1) begin
+				// Stay in reset
+			end else if (econet_ones_count == 6 && econet_data_sync[2] == 1'b1) begin
+				// Reset!
+				econet_ones_count <= econet_ones_count + 1;
+				econet_bit_count <= 0;
+			end else if (econet_ones_count == 6 && econet_data_sync[2] == 1'b0) begin
+				// Just received a flag
+				// Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
+				$display("received flag: put 1+%02x (1+%b) in serial shifter", {econet_shifter[6:0], 1'b0}, {econet_shifter[6:0], 1'b0});
+				serial_shifter <= {1'b1, econet_shifter[6:0], 1'b0, 1'b0};
+				serial_bit_count <= 11;
+				econet_ones_count <= 1'b0;
+				econet_bit_count <= 0;
+			end else if (econet_ones_count == 5 && econet_data_sync[2] == 1'b0) begin
+				// Just read a stuffed zero
+				// Reset ones count and skip this bit
+				econet_ones_count <= 0;
+			end else begin
+				// Read a normal bit
+				// Increment or reset ones count
+				if (econet_data_sync[2] == 1'b1) begin
+					econet_ones_count <= econet_ones_count + 1;
 				end else begin
-					// Increment or reset ones count
-					if (econet_data_sync[2] == 1'b1) begin
-						econet_ones_count <= econet_ones_count + 1;
-					end else begin
-						econet_ones_count <= 0;
-					end
-					// Not reading a bit-stuffed zero; shift it into the register
-					econet_shifter <= {econet_shifter[6:0], econet_data_sync[2]};
-					econet_bit_count <= econet_bit_count + 1;
-					if (econet_bit_count == 7) begin
-						// Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
-						serial_shifter <= {1'b0, econet_shifter, 1'b0};
-						serial_bit_count <= 11;
-					end
+					econet_ones_count <= 0;
+				end
+				// Shift it into the receive register
+				econet_shifter <= {econet_shifter[6:0], econet_data_sync[2]};
+				// $display("econet_shifter about to be %b", {econet_shifter[6:0], econet_data_sync[2]});
+				econet_bit_count <= econet_bit_count + 1;
+				if (econet_bit_count == 7) begin
+					// Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
+					$display("received byte: put 0+%02x (0+%b) in serial shifter", {econet_shifter[6:0], econet_data_sync[2]}, {econet_shifter[6:0], econet_data_sync[2]});
+					serial_shifter <= {1'b0, {econet_shifter[6:0], econet_data_sync[2]}, 1'b0};
+					serial_bit_count <= 11;
 				end
 			end
+		end  // rising econet_clock_R edge
 
-		end
-
-	end
+	end  // !mcu_is_transmitting
 
 end
 

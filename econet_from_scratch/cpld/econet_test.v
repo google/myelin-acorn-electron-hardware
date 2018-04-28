@@ -1,6 +1,8 @@
 `timescale 1ns/100ps
 `include "econet.v"
 
+`define assert(condition, message) if(!(condition)) begin $display(message); $finish(1); end
+
 module econet_test;
 
 	reg clk;
@@ -9,7 +11,7 @@ module econet_test;
 	reg mcu_is_transmitting;
 	wire outputting_frame, serial_buffer_empty;
 
-	reg econet_data_R, econet_clock_R;
+	reg econet_data_R = 1'b1, econet_clock_R = 1'b1;
 	wire econet_data_D, econet_clock_D;
 	wire econet_data_DE, econet_clock_DE;
 
@@ -44,60 +46,75 @@ module econet_test;
 		end
 	end
 
+	// econet
+
+	reg [56:0] test_econet_receive_shifter;
+	reg [7:0] test_bits_to_shift_into_econet = 0;
+
+	always @(negedge econet_clock_R) begin
+		if (test_bits_to_shift_into_econet != 0) begin
+			econet_data_R <= test_econet_receive_shifter[56];
+			test_econet_receive_shifter <= {test_econet_receive_shifter[55:0], 1'b1};
+			test_bits_to_shift_into_econet <= test_bits_to_shift_into_econet - 1;
+		end
+	end
+
 	// serial port (MCU side)
 
-	reg [9:0] serial_output_buffer = 10'b1111111111;
-	reg [8:0] serial_send_byte = 0;
-	reg [3:0] serial_output_bit = 0;  // counts down from 10
-	reg serial_output_start = 1'b0;  // set high to trigger a serial transmission
-	wire serial_output_empty;
-	assign serial_output_empty = (serial_output_bit == 0);
+	reg [9:0] test_serial_output_buffer = 10'b1111111111;
+	reg [8:0] test_serial_send_byte = 0;
+	reg [3:0] test_serial_output_bit = 0;  // counts down from 10
+	reg test_serial_output_start = 1'b0;  // set high to trigger a serial transmission
+	wire test_serial_output_empty;
+	assign test_serial_output_empty = (test_serial_output_bit == 0);
 
-	reg [3:0] serial_input_bit = 0;
-	reg [9:0] serial_input_buffer = 0, serial_received_byte = 0;
-	reg serial_input_full = 1'b0, serial_input_overrun = 1'b0;
+	reg [3:0] test_serial_input_bit = 0;
+	reg [8:0] test_serial_input_buffer = 0, test_serial_received_byte = 0;
+	reg test_serial_input_full = 1'b0, test_serial_input_overrun = 1'b0;
 
 	always @(posedge clk) begin
-		if (serial_input_bit == 0) begin
+		if (test_serial_input_bit == 0) begin
 			// waiting for start bit
 			if (mcu_txd == 1'b0) begin
 				// got start bit
-				serial_input_bit <= 1;
+				test_serial_input_bit <= 1;
 			end
 		end else begin
-			if (serial_input_bit == 10) begin
+			if (test_serial_input_bit == 10) begin
 				if (mcu_txd == 1'b1) begin
 					// Received byte
-					if (serial_input_full == 1'b1) begin
-						serial_input_overrun <= 1'b1;
+					$display("Byte received on serial port: $%03x (%b)", test_serial_input_buffer, test_serial_input_buffer);
+					if (test_serial_input_full == 1'b1) begin
+						test_serial_input_overrun <= 1'b1;
 					end else begin
-						serial_input_full <= 1'b1;
-						serial_received_byte <= serial_input_buffer;
+						test_serial_input_full <= 1'b1;
+						test_serial_received_byte <= test_serial_input_buffer;
 					end
 				end
-				serial_input_bit <= 0;
+				test_serial_input_bit <= 0;
 			end else begin
 				// Shift value on mcu_txd in from left
-				serial_input_buffer <= {mcu_txd, serial_input_buffer[9:1]};
+				test_serial_input_buffer <= {mcu_txd, test_serial_input_buffer[8:1]};
+				// $display("shift bit %b into test_serial_input_buffer; previously %b", mcu_txd, test_serial_input_buffer);
 				// bits 1-9 = data bits
-				serial_input_bit <= serial_input_bit + 1;
+				test_serial_input_bit <= test_serial_input_bit + 1;
 			end
 		end
 	end
 	always @(negedge clk) begin
-		if (serial_output_start == 1'b1 && serial_output_empty == 1'b1) begin
+		if (test_serial_output_start == 1'b1 && test_serial_output_empty == 1'b1) begin
 			// Kick off new transmission
 			$display("[serial] starting new transmission");
-			serial_output_buffer <= {serial_send_byte, 1'b0};
-			serial_output_bit <= 10;
+			test_serial_output_buffer <= {test_serial_send_byte, 1'b0};
+			test_serial_output_bit <= 10;
 		end else begin
 			// Change value on mcu_rxd and shift output buffer right one
-			mcu_rxd <= serial_output_buffer[0];
-			serial_output_buffer <= {1'b1, serial_output_buffer[9:1]};
+			mcu_rxd <= test_serial_output_buffer[0];
+			test_serial_output_buffer <= {1'b1, test_serial_output_buffer[9:1]};
 			// Track if we're in a transmission or not
-			if (serial_output_bit != 0) begin
-				serial_output_bit <= serial_output_bit - 1;
-				if (serial_output_bit == 1) begin
+			if (test_serial_output_bit != 0) begin
+				test_serial_output_bit <= test_serial_output_bit - 1;
+				if (test_serial_output_bit == 1) begin
 					$display("[serial] byte transmitted");
 				end
 			end
@@ -109,57 +126,57 @@ module econet_test;
 	    $dumpfile("econet_test.vcd");
 	    $dumpvars(0, econet_test);
 
-	    // test sending a frame out to the econet
+	    $display("--- TESTING SENDING DATA TO ECONET ---");
 
 	    // enable tx
 	    #100 mcu_is_transmitting = 1'b1;
 
 	    // send flag
 	    $display("send flag 01111110");
-	    wait (serial_output_empty == 1'b1);
-	    #1 serial_send_byte = 10'b101111110;
-	    serial_output_start <= 1'b1;
-	    wait (serial_output_empty == 1'b0);
-	    #1 serial_output_start <= 1'b0;
+	    wait (test_serial_output_empty == 1'b1);
+	    #1 test_serial_send_byte = 10'b101111110;
+	    test_serial_output_start <= 1'b1;
+	    wait (test_serial_output_empty == 1'b0);
+	    #1 test_serial_output_start <= 1'b0;
 	    $display("wait for flag request to finish going out over the serial port");
-	    wait (serial_output_empty == 1'b1);
+	    wait (test_serial_output_empty == 1'b1);
 	    $display("wait for serial port to be ready to receive another byte");
 	    wait (serial_buffer_empty == 1'b1);
 
 	    // send byte
 	    $display("send byte 011111(0)10");
-	    #1 serial_send_byte = 10'b001111110;
-	    serial_output_start <= 1'b1;
-	    wait (serial_output_empty == 1'b0);
-	    #1 serial_output_start <= 1'b0;
-	    wait (serial_output_empty == 1'b1);
+	    #1 test_serial_send_byte = 10'b001111110;
+	    test_serial_output_start <= 1'b1;
+	    wait (test_serial_output_empty == 1'b0);
+	    #1 test_serial_output_start <= 1'b0;
+	    wait (test_serial_output_empty == 1'b1);
 	    wait (serial_buffer_empty == 1'b1);
 
 	    // send byte
 	    $display("send byte 01000010");
-	    #1 serial_send_byte = 10'h42;
-	    serial_output_start <= 1'b1;
-	    wait (serial_output_empty == 1'b0);
-	    #1 serial_output_start <= 1'b0;
-	    wait (serial_output_empty == 1'b1);
+	    #1 test_serial_send_byte = 10'h42;
+	    test_serial_output_start <= 1'b1;
+	    wait (test_serial_output_empty == 1'b0);
+	    #1 test_serial_output_start <= 1'b0;
+	    wait (test_serial_output_empty == 1'b1);
 	    wait (serial_buffer_empty == 1'b1);
 
 	    // send byte
 	    $display("send byte 11111(0)111");
-	    #1 serial_send_byte = 10'hff;
-	    serial_output_start <= 1'b1;
-	    wait (serial_output_empty == 1'b0);
-	    #1 serial_output_start <= 1'b0;
-	    wait (serial_output_empty == 1'b1);
+	    #1 test_serial_send_byte = 10'hff;
+	    test_serial_output_start <= 1'b1;
+	    wait (test_serial_output_empty == 1'b0);
+	    #1 test_serial_output_start <= 1'b0;
+	    wait (test_serial_output_empty == 1'b1);
 	    wait (serial_buffer_empty == 1'b1);
 
 	    // send flag
 	    $display("send flag 01111110");
-	    #1 serial_send_byte = 10'b101111110;
-	    serial_output_start <= 1'b1;
-	    wait (serial_output_empty == 1'b0);
-	    #1 serial_output_start <= 1'b0;
-	    wait (serial_output_empty == 1'b1);
+	    #1 test_serial_send_byte = 10'b101111110;
+	    test_serial_output_start <= 1'b1;
+	    wait (test_serial_output_empty == 1'b0);
+	    #1 test_serial_output_start <= 1'b0;
+	    wait (test_serial_output_empty == 1'b1);
 	    wait (serial_buffer_empty == 1'b1);
 
 	    // disable tx
@@ -171,9 +188,53 @@ module econet_test;
 	    // test receiving a frame from the econet
 
 	    // enable rx
-	    // receive flag
-	    // receive byte
-	    // receive flag
+	    mcu_is_transmitting = 1'b0;
+	    #10000 $display("--- TESTING RECEIVING DATA FROM ECONET ---");
+
+	    `assert(mcu_txd == 1'b1, "FAIL: mcu_txd should be idle (1) when not transmitting");
+
+	    $display("start sending test data on econet_clock_R");
+	    test_econet_receive_shifter = {
+	    	8'b01111110,  // initial flag (17e)
+	    	8'b10101010,  // aa
+	    	8'b01010101,  // 55
+	    	8'b10101010,  // aa
+	    	9'b111110111, // ff
+	    	8'b00000000,  // 00
+	    	8'b01111110   // final flag (17e)
+	    };
+	    wait (econet_clock_R == 1'b0);
+	    test_bits_to_shift_into_econet = 64;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'h17e, "FAIL: expected 17e");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'haa, "FAIL: expected aa");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'h55, "FAIL: expected 55");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'haa, "FAIL: expected aa");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'hff, "FAIL: expected ff");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'h0, "FAIL: expected 00");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_serial_input_full == 1'b1);
+	    `assert(test_serial_input_buffer == 9'h17e, "FAIL: expected 17e");
+	    test_serial_input_full = 1'b0;
+
+	    wait (test_bits_to_shift_into_econet == 0);
 
 		$display("econet_test done");
 	    #1000 $finish;
@@ -181,7 +242,8 @@ module econet_test;
 
 	// Failsafe
 	initial begin
-		#1000000 $finish;
+		#1000000 $display("TIMEOUT -- EXITING");
+		$finish;
 	end
 
 endmodule
