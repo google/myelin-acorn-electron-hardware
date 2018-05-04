@@ -16,13 +16,14 @@ module econet_test;
     wire econet_data_DE, econet_clock_DE;
 
     econet test_econet(
-        .clock(clk),
-        .mcu_txd(mcu_txd),
-        .mcu_rxd(mcu_rxd),
+        .clock_24m(clk),
+        .serial_cpld_to_mcu(mcu_txd),
+        .serial_mcu_to_cpld(mcu_rxd),
         .mcu_is_transmitting(mcu_is_transmitting),
         .outputting_frame(outputting_frame),
         .serial_buffer_empty(serial_buffer_empty),
 
+        .drive_econet_clock(1'b0),
         .econet_data_R(econet_data_R),
         .econet_data_D(econet_data_D),
         .econet_data_DE(econet_data_DE),
