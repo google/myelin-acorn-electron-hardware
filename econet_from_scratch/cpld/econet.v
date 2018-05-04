@@ -54,20 +54,47 @@
 
 module econet(
     // to MCU
-    input wire clock,  // 24 MHz serial clock
-    output reg mcu_txd = 1'b1,  // USRT txd (connect to MCU's rxd)
-    input wire mcu_rxd,  // USRT rxd (connect to MCU's txd)
+    input wire clock_24m,  // 24 MHz serial clock
+    output reg serial_cpld_to_mcu = 1'b1,  // USRT txd (connect to MCU's rxd)
+    input wire serial_mcu_to_cpld,  // USRT rxd (connect to MCU's txd)
     input wire mcu_is_transmitting,  // direction select for the USRT; 1=mcu transmitting, 0 = cpld can transmit
     output reg outputting_frame = 1'b0,  // 1 when we're sending a frame, 0 when idle or underrun
     output wire serial_buffer_empty,  // 1 when the MCU can send a new byte
+    input wire drive_econet_clock,  // 1 when the MCU wants us to drive econet_clock_D with econet_clock_from_mcu
+    input wire econet_clock_from_mcu,  // clock signal from MCU to copy to econet_clock_D
 
     // to sn65c1168 dual differential transceiver
     input wire econet_data_R,  // received data
     output reg econet_data_D = 1'b1,  // transmitted data
     output wire econet_data_DE,  // 1 to transmit data, 0 otherwise
     input wire econet_clock_R,  // received clock
-    output reg econet_clock_D = 1'b1,  // transmitted clock
-    output reg econet_clock_DE = 1'b0  // 1 to transmit clock, 0 otherwise
+    output wire econet_clock_D,  // transmitted clock
+    output wire econet_clock_DE,  // 1 to transmit clock, 0 otherwise
+
+    // to collision detect circuit
+    input wire collision_detect,
+
+    // Econet module pins
+    input wire A0,
+    input wire A1,
+    input wire [7:0] D,
+    input wire nRESET,
+    input wire PHI2,
+    input wire RnW,
+    input wire nADLC,
+    input wire nNETINT,
+
+    // Dummy inputs for unused pins
+    // input wire PA08,
+    // input wire PA09,
+    // input wire PA10,
+    // input wire PA11,
+    // input wire PA14,  // GCK3
+    // input wire PA15,  // GCK2
+    input wire PA18,
+    input wire PA19,
+    input wire PA22,
+    input wire PA23
 );
 
 // So... how should this be implemented in the CPLD?  Matching the input for
@@ -106,15 +133,20 @@ reg econet_transmitting = 1'b0;  // Flag to say we're currently outputting from 
 reg econet_initiate_abort = 1'b0;  // Something went wrong: send an abort (raw 0xFF)
 
 assign econet_data_DE = outputting_frame;
+assign econet_clock_DE = drive_econet_clock;
+assign econet_clock_D = econet_clock_from_mcu;
 
-always @(negedge clock) begin
-    // FALLING edge of serial clock: update value on mcu_txd
-    mcu_txd <= mcu_is_transmitting_sync[2] ? 1'b1 : serial_shifter[0];
+wire econet_clock;
+assign econet_clock = drive_econet_clock ? econet_clock_from_mcu : econet_clock_R;
+
+always @(negedge clock_24m) begin
+    // FALLING edge of serial clock: update value on serial_cpld_to_mcu
+    serial_cpld_to_mcu <= mcu_is_transmitting_sync[2] ? 1'b1 : serial_shifter[0];
     // if (!mcu_is_transmitting && serial_bit_count != 0) $display("outputting bit to serial port: %b", serial_shifter[0]);
 end
 
-always @(posedge clock) begin
-    // RISING edge of serial clock: sample value on mcu_rxd
+always @(posedge clock_24m) begin
+    // RISING edge of serial clock: sample value on serial_mcu_to_cpld
 
     // To save on CPLD space, the entire system is half-duplex, driven by the
     // mcu_is_transmitting line.  When this line changes, the whole system is
@@ -122,7 +154,7 @@ always @(posedge clock) begin
 
     // Synchronize signals from the Econet line.  tRDS = 50ns and tRDH = 60ns,
     // and our clock period is 42ns, so we'll have a tight enough sample.
-    econet_clock_sync <= {econet_clock_sync[1:0], econet_clock_R};
+    econet_clock_sync <= {econet_clock_sync[1:0], econet_clock};
     econet_data_sync <= {econet_data_sync[1:0], econet_data_R};
     mcu_is_transmitting_sync <= {mcu_is_transmitting_sync[1:0], mcu_is_transmitting};
 
@@ -142,13 +174,13 @@ always @(posedge clock) begin
         // SERIAL PORT RECEIVER
 
         if (serial_bit_count == 0) begin
-            if (mcu_rxd == 1'b0) begin
+            if (serial_mcu_to_cpld == 1'b0) begin
                 // Received a start bit; start a transfer
                 serial_bit_count <= 10;
             end
         end else if (serial_bit_count == 1) begin
             // Receiving a stop bit
-            if (mcu_rxd == 1'b1) begin
+            if (serial_mcu_to_cpld == 1'b1) begin
                 // Received data!
                 if (serial_input_buffer_full == 1'b1) begin
                     // Buffer overrun; abort the frame.
@@ -163,7 +195,7 @@ always @(posedge clock) begin
             serial_bit_count <= 0;
         end else begin
             // Receiving 9 bits from the serial port, LSB-first
-            serial_shifter <= {mcu_rxd, serial_shifter[8:1]};
+            serial_shifter <= {serial_mcu_to_cpld, serial_shifter[8:1]};
             serial_bit_count <= serial_bit_count - 1;
         end
 
@@ -235,7 +267,7 @@ always @(posedge clock) begin
         // SERIAL PORT TRANSMITTER
 
         if (serial_bit_count != 0) begin
-            // --- MCU is receiving; we can drive mcu_txd ---
+            // --- MCU is receiving; we can drive serial_cpld_to_mcu ---
             serial_shifter <= {1'b1, serial_shifter[9:1]};
             serial_bit_count <= serial_bit_count - 1;
         end
@@ -283,7 +315,7 @@ always @(posedge clock) begin
                     serial_bit_count <= 11;
                 end
             end
-        end  // rising econet_clock_R edge
+        end  // rising econet_clock edge
 
     end  // !mcu_is_transmitting
 

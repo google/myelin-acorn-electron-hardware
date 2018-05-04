@@ -1,6 +1,8 @@
 Econet from scratch
 ===================
 
+http://myelin.nz/acorn/ecostd
+
 Can we implement an Econet interface from scratch, without having to use a BBC
 Master Econet module or MC68B54 chip?
 

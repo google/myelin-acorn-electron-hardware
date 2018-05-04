@@ -86,20 +86,23 @@ line_driver = myelin_kicad_pcb.Component(
     footprint="Housings_SOIC:SOIC-16W_5.3x10.2mm_Pitch1.27mm",
     identifier="U?",
     value="SN65C1168",
+    # http://www.ti.com/product/sn65c1168
+    # http://www.ti.com/general/docs/lit/getliterature.tsp?genericPartNumber=sn65c1168&fileType=pdf
     pins=[
         # Designed for full duplex, with Y/Z as outputs and A/B as inputs.
         # D is the input to the driver, R is the output from the receiver.
-        Pin( 1, "1B", "econet_data_line_P"),
-        Pin( 2, "1A", "econet_data_line_N"),
+        # Y, A = positive output/input, Z, B = inverted output/input
+        Pin( 1, "1B", "econet_data_line_P"),  # TODO(rev2) should be _N
+        Pin( 2, "1A", "econet_data_line_N"),  # TODO(rev2) should be _P
         Pin( 3, "1R", "econet_data_R"),
         Pin( 4, "1DE", "econet_data_DE"),
         Pin( 5, "2R", "econet_clock_R"),
-        Pin( 6, "2A", "econet_clock_line_N"),
-        Pin( 7, "2B", "econet_clock_line_P"),
+        Pin( 6, "2A", "econet_clock_line_N"),  # TODO(rev2) should be _P
+        Pin( 7, "2B", "econet_clock_line_P"),  # TODO(rev2) should be _N
         Pin( 8, "GND", "GND"),
         Pin( 9, "2D", "econet_clock_D"),
-        Pin(10, "2Y", "econet_clock_line_N"),
-        Pin(11, "2Z", "econet_clock_line_P"),
+        Pin(10, "2Y", "econet_clock_line_N"),  # TODO(rev2) should be _P
+        Pin(11, "2Z", "econet_clock_line_P"),  # TODO(rev2) should be _N
         Pin(12, "2DE", "econet_clock_DE"),
         Pin(13, "1Z", "econet_data_line_N"),
         Pin(14, "1Y", "econet_data_line_P"),
@@ -179,18 +182,19 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="U4",
     value="XC9572XL",
+    buses=["D"],
     pins=[
-        Pin(39, "P1.2",       "PA22"),
-        Pin(40, "P1.5",       "PA19"),
-        Pin(41, "P1.6",       "PA18"),
-        Pin(42, "P1.8",       "PA16"),
-        Pin(43, "P1.9-GCK1",  "PA17"),
-        Pin(44, "P1.11-GCK2", "PA15"),
-        Pin( 1, "P1.14-GCK3", "PA14"),
-        Pin( 2, "P1.15",      "PA11"),
-        Pin( 3, "P1.17",      "PA10"),
-        Pin( 5, "P3.2",       "PA09"),
-        Pin( 6, "P3.5",       "PA08"),
+        Pin(39, "P1.2",       "PA22"),  # PA22
+        Pin(40, "P1.5",       "PA19"),  # PA19.  Not connected to an Arduino pin.
+        Pin(41, "P1.6",       "PA18"),  # PA18.  Not connected to an Arduino pin.
+        Pin(42, "P1.8",       "drive_econet_clock"),  # PA16
+        Pin(43, "P1.9-GCK1",  "econet_clock_from_mcu"),  # PA17
+        Pin(44, "P1.11-GCK2", "clock_24m"),  # PA15
+        Pin( 1, "P1.14-GCK3", "serial_mcu_to_cpld"),  # PA14
+        Pin( 2, "P1.15",      "mcu_is_transmitting"),  # PA11
+        Pin( 3, "P1.17",      "outputting_frame"),  # PA10
+        Pin( 5, "P3.2",       "serial_buffer_empty"),  # PA09
+        Pin( 6, "P3.5",       "serial_cpld_to_mcu"),  # PA08
         Pin( 7, "P3.8",       "RnW"),
         Pin( 8, "P3.9",       "nNETINT"),
         Pin(12, "P3.11",      "nADLC"),
@@ -213,7 +217,7 @@ cpld = myelin_kicad_pcb.Component(
         Pin(34, "P2.11-GTS2", "econet_data_R"),
         Pin(36, "P2.14-GTS1", "econet_data_D"),
         Pin(37, "P2.15",      "collision_detect"),
-        Pin(38, "P2.17",      "PA23"),
+        Pin(38, "P2.17",      "PA23"),  # PA23
 
         Pin(4, "GND", ["GND"]),
         Pin(9, "TDI", ["cpld_TDI"]),
@@ -326,8 +330,8 @@ mcu = myelin_kicad_pcb.Component(
     pins=[
         # It looks like SECOM4 and SERCOM5 don't exist on the D21E, so we only
         # have SERCOM0-3.
-        Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_TXD"),
-        Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_RXD"),
+        Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_debug_TXD"),
+        Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
         Pin(3, "PA02/AIN0/DAC_OUT"),
         Pin(4, "PA03/ADC_VREFA/AIN1"),
         Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"), # sercom0 is mcu comms
@@ -336,18 +340,18 @@ mcu = myelin_kicad_pcb.Component(
         Pin(8, "PA07/SERCOM0.3/AIN7", "cpld_TDI"), # XCK0
         Pin(9, "VDDANA", ["3V3"]),  # decouple to GND
         Pin(10, "GND", ["GND"]),
-        Pin(11, "PA08/NMI/SERCOM2.0/0.0/AIN16", "PA08"), # TXRX0/2
-        Pin(12, "PA09/SERCOM2.1/0.1/AIN17", "PA09"), # XCK0/2
-        Pin(13, "PA10/SERCOM2.2/0.2/AIN18", "PA10"), # TXRX0/2
-        Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "PA11"), # XCK0/2
-        Pin(15, "PA14/XIN/SERCOM4.2/2.2", "PA14"), # TXRX2/4
-        Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "PA15"), # XCK2/4
-        Pin(17, "PA16/SERCOM1.0/3.0", "PA16"), # TXRX1/3
-        Pin(18, "PA17/SERCOM1.1/3.1", "PA17"), # XCK1/3
-        Pin(19, "PA18/SERCOM1.2/3.2", "PA18"), # TXRX1/3
-        Pin(20, "PA19/SERCOM1.3/3.3", "PA19"), # XCK1/3
-        Pin(21, "PA22/SERCOM3.0/5.0", "PA22"), # TXRX3/5
-        Pin(22, "PA23/SERCOM3.1/5.1/USBSOF", "PA23"), # XCK3/5
+        Pin(11, "PA08/NMI/SERCOM2.0/0.0/AIN16", "serial_cpld_to_mcu"), # TXRX0/2 -> cpld
+        Pin(12, "PA09/SERCOM2.1/0.1/AIN17", "serial_buffer_empty"), # XCK0/2 -> cpld
+        Pin(13, "PA10/SERCOM2.2/0.2/AIN18", "outputting_frame"), # TXRX0/2 -> cpld
+        Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "mcu_is_transmitting"), # XCK0/2 -> cpld
+        Pin(15, "PA14/XIN/SERCOM4.2/2.2", "serial_mcu_to_cpld"), # TXRX2/4 -> cpld GCK3
+        Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "clock_24m"), # XCK2/4 -> cpld GCK2.  Most shielded clock trace.
+        Pin(17, "PA16/SERCOM1.0/3.0", "drive_econet_clock"), # TXRX1/3 -> cpld.  Two vias in trace.  Ground this one?
+        Pin(18, "PA17/SERCOM1.1/3.1", "econet_clock_from_mcu"), # XCK1/3 -> cpld GCK1
+        Pin(19, "PA18/SERCOM1.2/3.2", "PA18"), # TXRX1/3 -> cpld.  Not connected to an Arduino pin.
+        Pin(20, "PA19/SERCOM1.3/3.3", "PA19"), # XCK1/3 -> cpld.  Not connected to an Arduino pin.
+        Pin(21, "PA22/SERCOM3.0/5.0", "PA22"), # TXRX3/5 -> cpld
+        Pin(22, "PA23/SERCOM3.1/5.1/USBSOF", "PA23"), # XCK3/5 -> cpld
         Pin(23, "PA24/USBDM", ["USBDM"]),
         Pin(24, "PA25/USBDP", ["USBDP"]),
         Pin(25, "PA27"),
@@ -385,9 +389,9 @@ swd = myelin_kicad_pcb.Component(
         Pin(3, "GND", ["GND"]),
         Pin(4, "SWCLK", ["SWCLK"]),
         Pin(5, "GND", ["GND"]),
-        Pin(6, "TXD", ["mcu_TXD"]),
+        Pin(6, "TXD", ["mcu_debug_TXD"]),
         Pin(7, "NC"),
-        Pin(8, "RXD", ["mcu_RXD"]),
+        Pin(8, "RXD", ["mcu_debug_RXD"]),
         Pin(9, "GND", ["GND"]),
         Pin(10, "RESET", ["mcu_RESET"]),
     ],
@@ -398,6 +402,7 @@ micro_usb = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:micro_usb_b_smd_molex",
     identifier="USB",
     value="usb",
+    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
     pins=[
         Pin(1, "V", ["VUSB"]),
         Pin(2, "-", ["USBDM"]),
