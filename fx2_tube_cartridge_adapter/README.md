@@ -52,6 +52,13 @@ Not yet tested:
   block
 - Several 0.1" jumpers
 
+### Programming the CPLD
+
+I'll write more about this at some point, but the easiest way to
+program the on-board CPLD is to use xc3sprog and the
+cpld/fx2_tube_cartridge_adapter.jed file, or any SVF player (openocd
+should work) and the cpld/fx2_tube_cartridge_adapter.svf file.
+
 ### Renders of the PCB
 
 ![PCB front](pcb/pcb-front.png)

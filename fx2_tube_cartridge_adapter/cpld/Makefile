@@ -19,8 +19,12 @@ default: all
 
 all:
 	make -f Makefile.remote clean
-	rsync -avrzu --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
+	rsync -arzu --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
 	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make -f Makefile.remote clean && make -f Makefile.remote MODULE=${MODULE} PART=${PART}" 2>&1 | tee out/build.log
-	rsync -avrzu xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" out/
+	rsync -arzu xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" out/
 	open out/${MODULE}_html/fit/index.htm
-	xc3sprog -v -c jlink out/${MODULE}.jed
+	mv out/${MODULE}.jed out/${MODULE}.svf .
+	xc3sprog -v -c jlink ${MODULE}.jed
+
+local:
+	make -f Makefile.remote clean && make -f Makefile.remote MODULE=${MODULE} PART=${PART}

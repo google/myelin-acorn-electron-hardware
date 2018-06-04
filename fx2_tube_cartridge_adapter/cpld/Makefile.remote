@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+UCF ?= constraints.ucf
+
 all:
 	xst -intstyle ise -ifn $$(pwd)/${MODULE}.xst -ofn $$(pwd)/${MODULE}.syr
-	ngdbuild -intstyle ise -dd _ngo -uc constraints.ucf -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
+	ngdbuild -intstyle ise -dd _ngo -uc ${UCF} -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
 	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize density -htmlrpt -loc on -slew fast -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
 	XSLTProcess ${MODULE}_build.xml
 	tsim -intstyle ise ${MODULE} ${MODULE}.nga
