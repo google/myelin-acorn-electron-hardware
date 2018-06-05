@@ -6,11 +6,11 @@ SOURCE_ROM = 'mos3.20'
 
 # List all ROMs you want to patch into the image, plus their locations, here:
 PATCH_ROMS = [
-    # Replace ViewSheet with Master user port MMFS
-    (0x08000, 'U_MAMMFS.rom'),
+    # Replace ADFS with Master user port MMFS
+    (0x14000, 'U_MAMMFS.rom'),
 
-    # Replace EDIT with UPURS 5.0R
-    (0x0C000, 'UPURS50R.rom'),
+    # Replace ViewSheet with UPURS 5.0R
+    (0x08000, 'UPURS50R.rom'),
 ]
 
 # The new image will be written here

@@ -11,4 +11,10 @@ n = len(roms)
 
 for i in range(128*1024):
     match = not any(image[i] != images[0][i] for image in images)
-    print "%06d: %s%s" % (i, " ".join("%02x" % ord(image[i]) for image in images), "" if match else " MISMATCH")
+    if match:
+        detail = ''
+    else:
+        detail = ' MISMATCH: %s' % " ".join(bin(ord(image[i])) for image in images)
+        if ~ord(images[0][i]) & ord(images[1][i]):
+            detail += " BITS SET IN IMAGE 1"
+    print "%06d: %s%s" % (i, " ".join("%02x" % ord(image[i]) for image in images), detail)

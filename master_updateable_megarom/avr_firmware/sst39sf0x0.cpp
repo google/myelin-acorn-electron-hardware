@@ -43,7 +43,7 @@ static inline uint8_t spi_transfer(uint8_t b) {
   return b;
 }
 
-static void spi_reset() {
+static void reset_spi() {
   // synchronous reset -- clock SCK while SS is high
   spi_deselect();
   SPI.transfer(0);

@@ -16,6 +16,14 @@ I think this is ready for others to try out.
 - [Xilinx XC9572-64VQG CPLD design](cpld/)
 - [Pro Micro firmware for USB interface](avr_firmware/)
 
+To do for next version
+----------------------
+
+Make the board compatible with a Model B, providing 8 x 16kB sideways banks:
+
+- Add jumpers for A14 and A15 so they can be wired to IC76
+- Add jumper to connect socket pin 20 (/CS) to cpld_JP1
+
 Installation
 ------------
 
@@ -120,6 +128,87 @@ multiple images and select between them with a physical switch:
 
 - [IFEL/ctorwy31 Switchable Master 128 MOS OS ROM
   3.20/3.50](http://chrisacorns.computinghistory.org.uk/New4Old/ctorwy31_MasterOS.html).
+
+Modification for use in a pair of Model B ROM sockets
+-----------------------------------------------------
+
+The MegaROM also works when installed in a Model B!  It gives you 8 flash
+banks, which behave like true ROMs, ignoring writes from the BBC.
+
+This does not work nearly as well as it does in a Master 128, because the
+Master 128 has a separate data bus for the MOS ROM, whereas the Model B just
+connects all the ROM chips to the system bus.  On a Master 128 you can just
+run read_rom.py and program_rom.py without worrying about what the host
+machine is doing (if you don't care about it crashing), whereas on a Model B
+you need to force the machine into an idle state before running anything.
+
+I tried a bunch of ways of doing this, and finally hit upon one that worked.
+The MOS 6502 has a bunch of undocumented instructions, many of which just halt
+the CPU.  If you have the standard Model B BASIC ROM installed in the MegaROM
+board, there's a character 0x02 at &8038, and you can halt the machine with
+CALL &8038.  This doesn't completely let go of the bus, but if you CALL &8038
+then hold down the BREAK key while the MegaROM is being read or programmed, it
+works.
+
+#### A couple of things that didn't work
+
+- Doing nothing at all (like on the Master 128).
+
+- Just holding down BREAK (presumably this halted the CPU while reading an
+  address from RAM or the OS ROM, which took over the bus).
+
+- Just executing the 'crash' instruction with CALL &8038.  I don't know why
+  this wasn't sufficient to halt the machine; maybe the 6502's address bus
+  isn't stable in the crashed state?
+
+All of these resulted in about a 20% error rate, suggesting that the MegaROM
+read/update code is lucky enough to perform most of its reads during the low
+clock period, when the bus is free, but something else takes over during the
+high period.
+
+#### The clever way to do it
+
+The ideal way to do this would be to use the low period of the BBC's clock cycle
+to perform all flash access.  We have partial access to the clock, via the /OE
+pin, which goes low during the high part of the clock cycle, however this
+behaviour is masked during accesses to &FCxx/FDxx/FExx, so it would be necessary
+to use a separate clock to wait for a rising edge on /OE and perform the memory
+access within the next 250 ns.  With some careful synchronization, it's probably
+possible to make this work with the 8MHz SPI clock.
+
+### Modification instructions
+
+This board can also be used to fill two of the ROM sockets on a Model B, and
+provide 8 16kB flash banks.  Some modifications are required.
+
+The Master 128's MOS ROM socket differs from the Model B's ROM sockets in the
+following ways:
+
+- Pin 1 is A15 on the Master, and 5V on the Model B
+- Pin 27 is A14 on the Master, and 5V on the Model B
+- Pin 22 is A16 on the Master, and /OE on the Model B
+- Pin 20 is /CE on both, but is always tied low on the Master and is selectable
+  on the BBC, and is left disconnected on this board.
+
+Wiring it up like this should work:
+
+- Cut pin 1 and solder a jumper wire from the top of the pin to IC76 pin 12.
+- Cut pin 27 and solder a jumper wire from the top of the pin to IC76 pin 11.
+- Solder a jumper wire from the top of pin 20 to the cpld_JP1 pin.
+- Connect a jumper wire from pin 20 on the adjacent socket to the cpld_JP0 pin.
+
+Changes are required to the Verilog also:
+
+- Set flash_A16=0 when cpld_JP1=0, and A16=1 when cpld_JP2=0
+- Set flash_nOE=0 when bbc_A16=0 and (cpld_JP1=0 or cpld_JP2 = 0)
+
+These are included in master_updateable_megarom.v; just change this line:
+
+    reg installed_in_bbc_master = 1'b1;
+
+to this:
+
+    reg installed_in_bbc_master = 1'b0;
 
 Pictures
 --------

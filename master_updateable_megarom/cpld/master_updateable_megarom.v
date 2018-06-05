@@ -19,15 +19,34 @@ module master_updateable_megarom(
   output wire [18:0] flash_A,
   output wire flash_nOE,
   output wire flash_nWE,
-  input wire cpld_SCK,
+  input wire cpld_SCK_in,
+
+  // Clock output so we can throw it on a BUFG.
+  // TODO this doesn't seem to work.  maybe the
+  // signal needs to be internally generated,
+  // as opposed to just a copy of cpld_SCK_in?
+  //output wire cpld_SCK,
+
   input wire cpld_MOSI,
   input wire cpld_SS,
   output reg cpld_MISO,
   input wire [1:0] cpld_JP
 );
 
+assign cpld_SCK = cpld_SCK_in;
+
+// 1 when installed in a Master 128, 0 when installed in a Model B
+reg installed_in_bbc_master = 1'b0;
+
 // flash bank to use for BBC reads
 reg [1:0] flash_bank = 2'b0;
+
+// When installed in a Model B, this decodes A16 from cpld_JP
+wire model_b_A16;
+
+// We're always selected when installed as a Master 128 MOS ROM, but when
+// installed in a Model B, this decodes /CE from cpld_JP
+wire bbc_nCE;
 
 // address value from SPI transaction
 reg [18:0] spi_A = 19'b0;
@@ -37,6 +56,8 @@ reg [7:0] spi_D = 8'b0;
 
 // 1 to pass the bbc_A through to flash_A, 0 to use A instead
 reg allowing_bbc_access_int = 1'b1;
+
+// overrideable version of the above
 wire allowing_bbc_access;
 
 // 1 to drive flash_nOE or flash_nWR
@@ -53,16 +74,28 @@ reg driving_bus = 1'b0;
 // counts up to 31
 reg [4:0] spi_bit_count = 5'b0;
 
-
-assign allowing_bbc_access = allowing_bbc_access_int;
+// this is controllable for debugging:
+assign allowing_bbc_access = allowing_bbc_access_int; // normal operation
+// assign allowing_bbc_access = 1'b0; // never allow bbc access, for debugging
 
 // We're either passing bbc_A through to flash_A, with D tristated, or we're
 // controlling both and ignoring bbc_A.
-assign flash_A = (allowing_bbc_access == 1'b1) ? {flash_bank, bbc_A} : spi_A;
+assign flash_A = (allowing_bbc_access == 1'b1)
+                 ? (installed_in_bbc_master
+                    ? {flash_bank, bbc_A} // Master 128
+                    : {flash_bank, model_b_A16, bbc_A[15:0]}) // Model B
+                 : spi_A;
+
+// when installed in a Model B, we need to decode A16 and nCE from cpld_JP.
+assign model_b_A16 = cpld_JP[0];
+assign bbc_nCE = installed_in_bbc_master
+                 ? 1'b0 // Master 128
+                 : (cpld_JP[0] && cpld_JP[1]); // Model B
 
 // assert OE
 assign reading_memory = accessing_memory && rnw;
-assign flash_nOE = !(allowing_bbc_access || reading_memory);
+assign flash_nOE = !((allowing_bbc_access && !bbc_nCE && !bbc_A[16]) // A16=nOE
+                     || reading_memory);
 
 // assert WE and D when the BBC is disabled and we're doing a memory write
 assign writing_memory = accessing_memory && !rnw;
@@ -71,7 +104,7 @@ assign flash_nWE = !(!allowing_bbc_access && writing_memory);
 // drive D when writing
 assign D = (allowing_bbc_access == 1'b0 && (driving_bus == 1'b1 && rnw == 1'b0)) ? spi_D : 8'bZZZZZZZZ;
 
-always @(posedge cpld_SCK) begin
+always @(posedge cpld_SCK or posedge cpld_SS) begin
 
   if (cpld_SS == 1'b1) begin
     accessing_memory <= 1'b0;
@@ -83,7 +116,7 @@ always @(posedge cpld_SCK) begin
     // SPI is big-endian; send the MSB first and clock into the LSB.
 
     // to block out the BBC and enable flash access: send ffffff00. to reenable
-    // the BBC, send 32 bits of ones.  the final bit sets 'allowing_bbc_access_int'.
+    // the BBC, send 32 bits of ones.  the final bit sets 'allowing_bbc_access'.
 
     // message format for a WRITE that blocks the BBC after: 19 address bits,
     // rnw, 8 data bits, 4 zeros, with the write happening during the six zeros.

@@ -94,12 +94,12 @@ cpld = myelin_kicad_pcb.Component(
         Pin(11, "P1.8",    ["bbc_A5"]),
         Pin(12, "P1.3",    ["bbc_A11"]),
         Pin(13, "P1.4",    ["bbc_A6"]),
-        Pin(15, "P1.GCK1", ["bbc_A9"]),
-        Pin(16, "P1.GCK2", ["bbc_A7"]),
-        Pin(17, "P1.GCK3", ["bbc_A8"]),
+        Pin(15, "P1.GCK1", ["bbc_A9"]),  # Should have put SCK on one of these!
+        Pin(16, "P1.GCK2", ["bbc_A7"]),  # Try drilling out one of the tracks and
+        Pin(17, "P1.GCK3", ["bbc_A8"]),  # using it as a spare GCK pin.
         Pin(18, "P1.10",   ["bbc_A12"]),
-        Pin(19, "P1.15",   ["cpld_JP1"]),
-        Pin(20, "P1.17",   ["bbc_A15"]),
+        Pin(19, "P1.15",   ["cpld_JP1"]),  # TODO(r2) shuffle pins around so
+        Pin(20, "P1.17",   ["bbc_A15"]),   # cpld_SCK ends up on a GCK.
         Pin(22, "P3.2",    ["cpld_JP0"]),
         Pin(23, "P1.12",   ["bbc_A13"]),
         Pin(24, "P3.5",    ["bbc_A14"]),

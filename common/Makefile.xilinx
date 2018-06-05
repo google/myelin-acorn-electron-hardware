@@ -19,6 +19,7 @@
 UCF ?= constraints.ucf
 OPTIMIZE ?= density
 SLEW ?= slow
+REMOTE_MAKEFILE ?= Makefile
 
 default: all
 
@@ -32,7 +33,7 @@ remote: clean build-remote show-results
 build-remote:
 	cp -v ${SHARED_PATH}/Makefile.xilinx .
 	rsync -arzu --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
-	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make clean build-local SHARED_PATH=." 2>&1 | tee build.log
+	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make -f${REMOTE_MAKEFILE} clean build-local SHARED_PATH=." 2>&1 | tee build.log
 	rsync -arzu xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" ./
 	rm Makefile.xilinx
 
@@ -71,3 +72,12 @@ program-xc3sprog:
 
 program-xc3sprog-jlink:
 	xc3sprog -v -c jlink out/$MODULE.jed
+
+# Test using Icarus Verilog (only works on Verilog projects)
+
+test:
+	iverilog -o $(MODULE)_tb.vvp $(MODULE)_tb.v
+	vvp $(MODULE)_tb.vvp
+
+test_show: test
+	open -a Scansion $(MODULE)_tb.vcd

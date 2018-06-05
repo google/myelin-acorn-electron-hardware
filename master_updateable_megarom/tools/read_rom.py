@@ -41,14 +41,19 @@ def main():
         ser.write("\n")
         r = read_until(ser, "", "OK")
 
-        print "\n* Requesting chip ID"
-        ser.write("I\n")  # identify chip
-        r = read_until(ser, "", "OK")
-        m = re.search("Size = (\d+)", r)
-        if not m:
-            raise Exception("Chip identification failed")
-        chip_size = int(m.group(1))
-        print "\n* Chip size = %d bytes" % chip_size
+        for try_number in range(5):
+            print "\n* Requesting chip ID (try %d)" % (try_number + 1)
+            ser.write("I\n")  # identify chip
+            r = read_until(ser, "", "OK")
+            print "CHIP ID TEXT %s" % `r`
+            m = re.search("Size = (\d+)", r)
+            if not m:
+                raise Exception("Chip identification failed")
+            chip_size = int(m.group(1))
+            print "\n* Chip size = %d bytes" % chip_size
+            if chip_size: break
+
+        assert chip_size, "failed to identify chip"
 
         print "\n* Start read"
         ser.write("R\n")

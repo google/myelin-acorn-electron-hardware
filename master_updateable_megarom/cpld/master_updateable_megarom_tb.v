@@ -51,7 +51,7 @@ module master_updateable_megarom_tb;
     .flash_A(flash_A),
     .flash_nOE(flash_nOE),
     .flash_nWE(flash_nWE),
-    .cpld_SCK(spi_sck),
+    .cpld_SCK_in(spi_sck),
     .cpld_MOSI(spi_mosi),
     .cpld_SS(spi_ss),
     .cpld_MISO(spi_miso),

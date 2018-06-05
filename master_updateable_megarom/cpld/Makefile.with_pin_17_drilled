@@ -12,8 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MODULE=master_updateable_megarom
-PART=xc9572xl-10-VQ64
+# Experimental version which 
+
+MODULE = master_updateable_megarom
+PART = xc9572xl-10-VQ64
 SHARED_PATH ?= ../../common
+
+REMOTE_MAKEFILE = Makefile.with_pin_17_drilled
+UCF=constraints_with_drilled_out_pin_17.ucf
 
 include ${SHARED_PATH}/Makefile.xilinx
