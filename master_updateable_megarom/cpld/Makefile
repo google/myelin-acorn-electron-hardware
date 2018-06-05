@@ -14,6 +14,6 @@
 
 MODULE=master_updateable_megarom
 PART=xc9572xl-10-VQ64
-SHARED_PATH ?= ../../common
 
+SHARED_PATH ?= ../../common
 include ${SHARED_PATH}/Makefile.xilinx
