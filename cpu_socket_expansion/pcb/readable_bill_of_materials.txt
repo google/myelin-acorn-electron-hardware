@@ -1,0 +1,133 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+ABUFH
+- Value: 74LVC245APW
+- Description: 74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND
+- KiCad package: Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm
+
+ABUFL
+- Value: 74LVC245APW
+- Description: 74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND
+- KiCad package: Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm
+
+C1
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C2
+- Value: 1u
+- Description: 1u capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C3
+- Value: 1u
+- Description: 1u capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C4
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C5
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C6
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C7
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C8
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+CON
+- Value: 2x20 connector for daughterboard
+- Description: 2x20 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x20_Pitch2.54mm
+
+CPU1
+- Value: 6502
+- Description: adapter to emulate a 600mil 40-pin DIP, e.g. Digikey 1175-1527-5-ND
+- KiCad package: Housings_DIP:DIP-40_W15.24mm
+
+CPU2
+- Value: 6502
+- Description: 600mil 40-pin DIP socket, e.g. Digikey 609-4716-ND
+- KiCad package: Housings_DIP:DIP-40_W15.24mm
+
+DBUF
+- Value: 74LVC245APW
+- Description: 74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND
+- KiCad package: Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm
+
+EXTPWR
+- Value: ext pwr
+- Description: 1x3 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm
+
+JP1
+- Value: VPB
+- Description: 1x2 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+
+JTAG1
+- Value: jtag
+- Description: 2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
+
+M16
+- Value: 16MHz
+- Description: 1x2 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+
+PLD
+- Value: XC9572XL-10VQG44C
+- Description: Xilinx XC9572XL in 44-pin 0.8mm TQFP package.  Any speed or temperature grade is OK.
+- KiCad package: myelin-kicad:xilinx_vqg44
+
+R1
+- Value: 4k7
+- Description: 4k7 resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R2
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R3
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R4
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R5
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R6
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+REG
+- Value: MCP1700T-3302E/MB
+- Description: 3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.
+- KiCad package: TO_SOT_Packages_SMD:SOT-89-3
+

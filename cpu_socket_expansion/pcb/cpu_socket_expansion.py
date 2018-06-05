@@ -100,6 +100,11 @@ cpu_1, cpu_2 = [
         footprint="Housings_DIP:DIP-40_W15.24mm",
         identifier="CPU%d" % (cpuid + 1),
         value="6502",
+        desc=(
+            "adapter to emulate a 600mil 40-pin DIP, e.g. Digikey 1175-1527-5-ND"
+            if cpuid == 0
+            else "600mil 40-pin DIP socket, e.g. Digikey 609-4716-ND"
+        ),
         pins=[
             # Need to disconnect pin 1 on W65C02S; add a jumper between these two nets
             Pin( 1, "VSS", ["cpu_GND_VPB_2" if cpuid else "GND"]),
@@ -149,6 +154,7 @@ cpu_cap = myelin_kicad_pcb.C0805("100n", "GND", "5V", ref="C1")
 cpu_VPB_jumper = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
     identifier="JP1",
+	desc="1x2 0.1 inch male header",
     value="VPB",
     pins=[
         Pin(1, "A", ["cpu_GND_VPB_2"]),
@@ -159,6 +165,7 @@ cpu_BE_pullup = myelin_kicad_pcb.R0805("4k7", "cpu_NC_BE", "5V", ref="R1")
 cpld_16MHz_port = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
     identifier="M16",
+	desc="1x2 0.1 inch male header",
     value="16MHz",
     pins=[
         Pin(1, "A", ["clk_16MHz"]),
@@ -171,6 +178,7 @@ regulator = myelin_kicad_pcb.Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
     identifier="REG",
     value="MCP1700T-3302E/MB",
+	desc="3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.",
     pins=[
         Pin(2, "VIN", ["5V"]),
         Pin(3, "VOUT", ["3V3"]),
@@ -185,6 +193,7 @@ ext_power = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm",
     identifier="EXTPWR",
     value="ext pwr",
+	desc="1x3 0.1 inch male header",
     pins=[
         Pin(1, "A", ["GND"]),
         Pin(2, "B", ["3V3"]),
@@ -197,7 +206,8 @@ ext_power = myelin_kicad_pcb.Component(
 data_buf = myelin_kicad_pcb.Component(
     footprint="Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm",
     identifier="DBUF",
-    value="74LVC245",
+    value="74LVC245APW",
+    desc="74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND",
     pins=[
         Pin( 1, "A->B", ["dbuf_ext_to_cpu"]),
         Pin( 2, "A0", ["ext_D7"]),
@@ -229,7 +239,8 @@ dbuf_nCE_pullup = myelin_kicad_pcb.R0805("10k", "dbuf_nCE", "3V3", ref="R2")
 addr_buf_lo = myelin_kicad_pcb.Component(
     footprint="Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm",
     identifier="ABUFL",
-    value="74LVC245",
+    value="74LVC245APW",
+    desc="74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND",
     pins=[
         Pin( 1, "A->B", ["abuf_ext_to_cpu"]),
         Pin( 2, "A0", ["ext_A0"]),
@@ -259,7 +270,8 @@ abuf_nCE_pullup = myelin_kicad_pcb.R0805("10k", "abuf_nCE", "3V3", ref="R3")
 addr_buf_hi = myelin_kicad_pcb.Component(
     footprint="Housings_SSOP:SSOP-20_4.4x6.5mm_Pitch0.65mm",
     identifier="ABUFH",
-    value="74LVC245",
+    value="74LVC245APW",
+    desc="74LVC245 in TSSOP20 with 4.4mm body width, e.g. Digikey 1727-3105-1-ND",
     pins=[
         Pin( 1, "A->B", ["abuf_ext_to_cpu"]),
         Pin( 2, "A0", ["ext_A8"]),
@@ -311,7 +323,8 @@ addr_buf_hi_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C6")
 cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="PLD",
-    value="XC9572XL",
+    value="XC9572XL-10VQG44C",
+	desc="Xilinx XC9572XL in 44-pin 0.8mm TQFP package.  Any speed or temperature grade is OK.",
     buses=[],
     pins=[
         Pin(39, "P1.2",          ["cpu_RDY"]),
@@ -371,6 +384,7 @@ cpld_jtag = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
     identifier="JTAG1",
     value="jtag",
+	desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
     pins=[
         Pin(1, "TCK", ["cpld_TCK"]), # top left
         Pin(2, "GND", ["GND"]), # top right
@@ -395,6 +409,7 @@ connector = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x20_Pitch2.54mm",
     identifier="CON",
     value="2x20 connector for daughterboard",
+	desc="2x20 0.1 inch male header",
     pins=[
         Pin( "1", "", ["ext_GP0"]),
         Pin( "2", "", ["ext_GP1"]),
@@ -454,3 +469,5 @@ staples = [
 ]
 
 myelin_kicad_pcb.dump_netlist("cpu_socket_expansion.net")
+myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
+                          "readable_bill_of_materials.txt")
