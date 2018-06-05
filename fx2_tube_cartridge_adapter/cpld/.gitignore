@@ -1,3 +1,7 @@
+*.vcd
+*.vvp
 out
-Makefile.xilinx
 build.log
+*_html
+*.xsvf
+Makefile.xilinx

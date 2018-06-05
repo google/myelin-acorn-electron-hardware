@@ -4,3 +4,4 @@ out
 build.log
 *_html
 *.xsvf
+Makefile.xilinx

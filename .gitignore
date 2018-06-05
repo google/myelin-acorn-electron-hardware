@@ -1,6 +1,7 @@
 .dropbox
 Icon?
 *.pyc
+*.bak
 *-bak
 *~
 .DS_Store
