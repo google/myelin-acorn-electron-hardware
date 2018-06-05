@@ -11,9 +11,8 @@ module econet_test;
     reg mcu_is_transmitting;
     wire outputting_frame, serial_buffer_empty;
 
-    reg econet_data_R = 1'b1, econet_clock_R = 1'b1;
-    wire econet_data_D, econet_clock_D;
-    wire econet_data_DE, econet_clock_DE;
+    wire econet_data_R, econet_data_D, econet_clock_D;
+    wire econet_clock_R, econet_data_DE, econet_clock_DE;
 
     econet test_econet(
         .clock_24m(clk),
@@ -32,6 +31,10 @@ module econet_test;
         .econet_clock_DE(econet_clock_DE)
     );
 
+    reg econet_data_R_pre = 1'b1, econet_clock_R_pre = 1'b1;
+    assign econet_clock_R = econet_clock_R_pre ^ test_econet.buggy_rev1_pcb;
+    assign econet_data_R = econet_data_R_pre ^ test_econet.buggy_rev1_pcb;
+
     initial begin
         // 24 MHz clock, with 1/48 us = #10, so #480 = 1us
         clk = 1'b0;
@@ -39,11 +42,11 @@ module econet_test;
     end
 
     initial begin
-        econet_clock_R = 1'b1;
+        econet_clock_R_pre = 1'b1;
         // 1us up, 4us down
         forever begin
-            #480 econet_clock_R = 1'b0;
-            #1920 econet_clock_R = 1'b1;
+            #480 econet_clock_R_pre = 1'b0;
+            #1920 econet_clock_R_pre = 1'b1;
         end
     end
 
@@ -54,7 +57,7 @@ module econet_test;
 
     always @(negedge econet_clock_R) begin
         if (test_bits_to_shift_into_econet != 0) begin
-            econet_data_R <= test_econet_receive_shifter[56];
+            econet_data_R_pre <= test_econet_receive_shifter[56];
             test_econet_receive_shifter <= {test_econet_receive_shifter[55:0], 1'b1};
             test_bits_to_shift_into_econet <= test_bits_to_shift_into_econet - 1;
         end

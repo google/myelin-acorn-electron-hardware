@@ -35,7 +35,7 @@ NET D<7> LOC = P28;
 ### Signals connected to MCU
 
 # NET PA08 LOC = P6;
-NET serial_mcu_to_cpld LOC = P6;
+NET serial_mcu_to_cpld LOC = P1;
 # NET PA09 LOC = P5;
 NET serial_buffer_empty LOC = P5;
 # NET PA10 LOC = P3;
@@ -43,9 +43,10 @@ NET outputting_frame LOC = P3;
 # NET PA11 LOC = P2;
 NET mcu_is_transmitting LOC = P2;
 # NET PA14 LOC = P1;
-NET serial_cpld_to_mcu LOC = P1;
+NET serial_cpld_to_mcu LOC = P6;
 # NET PA15 LOC = P44;
 NET clock_24m LOC = P44;
+NET clock_24m BUFG = CLK;
 # NET PA16 LOC = P42;
 NET drive_econet_clock LOC = P42;
 # NET PA17 LOC = P43;

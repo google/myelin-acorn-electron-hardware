@@ -65,7 +65,7 @@ module econet(
 
     // to sn65c1168 dual differential transceiver
     input wire econet_data_R,  // received data
-    output reg econet_data_D = 1'b1,  // transmitted data
+    output wire econet_data_D,  // transmitted data
     output wire econet_data_DE,  // 1 to transmit data, 0 otherwise
     input wire econet_clock_R,  // received clock
     output wire econet_clock_D,  // transmitted clock
@@ -74,23 +74,19 @@ module econet(
     // to collision detect circuit
     input wire collision_detect,
 
-    // Econet module pins
-    input wire A0,
-    input wire A1,
-    input wire [7:0] D,
-    input wire nRESET,
-    input wire PHI2,
+    // Econet module pins, left to right on bottom of board
+    // These are currently used to output debug signals
+    input wire nNETINT,
     input wire RnW,
     input wire nADLC,
-    input wire nNETINT,
+    input wire PHI2,
+    input wire A0,
+    input wire A1,
+    output wire [7:0] D,  // D0..D7 from left to right
+    output wire nRESET,
+    // ... followed by GND, and 5V is in the bottom right corner
 
-    // Dummy inputs for unused pins
-    // input wire PA08,
-    // input wire PA09,
-    // input wire PA10,
-    // input wire PA11,
-    // input wire PA14,  // GCK3
-    // input wire PA15,  // GCK2
+    // Dummy inputs for unused pins that connect to the MCU
     input wire PA18,
     input wire PA19,
     input wire PA22,
@@ -131,13 +127,31 @@ reg [7:0] econet_shifter = 0;  // 8-bit output shift register
 reg econet_output_raw = 1'b0;  // If 1, don't bit stuff
 reg econet_transmitting = 1'b0;  // Flag to say we're currently outputting from the shift register
 reg econet_initiate_abort = 1'b0;  // Something went wrong: send an abort (raw 0xFF)
+wire econet_clock_out;
+reg econet_data_out = 1'b1;  // Passed through to econet_data_D
+
+// rev1 PCB is buggy and has data input and clock input and output inverted.
+// (Data output is the only correct one.)
+reg buggy_rev1_pcb = 1'b1;
 
 assign econet_data_DE = outputting_frame;
+assign econet_data_D = econet_data_out;
+
 assign econet_clock_DE = drive_econet_clock;
-assign econet_clock_D = econet_clock_from_mcu;
+assign econet_clock_out = econet_clock_from_mcu;
+assign econet_clock_D = econet_clock_out ^ buggy_rev1_pcb;
 
 wire econet_clock;
-assign econet_clock = drive_econet_clock ? econet_clock_from_mcu : econet_clock_R;
+assign econet_clock = drive_econet_clock ? econet_clock_from_mcu : (econet_clock_R ^ buggy_rev1_pcb);
+
+// A bunch of debug outputs using the Econet module pins along the bottom of the board
+assign nRESET = mcu_is_transmitting; //DEBUG
+assign D[7] = serial_mcu_to_cpld; //DEBUG
+assign D[6] = serial_buffer_empty; //DEBUG
+assign D[5] = serial_input_buffer_full; //DEBUG
+assign D[4] = econet_initiate_abort; //DEBUG
+assign D[3] = econet_transmitting; //DEBUG
+assign D[2] = outputting_frame; //DEBUG
 
 always @(negedge clock_24m) begin
     // FALLING edge of serial clock: update value on serial_cpld_to_mcu
@@ -155,13 +169,15 @@ always @(posedge clock_24m) begin
     // Synchronize signals from the Econet line.  tRDS = 50ns and tRDH = 60ns,
     // and our clock period is 42ns, so we'll have a tight enough sample.
     econet_clock_sync <= {econet_clock_sync[1:0], econet_clock};
-    econet_data_sync <= {econet_data_sync[1:0], econet_data_R};
+    econet_data_sync <= {econet_data_sync[1:0], (econet_data_R ^ buggy_rev1_pcb)};
     mcu_is_transmitting_sync <= {mcu_is_transmitting_sync[1:0], mcu_is_transmitting};
 
     if (mcu_is_transmitting_sync[2] != mcu_is_transmitting_sync[1]) begin  // DIRECTION CHANGE
 
         serial_bit_count <= 0;
+        serial_input_buffer_full <= 1'b0;
         serial_shifter[0] <= 1'b1;
+        econet_initiate_abort <= 1'b0;
         econet_transmitting <= 1'b0;
         econet_bit_count <= 0;
         econet_ones_count <= 7;
@@ -235,11 +251,15 @@ always @(posedge clock_24m) begin
                 end
             end
 
-            // Transmit even if we're not inside a frame, to avoid deadlocks
-            if (econet_transmitting == 1'b1) begin
+
+            if (econet_transmitting == 1'b0) begin
+                // econet_data_D should idle high
+                // econet_data_out <= 1'b1;
+            end else begin
+                // Transmit even if we're not inside a frame, to avoid deadlocks
                 if (econet_output_raw == 1'b0 && econet_ones_count == 5) begin
                     // stuff a zero and reset the bit-stuff counter
-                    econet_data_D <= 1'b0;
+                    econet_data_out <= 1'b0;
                     econet_ones_count <= 0;
                 end else begin
                     // shift out a bit (LSB first) and increment/zero ones count as necessary
@@ -248,7 +268,7 @@ always @(posedge clock_24m) begin
                     end else begin
                         econet_ones_count <= 0;
                     end
-                    econet_data_D <= econet_shifter[0];
+                    econet_data_out <= econet_shifter[0];
                     econet_shifter <= {1'b1, econet_shifter[7:1]};
                     econet_bit_count <= econet_bit_count + 1;
 
