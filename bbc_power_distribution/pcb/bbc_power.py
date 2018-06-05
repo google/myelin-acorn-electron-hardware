@@ -47,6 +47,7 @@ micro_usb = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:micro_usb_b_smd_molex",
     identifier="USB",
     value="usb",
+    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
     pins=[
         Pin(1, "V", ["5V"]),
         Pin(5, "G", ["GND"]),
