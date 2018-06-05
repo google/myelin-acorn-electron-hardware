@@ -52,12 +52,25 @@ Not yet tested:
   block
 - Several 0.1" jumpers
 
-### Programming the CPLD
+### Programming the Xilinx XC9572XL CPLD
 
-I'll write more about this at some point, but the easiest way to
-program the on-board CPLD is to use xc3sprog and the
-cpld/fx2_tube_cartridge_adapter.jed file, or any SVF player (openocd
-should work) and the cpld/fx2_tube_cartridge_adapter.svf file.
+Pre-built .jed and .svf files for the CPLD are checked in to the cpld/ folder,
+so you don't need to install the Xilinx tools to program the CPLD.
+
+If you're using a [simple_cpld_programmer](../simple_cpld_programmer) board, you
+can program the CPLD like this:
+
+    cd cpld
+    make program
+
+If you have an FTDI JTAG cable, you can program the CPLD like this:
+
+    cd cpld
+    make program-xc3sprog-ftdi
+
+See [../notes/pld_programming_and_jtag.md](../notes/pld_programming_and_jtag.md)
+for details on the JTAG pinout and on how to build a simple_cpld_programmer
+board.
 
 ### Renders of the PCB
 

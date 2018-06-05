@@ -1,0 +1,73 @@
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This Makefile is included by various Makefiles in this repository to build
+# VHDL and Verilog code for a Xilinx CPLD into .jed and .svf files.  It will not
+# run by itself.
+
+UCF ?= constraints.ucf
+OPTIMIZE ?= density
+SLEW ?= slow
+
+default: all
+
+all: local program
+
+# The remote build process assumes you have the Xilinx tools installed on a
+# Linux server called 'xilinx' (or aliased as 'xilinx' in ~/.ssh/config).
+
+remote: clean build-remote show-results
+
+build-remote:
+	cp -v ${SHARED_PATH}/Makefile.xilinx .
+	rsync -arzu --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
+	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make clean build-local SHARED_PATH=." 2>&1 | tee build.log
+	rsync -arzu xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" ./
+	rm Makefile.xilinx
+
+# The local build process assumes you have the Xilinx tools installed locally,
+# and have run settings64.sh in the current shell.
+
+local: clean build-local show-results
+
+build-local:
+	xst -intstyle ise -ifn $$(pwd)/${MODULE}.xst -ofn $$(pwd)/${MODULE}.syr
+	ngdbuild -intstyle ise -dd _ngo -uc ${UCF} -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
+	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize ${OPTIMIZE} -htmlrpt -loc on -slew ${SLEW} -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
+	XSLTProcess ${MODULE}_build.xml
+	tsim -intstyle ise ${MODULE} ${MODULE}.nga
+	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
+	impact -batch impact.cmd
+
+clean:
+	rm -rf *.mfd *.nga *.ngc *.ngd *.xrpt *.ngr *.pad *.csv *.svf *.pnx *.rpt *.vm6 *.xml *.jed *.lso *.gyd *.bld *.err _xmsgs xlnx* _ngo *.syr *_html *_xdb xst *.log *.cmd_log *~ *.html *.stx *.tim *.tspec *.xsvf *.gise *.ise out
+	mkdir xst xst/projnav.tmp xst/work
+
+show-results:
+	open ${MODULE}_html/fit/index.htm
+
+# Program using a simple_cpld_programmer board
+
+program:
+	python ../../simple_cpld_programmer/tools/program_cpld.py out/${MODULE}.svf
+
+# Program using xc3sprog and an FTDI board
+
+program-xc3sprog:
+	xc3sprog -v -c ftdi out/$MODULE.jed
+
+# Program using xc3sprog and a J-Link
+
+program-xc3sprog-jlink:
+	xc3sprog -v -c jlink out/$MODULE.jed

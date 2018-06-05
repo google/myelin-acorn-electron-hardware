@@ -13,25 +13,36 @@ repository and need to program in a .jed or .svf file, this section is what
 you're looking for.
 
 _Something I'm working on (EXPERIMENTAL SO FAR)_:
-- Get a Pro Micro board:
-  - Most reliable way: [Get an original one direct from SparkFun](https://www.sparkfun.com/products/12640)
+- Get an Arduino Leonardo or Pro Micro board:
+  - Most reliable way: Get an original Leonardo from an Arduino distributor (TODO add link), or [an original Pro Micro direct from SparkFun](https://www.sparkfun.com/products/12640)
   - There are plenty on eBay and Aliexpress, but labelling is inconsistent, so be careful when shopping there.
-  - Make sure you get one with an ATMEGA32U4 chip and a micro USB socket.
-  - Often you'll see ones with ATMEGA328P or mini USB -- these are different boards and won't work here.
+  - Leonardo shopping advice:
+    - Make sure it has an ATMEGA32U4 chip.  If it has an ATMEGA328P, it's an Uno, not a Leonardo.
+  - Pro Micro shopping advice:
+    - Make sure you get one with an ATMEGA32U4 chip and a micro USB socket.  Often you'll see ones with ATMEGA328P or mini USB -- these are different boards and won't work here.
+    - It doesn't matter for this project, but I've also found two different form factors; the original measures 1.3 by 0.7 inches.
+    - There are 3.3V and 5V versions; the 5V version runs at 16MHz, is more flexible for retro hardware work, and works to program the Xilinx XC9500XL-series CPLDs in many of the projects in this repository, but the 3.3V version will also work fine for the project, and will be required for interfacing with 3.3V-only chips (all modern FPGAs, including the Lattice MachXO/MachXO2 and Intel MAX 10, which are used in this repository).
 - Program the simple_cpld_programmer firmware into it:
-  - Load [simple_cpld_programmer_firmware.ino](../simple_cpld_programmer/simple_cpld_programmer_firmware/simple_cpld_programmer_firmware.ino) up in the Arduino IDE, select Arduino Leonardo as the board type, select the port, and hit 'Program'.
+  - Using the Arduino IDE:
+    - Open [simple_cpld_programmer_firmware.ino](../simple_cpld_programmer/simple_cpld_programmer_firmware/simple_cpld_programmer_firmware.ino) in the Arduino IDE
+    - Plug the board into a USB port
+    - Select the correct board type: _Arduino Leonardo_ if you have a Leonardo or a 5V Pro Micro, or _LilyPad Arduino USB_ if you have a 3.3V Pro Micro
+    - Select the port associated with the board
+    - Click the 'Upload' button
   - Or at the command line:
+    - Plug the board into a USB port
     - cd simple_cpld_programmer/simple_cpld_programmer_firmware
     - make upload
 - Wire it to the JTAG port on the target board (the one with the CPLD you wish to program):
-  - JTAG GND to Pro Micro GND
-  - JTAG TDO to Pro Micro pin 18
-  - JTAG TMS to Pro Micro pin 19
-  - JTAG TCK to Pro Micro pin 20
-  - JTAG TDI to Pro Micro pin 21
+  - JTAG GND to Arduino GND
+  - JTAG TDO to Arduino pin 18
+  - JTAG TMS to Arduino pin 19
+  - JTAG TCK to Arduino pin 20
+  - JTAG TDI to Arduino pin 21
 - Use the simple_cpld_programmer/tools/program_cpld.py script to play JTAG
   commands from the .svf file and program the chip.
   - python simple_cpld_programmer/tools/program_cpld.py path/to/datafile.svf
+  - Or from a project folder: cd cpld; make program
 
 _Ready made Xilinx solution_: If you already have a Xilinx Platform Cable and an
 ISE installation, you can use Xilinx iMPACT to program the .jed file into the
@@ -39,6 +50,9 @@ chip.
 
 _Ready made open source solution_: If you have an FTDI FT232H or FT2232H
 breakout board, you can use xc3sprog to program the .jed file into the chip.
+
+- Install xc3sprog
+- From a project folder: cd cpld; make program-xc3sprog
 
 _Trickier open source solution_: If you have a JTAG adapter supported by
 openocd, you can use it to play the .svf file to program the chip.
