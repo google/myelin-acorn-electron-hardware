@@ -1,3 +1,6 @@
 *.vcd
 *.vvp
 out
+build.log
+*_html
+*.xsvf
