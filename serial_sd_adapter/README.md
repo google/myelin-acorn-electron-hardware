@@ -110,6 +110,26 @@ Electron version, from [serial_sd_mcu/](serial_sd_mcu/).
   different microcontrollers, but it's safe to solder the Pro Micro directly
   onto the board if you prefer.
 
+### Programming the Xilinx XC9572XL CPLD
+
+Pre-built .jed and .svf files for the CPLD are checked in to the bbc_1mhz_serial_cpld/ folder,
+so you don't need to install the Xilinx tools to program the CPLD.
+
+If you're using a [simple_cpld_programmer](../simple_cpld_programmer) board, you
+can program the CPLD like this:
+
+    cd bbc_1mhz_serial_cpld
+    make program
+
+If you have an FTDI JTAG cable, you can program the CPLD like this:
+
+    cd bbc_1mhz_serial_cpld
+    make program-xc3sprog-ftdi
+
+See [../notes/pld_programming_and_jtag.md](../notes/pld_programming_and_jtag.md)
+for details on the JTAG pinout and on how to build a simple_cpld_programmer
+board.
+
 ### Installed in a BBC B
 
 ![Installed in a BBC B](bbc_1mhz_bus_pcb/2017-11-installed_in_bbc.jpeg)

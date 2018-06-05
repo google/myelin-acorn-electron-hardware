@@ -7,7 +7,7 @@ run
 -ofmt NGC
 -p xc9500xl
 -top serial_sd_adapter
--opt_mode Speed
+-opt_mode Area
 -opt_level 1
 -iuc NO
 -keep_hierarchy Yes

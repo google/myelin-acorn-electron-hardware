@@ -1,1 +1,2 @@
+vhdl work "rom_fd00.vhd"
 vhdl work "serial_sd_adapter.vhd"
