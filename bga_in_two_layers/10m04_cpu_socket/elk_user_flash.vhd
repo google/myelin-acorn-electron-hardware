@@ -20,6 +20,17 @@ use IEEE.numeric_std.all;
 -- ordinary flash chip at 2MHz.  altera_onchip_flash is designed to run at a
 -- super high clock rate, but requires a few clock cycles to return data.
 
+-- From the Max 10 UFM User Guide:
+
+-- 10M04SC only has the UFM0 sector -- no UFM1, or CFM{0, 1, 2}.
+-- UFM0 has 8 x 16kb (2kB) pages, for a total of 16kB of user flash.
+-- Either a whole sector, or an individual page, can be erased.
+
+-- csr_addr = '0' => read-only status register
+--   "1111111111111111111111" & sp5 & sp4 & sp3 & sp2 & sp1 & es & ws & rs & busy[2]
+-- csr_addr = '1' => read/write control register
+--   "1111" & wp5 & wp4 & wp3 & wp2 & wp1 & se[3] & pe[20]
+
 entity elk_user_flash is
   port (
     slow_clock : in std_logic;  -- 2MHz clock
@@ -85,6 +96,8 @@ begin
         address_reg <= address;
         flash_read <= '1';
       end if;
+
+      -- this will take 5-6 clocks, i.e. ~75 ns plus the time to register flash_read and data_reg
 
       -- register flash output when we get a successful read
       if flash_readdatavalid = '1' then

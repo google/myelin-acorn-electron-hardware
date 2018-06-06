@@ -1,0 +1,169 @@
+/*
+WARNING: Do NOT edit the input and output ports in this file in a text
+editor if you plan to continue editing the block that represents it in
+the Block Editor! File corruption is VERY likely to occur.
+*/
+/*
+Copyright (C) 2017  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details.
+*/
+(header "symbol" (version "1.1"))
+(symbol
+	(rect 0 0 400 400)
+	(text "internal_flash" (rect 161 -1 212 11)(font "Arial" (font_size 10)))
+	(text "inst" (rect 8 384 20 396)(font "Arial" ))
+	(port
+		(pt 0 72)
+		(input)
+		(text "clock" (rect 0 0 20 12)(font "Arial" (font_size 8)))
+		(text "clock" (rect 4 61 34 72)(font "Arial" (font_size 8)))
+		(line (pt 0 72)(pt 160 72)(line_width 1))
+	)
+	(port
+		(pt 0 112)
+		(input)
+		(text "avmm_csr_addr" (rect 0 0 69 12)(font "Arial" (font_size 8)))
+		(text "avmm_csr_addr" (rect 4 101 82 112)(font "Arial" (font_size 8)))
+		(line (pt 0 112)(pt 160 112)(line_width 1))
+	)
+	(port
+		(pt 0 128)
+		(input)
+		(text "avmm_csr_read" (rect 0 0 69 12)(font "Arial" (font_size 8)))
+		(text "avmm_csr_read" (rect 4 117 82 128)(font "Arial" (font_size 8)))
+		(line (pt 0 128)(pt 160 128)(line_width 1))
+	)
+	(port
+		(pt 0 144)
+		(input)
+		(text "avmm_csr_writedata[31..0]" (rect 0 0 109 12)(font "Arial" (font_size 8)))
+		(text "avmm_csr_writedata[31..0]" (rect 4 133 154 144)(font "Arial" (font_size 8)))
+		(line (pt 0 144)(pt 160 144)(line_width 3))
+	)
+	(port
+		(pt 0 160)
+		(input)
+		(text "avmm_csr_write" (rect 0 0 69 12)(font "Arial" (font_size 8)))
+		(text "avmm_csr_write" (rect 4 149 88 160)(font "Arial" (font_size 8)))
+		(line (pt 0 160)(pt 160 160)(line_width 1))
+	)
+	(port
+		(pt 0 216)
+		(input)
+		(text "avmm_data_addr[11..0]" (rect 0 0 95 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_addr[11..0]" (rect 4 205 130 216)(font "Arial" (font_size 8)))
+		(line (pt 0 216)(pt 160 216)(line_width 3))
+	)
+	(port
+		(pt 0 232)
+		(input)
+		(text "avmm_data_read" (rect 0 0 73 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_read" (rect 4 221 88 232)(font "Arial" (font_size 8)))
+		(line (pt 0 232)(pt 160 232)(line_width 1))
+	)
+	(port
+		(pt 0 248)
+		(input)
+		(text "avmm_data_writedata[31..0]" (rect 0 0 113 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_writedata[31..0]" (rect 4 237 160 248)(font "Arial" (font_size 8)))
+		(line (pt 0 248)(pt 160 248)(line_width 3))
+	)
+	(port
+		(pt 0 264)
+		(input)
+		(text "avmm_data_write" (rect 0 0 73 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_write" (rect 4 253 94 264)(font "Arial" (font_size 8)))
+		(line (pt 0 264)(pt 160 264)(line_width 1))
+	)
+	(port
+		(pt 0 328)
+		(input)
+		(text "avmm_data_burstcount[3..0]" (rect 0 0 116 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_burstcount[3..0]" (rect 4 317 160 328)(font "Arial" (font_size 8)))
+		(line (pt 0 328)(pt 160 328)(line_width 3))
+	)
+	(port
+		(pt 0 368)
+		(input)
+		(text "reset_n" (rect 0 0 30 12)(font "Arial" (font_size 8)))
+		(text "reset_n" (rect 4 357 46 368)(font "Arial" (font_size 8)))
+		(line (pt 0 368)(pt 160 368)(line_width 1))
+	)
+	(port
+		(pt 0 176)
+		(output)
+		(text "avmm_csr_readdata[31..0]" (rect 0 0 109 12)(font "Arial" (font_size 8)))
+		(text "avmm_csr_readdata[31..0]" (rect 4 165 148 176)(font "Arial" (font_size 8)))
+		(line (pt 0 176)(pt 160 176)(line_width 3))
+	)
+	(port
+		(pt 0 280)
+		(output)
+		(text "avmm_data_readdata[31..0]" (rect 0 0 113 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_readdata[31..0]" (rect 4 269 154 280)(font "Arial" (font_size 8)))
+		(line (pt 0 280)(pt 160 280)(line_width 3))
+	)
+	(port
+		(pt 0 296)
+		(output)
+		(text "avmm_data_waitrequest" (rect 0 0 99 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_waitrequest" (rect 4 285 130 296)(font "Arial" (font_size 8)))
+		(line (pt 0 296)(pt 160 296)(line_width 1))
+	)
+	(port
+		(pt 0 312)
+		(output)
+		(text "avmm_data_readdatavalid" (rect 0 0 107 12)(font "Arial" (font_size 8)))
+		(text "avmm_data_readdatavalid" (rect 4 301 142 312)(font "Arial" (font_size 8)))
+		(line (pt 0 312)(pt 160 312)(line_width 1))
+	)
+	(drawing
+		(text "clk" (rect 145 43 308 99)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "clk" (rect 165 67 348 144)(font "Arial" (color 0 0 0)))
+		(text "csr" (rect 143 83 304 179)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "address" (rect 165 107 372 224)(font "Arial" (color 0 0 0)))
+		(text "read" (rect 165 123 354 256)(font "Arial" (color 0 0 0)))
+		(text "writedata" (rect 165 139 384 288)(font "Arial" (color 0 0 0)))
+		(text "write" (rect 165 155 360 320)(font "Arial" (color 0 0 0)))
+		(text "readdata" (rect 165 171 378 352)(font "Arial" (color 0 0 0)))
+		(text "data" (rect 136 187 296 387)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "address" (rect 165 211 372 432)(font "Arial" (color 0 0 0)))
+		(text "read" (rect 165 227 354 464)(font "Arial" (color 0 0 0)))
+		(text "writedata" (rect 165 243 384 496)(font "Arial" (color 0 0 0)))
+		(text "write" (rect 165 259 360 528)(font "Arial" (color 0 0 0)))
+		(text "readdata" (rect 165 275 378 560)(font "Arial" (color 0 0 0)))
+		(text "waitrequest" (rect 165 291 396 592)(font "Arial" (color 0 0 0)))
+		(text "readdatavalid" (rect 165 307 408 624)(font "Arial" (color 0 0 0)))
+		(text "burstcount" (rect 165 323 390 656)(font "Arial" (color 0 0 0)))
+		(text "nreset" (rect 124 339 284 691)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "reset_n" (rect 165 363 372 736)(font "Arial" (color 0 0 0)))
+		(text " internal_flash " (rect 339 384 774 778)(font "Arial" ))
+		(line (pt 160 32)(pt 240 32)(line_width 1))
+		(line (pt 240 32)(pt 240 384)(line_width 1))
+		(line (pt 160 384)(pt 240 384)(line_width 1))
+		(line (pt 160 32)(pt 160 384)(line_width 1))
+		(line (pt 161 52)(pt 161 76)(line_width 1))
+		(line (pt 162 52)(pt 162 76)(line_width 1))
+		(line (pt 161 92)(pt 161 180)(line_width 1))
+		(line (pt 162 92)(pt 162 180)(line_width 1))
+		(line (pt 161 196)(pt 161 332)(line_width 1))
+		(line (pt 162 196)(pt 162 332)(line_width 1))
+		(line (pt 161 348)(pt 161 372)(line_width 1))
+		(line (pt 162 348)(pt 162 372)(line_width 1))
+		(line (pt 0 0)(pt 400 0)(line_width 1))
+		(line (pt 400 0)(pt 400 400)(line_width 1))
+		(line (pt 0 400)(pt 400 400)(line_width 1))
+		(line (pt 0 0)(pt 0 400)(line_width 1))
+	)
+)

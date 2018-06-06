@@ -29,13 +29,14 @@ use IEEE.numeric_std.all;
 
 entity elk_interface is
   port (
-    debug_uart_txd : out std_logic;
+    debug_uart_txd : out std_logic;  -- 2MHz trace uart transmitter
     debug_a : out std_logic;
     debug_b : out std_logic;
-    ext_uart_rxd : in std_logic;
-    ext_uart_txd : out std_logic;
+    ext_uart_rxd : in std_logic;  -- 115k2 sideways ram input
+    ext_uart_txd : out std_logic;  -- 115k2 debug output
 
-    fast_clock : in std_logic; -- pass through for FPGA's internal flash
+    fast_clock : in std_logic;  -- 82MHz internal oscillator clock
+
     elk_A : in std_logic_vector(15 downto 0);
     elk_D : inout std_logic_vector(7 downto 0);
     elk_PHI0 : in std_logic;
@@ -192,16 +193,18 @@ begin
   SIDEWAYS <= '1' when elk_A(15 downto 14) = "10" else '0';
 
   -- rom "zero" in bank 6 (the name comes from way back when I had it in bank 0)
-  reading_rom_zero <= '1' when SIDEWAYS = '1' and bank = x"6" else '0';
-  --DEBUG: put it in &FDxx instead
-  --reading_rom_zero <= '1' when elk_A(15 downto 8) = x"FD" else '0';
+  --reading_rom_zero <= '1' when SIDEWAYS = '1' and bank = x"6" else '0';
+  --DEBUG: put it in &FDxx as well
+  reading_rom_zero <= '1' when
+    (SIDEWAYS = '1' and bank = x"6") or (elk_A(15 downto 8) = x"FD")
+    else '0';
 
   -- sideways ram in bank 7 (or bank 0, depending)
-  --accessing_sideways_ram <= '1' when SIDEWAYS = '1' and bank = x"7" else '0';
+  accessing_sideways_ram <= '1' when SIDEWAYS = '1' and bank = x"7" else '0';
   --DEBUG: put it in &FDxx as well
-  accessing_sideways_ram <= '1' when
-    (SIDEWAYS = '1' and bank = x"7") or (elk_A(15 downto 8) = x"FD")
-    else '0';
+  --accessing_sideways_ram <= '1' when
+  --  (SIDEWAYS = '1' and bank = x"7") or (elk_A(15 downto 8) = x"FD")
+  --  else '0';
 
   -- debug register
   DEBUG <= '1' when sampled_A(15 downto 4) = x"FCF" else '0';
@@ -494,7 +497,7 @@ begin
         end if;
       end if;
 
-    end if; -- falling fast_clock edge
+    end if; -- rising fast_clock edge
   end process;
 
 end rtl;
