@@ -1,0 +1,29 @@
+Info: Starting: Create block symbol file (.bsf)
+Info: qsys-generate C:\Users\phil2\Dropbox\myelin-acorn-electron-hardware\bga_in_two_layers\10m04_blink\internal_osc.qsys --block-symbol-file --output-directory=C:\Users\phil2\Dropbox\myelin-acorn-electron-hardware\bga_in_two_layers\10m04_blink\internal_osc --family="MAX 10" --part=10M04SCU169C8G
+Progress: Loading 10m04_blink/internal_osc.qsys
+Progress: Reading input file
+Progress: Adding int_osc_0 [altera_int_osc 17.1]
+Progress: Parameterizing module int_osc_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: qsys-generate succeeded.
+Info: Finished: Create block symbol file (.bsf)
+Info: 
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\Users\phil2\Dropbox\myelin-acorn-electron-hardware\bga_in_two_layers\10m04_blink\internal_osc.qsys --synthesis=VHDL --output-directory=C:\Users\phil2\Dropbox\myelin-acorn-electron-hardware\bga_in_two_layers\10m04_blink\internal_osc\synthesis --family="MAX 10" --part=10M04SCU169C8G
+Progress: Loading 10m04_blink/internal_osc.qsys
+Progress: Reading input file
+Progress: Adding int_osc_0 [altera_int_osc 17.1]
+Progress: Parameterizing module int_osc_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: internal_osc: Generating internal_osc "internal_osc" for QUARTUS_SYNTH
+Info: int_osc_0: Generating top-level entity altera_int_osc.
+Info: int_osc_0: "internal_osc" instantiated altera_int_osc "int_osc_0"
+Info: internal_osc: Done "internal_osc" with 2 modules, 3 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

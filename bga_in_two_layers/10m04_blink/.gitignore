@@ -1,0 +1,7 @@
+*.log
+.qsys_edit
+db
+incremental_db
+output_files
+precision_work
+simulation
