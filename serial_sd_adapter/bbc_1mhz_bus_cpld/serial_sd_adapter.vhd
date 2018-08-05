@@ -43,7 +43,7 @@ entity serial_sd_adapter is
         include_bitbang_sd : boolean := true;
 
         -- '1' to include the pass-through SD card interface via the AVR
-        include_avr_sd : boolean := true;
+        include_avr_sd : boolean := false;
 
         -- '1' to include the second serial port
         include_second_serial : std_logic := '0'
