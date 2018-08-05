@@ -1,7 +1,7 @@
 myelin-acorn-electron-hardware
 ==============================
 
-The Acorn Electron is a British computer that was very popular in the UK and New
+The [Acorn Electron](https://en.wikipedia.org/wiki/Acorn_Electron) is a British computer that was very popular in the UK and New
 Zealand in the 80s, and was the first computer I ever used, in 1985.  I acquired
 one on eBay in 2016, and started hacking on hardware expansions for it a little
 later.  In the meantime I've also acquired a BBC Model B, and some BBC Master
@@ -125,14 +125,13 @@ Installation notes
 
 I use my own Python scripts for generating netlists, rather than entering
 schematics through Kicad's eeschema package.  If you change the .py file in
-any of the 'pcb' folders, running 'make' (or 'make net') should rebuild the
+any of the `pcb` folders, running 'make' (or 'make net') should rebuild the
 netlist.
 
 The Makefile will also plot gerbers once a .kicad_pcb file has been created.
 This requires some messing around on macOS -- you have to copy the system
 Python executable into the pcbnew folder.
 
-Generating the previews linked from the README.md files requires pcb-tools,
-which you can install using 'python setup.py install' in the third_party/pcb-
-tools folder (after running git submodule update --init).  On macOS, first
-install its dependencies with 'brew install cairo pango'.
+Generating the previews linked from the `README.md` files requires pcb-tools,
+which you can install using `python setup.py install` in the `third_party/pcb-tools` folder (after running `git submodule update --init`).  On macOS, first
+install its dependencies with `brew install cairo pango`.
