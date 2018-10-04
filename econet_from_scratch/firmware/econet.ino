@@ -189,10 +189,19 @@ void loop() {
 
   // static uint8_t serial_state = 0;
   // static unsigned long serial_state_time = 0;
+  static int chars_to_write = 0, is_first_char = 0;
   static unsigned long last_char_write = 0;
-  if (sercom2.isDataRegisterEmptyUART() &&
-      digitalRead(PIN_SERIAL_BUFFER_EMPTY) == HIGH &&
-      (last_char_write - millis()) > 50
+
+  // wait 50ms between frames
+  if (!chars_to_write && (last_char_write - millis()) > 50) {
+    chars_to_write = 20;
+    is_first_char = 1;
+  }
+
+
+  if (sercom2.isDataRegisterEmptyUART()
+      && digitalRead(PIN_SERIAL_BUFFER_EMPTY) == HIGH
+      && chars_to_write > 0
   ) {
     digitalWrite(PIN_MCU_IS_TRANSMITTING, HIGH);
   //   serial_state = 1;
@@ -201,7 +210,10 @@ void loop() {
   // if (serial_state == 1 && millis() > serial_state_time + 1) {
     // sercom2.writeDataUART() casts our input to uint8_t, so we have
     // to go straight to the register here.
-    SERCOM2->USART.DATA.reg = (uint16_t)0x142;
+    chars_to_write --;
+    // start and end with flag, and transmit lots of 0x42 in between
+    SERCOM2->USART.DATA.reg = (is_first_char || !chars_to_write) ? (uint16_t)0x17E : (uint16_t)0x42;
+    is_first_char = 0;
     last_char_write = millis();
   //   serial_state = 2;
   }
