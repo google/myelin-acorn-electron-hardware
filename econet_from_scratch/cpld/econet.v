@@ -259,9 +259,10 @@ always @(posedge clock_24m) begin
                 if (econet_transmitting == 1'b0) begin
                     // Buffer underrun: we're in a frame and it's time to output a bit, but we have nothing
                     outputting_frame <= 1'b0;
+                    // Reset line to '1' when idling, so we don't get a glitch when we start driving again
+                    econet_data_out <= 1'b1;
                 end
             end
-
 
             if (econet_transmitting == 1'b0) begin
                 // econet_data_D should idle high
