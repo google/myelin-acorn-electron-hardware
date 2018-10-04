@@ -3,7 +3,7 @@
 
 `define assert(condition, message) if(!(condition)) begin $display(message); $finish(1); end
 
-module econet_test;
+module econet_tb;
 
     reg clk;
     wire mcu_txd;
@@ -126,9 +126,9 @@ module econet_test;
     end
 
     initial begin
-        $display("econet_test");
-        $dumpfile("econet_test.vcd");
-        $dumpvars(0, econet_test);
+        $display("econet_tb");
+        $dumpfile("econet_tb.vcd");
+        $dumpvars(0, econet_tb);
 
         $display("--- TESTING SENDING DATA TO ECONET ---");
 

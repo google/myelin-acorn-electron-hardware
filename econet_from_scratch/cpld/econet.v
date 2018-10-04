@@ -145,7 +145,7 @@ wire econet_clock;
 assign econet_clock = drive_econet_clock ? econet_clock_from_mcu : (econet_clock_R ^ buggy_rev1_pcb);
 
 // A bunch of debug outputs using the Econet module pins along the bottom of the board
-assign nRESET = mcu_is_transmitting; //DEBUG
+assign nRESET = mcu_is_transmitting_sync[2]; //DEBUG
 assign D[7] = serial_mcu_to_cpld; //DEBUG
 assign D[6] = serial_buffer_empty; //DEBUG
 assign D[5] = serial_input_buffer_full; //DEBUG
@@ -219,6 +219,10 @@ always @(posedge clock_24m) begin
         // Push a byte into the output shift register if necessary
         if (econet_transmitting == 1'b0) begin
             if (econet_initiate_abort == 1'b1) begin
+                // We're sending an abort, probably because we got a buffer
+                // overrun (on receiption).  This will cancel the current frame.
+                // If we get a buffer underrun on transmission, we probably
+                // just bomb out and let the line idle state abort our frame.
                 serial_input_buffer_full <= 1'b0;
                 outputting_frame <= 1'b1;
                 econet_transmitting <= 1'b1;
@@ -226,12 +230,19 @@ always @(posedge clock_24m) begin
                 econet_shifter <= 8'b11111111;
                 econet_bit_count <= 3'b0;
             end else if (serial_input_buffer_full == 1'b1) begin
+                // We've received a byte from the MCU and want to transmit it.
+
+                // Make room for the next byte from the MCU.
                 serial_input_buffer_full <= 1'b0;
+
+                // When we're not transmitting, we ignore anything without
+                // the 'raw' byte.
                 if (serial_shifter[8] == 1'b1) begin
                     // new frames always start with a raw (flag) byte
                     outputting_frame <= 1'b1;
                 end
                 econet_transmitting <= 1'b1;
+                // 0x1XX = 8 raw bits; 0x0XX = 8 bits with zero stuffing
                 econet_output_raw <= serial_shifter[8];
                 econet_shifter <= serial_shifter[7:0];
                 econet_bit_count <= 3'b0;

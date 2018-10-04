@@ -50,9 +50,11 @@
 
 // PA08 - D35 - serial_cpld_to_mcu (RX2)
 #define PIN_SERIAL_CPLD_TO_MCU 35
-// PA09 - D23
+// PA09 - D23 - serial_buffer_empty
+#define PIN_SERIAL_BUFFER_EMPTY 23
 // PA10 - D34
-// PA11 - D22
+// PA11 - D22 - mcu_is_transmitting
+#define PIN_MCU_IS_TRANSMITTING 22
 // PA14 - D5 - serial_mcu_to_cpld (TX2)
 #define PIN_SERIAL_MCU_TO_CPLD 5
 // PA15 - D7 - clock_24m (XCK2)
@@ -84,7 +86,6 @@ void setup() {
   // Set up USB serial port
   Serial.begin(9600);
 
-if (1) {
   // Initialize SERCOM2 as UART at max speed (we'll switch to USRT later)
   sercom2.initUART(UART_INT_CLOCK, SAMPLE_RATE_x8, 3000000ul);
 
@@ -127,17 +128,47 @@ if (1) {
 
   // And we're ready to go!
   sercom2.enableUART();
-}
 
   // Initialize timer/counter to generate 200kHz PWM w/ 20% duty cycle
   // divide main clock by 48 to get 1MHz, then set transitions at 0/1/5
-  //TODO
+  //TODO verify this
+  //TODO we may be able to just kick this off with an analogWrite, then change CC[1] and PER
+
+  // Enable clock for TCC2
+  GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCM_TCC2_TC3);
+  while (GCLK->STATUS.bit.SYNCBUSY == 1);
+
+  // Set pin function to TCC2/WO[1]
+  pinPeripheral(PIN_ECONET_CLOCK_FROM_MCU, PIO_TIMER);
+
+  // Disable
+  TCC2->CTRLA.bit.ENABLE = 0;
+  while (TCC2->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
+  // Normal PWM
+  TCC2->WAVE.reg |= TCC_WAVE_WAVEGEN_NPWM;
+  while (TCC2->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
+  // Set compare channel to 1us (48 clocks)
+  TCC2->CC[1].reg = 48;
+  while (TCC2->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
+  // Set PER to 5us (5 * 48 clocks)
+  TCC2->PER.reg = 5 * 48;
+  while (TCC2->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
+  // Enable
+  TCC2->CTRLA.bit.ENABLE = 1;
+  while (TCC2->SYNCBUSY.reg & TCC_SYNCBUSY_MASK);
 
   // Set econet clock pin directions
-  pinMode(PIN_ECONET_CLOCK_FROM_MCU, OUTPUT);
-  digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, HIGH);
+  // pinMode(PIN_ECONET_CLOCK_FROM_MCU, OUTPUT);
+  // digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, HIGH);
   pinMode(PIN_DRIVE_ECONET_CLOCK, OUTPUT);
   digitalWrite(PIN_DRIVE_ECONET_CLOCK, HIGH);
+
+  // CPLD runs in transmit mode when we drive this high
+  pinMode(PIN_MCU_IS_TRANSMITTING, OUTPUT);
+  digitalWrite(PIN_MCU_IS_TRANSMITTING, LOW);
+
+  // CPLD drives this high when we can write to it
+  pinMode(PIN_SERIAL_BUFFER_EMPTY, INPUT);
 }
 
 uint8_t serial_get_uint8() {
@@ -152,15 +183,35 @@ uint16_t serial_read_addr() {
 }
 
 void loop() {
-  static uint8_t econet_clock_drive = 0;
-  static uint8_t econet_clock_state = 0;
-  digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, econet_clock_state ? HIGH : LOW);
-  econet_clock_state = !econet_clock_state;
+  // static uint8_t econet_clock_state = 0;
+  // digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, econet_clock_state ? HIGH : LOW);
+  // econet_clock_state = !econet_clock_state;
 
-  // digitalWrite(PIN_DRIVE_ECONET_CLOCK, sercom2.isDataRegisterEmptyUART() ? HIGH : LOW);
-  if (sercom2.isDataRegisterEmptyUART()) {
-    sercom2.writeDataUART(0x42);
+  // static uint8_t serial_state = 0;
+  // static unsigned long serial_state_time = 0;
+  static unsigned long last_char_write = 0;
+  if (sercom2.isDataRegisterEmptyUART() &&
+      digitalRead(PIN_SERIAL_BUFFER_EMPTY) == HIGH &&
+      (last_char_write - millis()) > 50
+  ) {
+    digitalWrite(PIN_MCU_IS_TRANSMITTING, HIGH);
+  //   serial_state = 1;
+  //   serial_state_time = millis();
+  // }
+  // if (serial_state == 1 && millis() > serial_state_time + 1) {
+    // sercom2.writeDataUART() casts our input to uint8_t, so we have
+    // to go straight to the register here.
+    SERCOM2->USART.DATA.reg = (uint16_t)0x142;
+    last_char_write = millis();
+  //   serial_state = 2;
   }
+  // if (serial_state == 2 && millis() > serial_state_time + 11) {
+  //   digitalWrite(PIN_MCU_IS_TRANSMITTING, LOW);
+  //   serial_state = 3;
+  // }
+  // if (serial_state == 3 && millis() > serial_state_time + 21) {
+  //   serial_state = 0;
+  // }
 
   static uint8_t serial_active = 0;
   static unsigned long serial_active_when = 0;
@@ -176,18 +227,19 @@ void loop() {
     // Serial port should have settled by now
     Serial.println(SystemCoreClock);
     serial_active = 2;
-  } else if (serial_active = 2) {
+  } else if (serial_active == 2) {
     // Serial port is actually open.
   }
 
   // turn it on and off to make sure the _DE input is functioning
-  ++ econet_clock_drive;
-  if (econet_clock_drive == 10) {
-    digitalWrite(PIN_DRIVE_ECONET_CLOCK, LOW);
-  } else if (econet_clock_drive == 20) {
-    digitalWrite(PIN_DRIVE_ECONET_CLOCK, HIGH);
-    econet_clock_drive = 0;
-  }
+  // static uint8_t econet_clock_drive = 0;
+  // ++ econet_clock_drive;
+  // if (econet_clock_drive == 10) {
+  //   digitalWrite(PIN_DRIVE_ECONET_CLOCK, LOW);
+  // } else if (econet_clock_drive == 20) {
+  //   digitalWrite(PIN_DRIVE_ECONET_CLOCK, HIGH);
+  //   econet_clock_drive = 0;
+  // }
 
 #define LINE_SIZE 16
   uint8_t buf[LINE_SIZE];
