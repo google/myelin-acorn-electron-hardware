@@ -36,6 +36,36 @@
 
 #include <stdint.h>
 
+static inline uint8_t rev8(uint8_t a) {
+  return ((a & 0x01) << 7)
+    | ((a & 0x02) << 5)
+    | ((a & 0x04) << 3)
+    | ((a & 0x08) << 1)
+    | ((a & 0x10) >> 1)
+    | ((a & 0x20) >> 3)
+    | ((a & 0x40) >> 5)
+    | ((a & 0x80) >> 7);
+}
+
+static inline uint16_t rev16(uint16_t a) {
+  return ((a & 0x01) << 15)
+    | ((a & 0x02) << 13)
+    | ((a & 0x04) << 11)
+    | ((a & 0x08) << 9)
+    | ((a & 0x10) << 7)
+    | ((a & 0x20) << 5)
+    | ((a & 0x40) << 3)
+    | ((a & 0x80) << 1)
+    | ((a & 0x100) >> 1)
+    | ((a & 0x200) >> 3)
+    | ((a & 0x400) >> 5)
+    | ((a & 0x800) >> 7)
+    | ((a & 0x1000) >> 9)
+    | ((a & 0x2000) >> 11)
+    | ((a & 0x4000) >> 13)
+    | ((a & 0x8000) >> 15);
+}
+
 /*
  * #define CRC_POLY_xxxx
  *
@@ -79,6 +109,7 @@ uint32_t		crc_32(            const unsigned char *input_str, size_t num_bytes   
 uint16_t		crc_ccitt_1d0f(    const unsigned char *input_str, size_t num_bytes       );
 uint16_t		crc_ccitt_ffff(    const unsigned char *input_str, size_t num_bytes       );
 uint16_t		crc_dnp(           const unsigned char *input_str, size_t num_bytes       );
+uint16_t		crc_econet(        const unsigned char *input_str, size_t num_bytes       );
 uint16_t		crc_kermit(        const unsigned char *input_str, size_t num_bytes       );
 uint16_t		crc_modbus(        const unsigned char *input_str, size_t num_bytes       );
 uint16_t		crc_sick(          const unsigned char *input_str, size_t num_bytes       );
@@ -88,6 +119,7 @@ uint16_t		update_crc_16(     uint16_t crc, unsigned char c                      
 uint32_t		update_crc_32(     uint32_t crc, unsigned char c                          );
 uint16_t		update_crc_ccitt(  uint16_t crc, unsigned char c                          );
 uint16_t		update_crc_dnp(    uint16_t crc, unsigned char c                          );
+uint16_t		update_crc_econet( uint16_t crc, unsigned char c                          );
 uint16_t		update_crc_kermit( uint16_t crc, unsigned char c                          );
 uint16_t		update_crc_sick(   uint16_t crc, unsigned char c, unsigned char prev_byte );
 

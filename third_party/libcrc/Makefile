@@ -188,6 +188,7 @@ ${LIBDIR}libcrc${LIBEXT} :			\
 	${OBJDIR}crc32${OBJEXT}			\
 	${OBJDIR}crcccitt${OBJEXT}		\
 	${OBJDIR}crcdnp${OBJEXT}		\
+	${OBJDIR}crceconet${OBJEXT}		\
 	${OBJDIR}crckrmit${OBJEXT}		\
 	${OBJDIR}crcsick${OBJEXT}		\
 	${OBJDIR}nmea-chk${OBJEXT}		\
@@ -198,6 +199,7 @@ ${LIBDIR}libcrc${LIBEXT} :			\
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crc8${OBJEXT}
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crcccitt${OBJEXT}
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crcdnp${OBJEXT}
+		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crceconet${OBJEXT}
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crckrmit${OBJEXT}
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}crcsick${OBJEXT}
 		${AR} ${ARQ} ${LIBDIR}libcrc${LIBEXT} ${OBJDIR}nmea-chk${OBJEXT}
@@ -216,6 +218,8 @@ ${OBJDIR}crc32${OBJEXT}			: ${SRCDIR}crc32.c ${INCDIR}checksum.h
 ${OBJDIR}crcccitt${OBJEXT}		: ${SRCDIR}crcccitt.c ${INCDIR}checksum.h
 
 ${OBJDIR}crcdnp${OBJEXT}		: ${SRCDIR}crcdnp.c ${INCDIR}checksum.h
+
+${OBJDIR}crceconet${OBJEXT}		: ${SRCDIR}crceconet.c ${INCDIR}checksum.h
 
 ${OBJDIR}crckrmit${OBJEXT}		: ${SRCDIR}crckrmit.c ${INCDIR}checksum.h
 
