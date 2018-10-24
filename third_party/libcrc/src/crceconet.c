@@ -108,8 +108,8 @@ uint16_t update_crc_econet( uint16_t crc, unsigned char c ) {
 
 	if ( ! crc_tabeconet_init ) init_crceconet_tab();
 
-	tmp = (crc >> 8) ^ short_c;
-	crc = (crc << 8) ^ crc_tabeconet[tmp];
+	tmp = (crc & 0x00ff) ^ short_c;
+	crc = ((crc & 0xff00) >> 8) ^ crc_tabeconet[tmp];
 
 	return crc;
 
