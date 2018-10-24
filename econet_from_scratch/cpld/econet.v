@@ -147,7 +147,7 @@ assign econet_clock = drive_econet_clock ? econet_clock_from_mcu : (econet_clock
 // A bunch of debug outputs using the Econet module pins along the bottom of the board
 assign nRESET = mcu_is_transmitting_sync[2]; //DEBUG
 assign D[7] = serial_mcu_to_cpld; //DEBUG
-assign D[6] = serial_buffer_empty; //DEBUG
+assign D[6] = serial_cpld_to_mcu; //serial_buffer_empty; //DEBUG
 assign D[5] = serial_input_buffer_full; //DEBUG
 assign D[4] = econet_initiate_abort; //DEBUG
 assign D[3] = econet_transmitting; //DEBUG
@@ -269,27 +269,33 @@ always @(posedge clock_24m) begin
                 // econet_data_out <= 1'b1;
             end else begin
                 // Transmit even if we're not inside a frame, to avoid deadlocks
-                if (econet_output_raw == 1'b0 && econet_ones_count == 5) begin
-                    // stuff a zero and reset the bit-stuff counter
-                    econet_data_out <= 1'b0;
+
+                // shift out a bit (LSB first) and increment/zero ones count as necessary
+                econet_data_out <= econet_shifter[0];
+
+                // TODO verify that this always sends a 0 after five 1 bits,
+                // even at the end of a transmission (i.e. verify that sending
+                // 00011111 then a flag results in 000111110 01111110).
+                // See: https://stardot.org.uk/forums/viewtopic.php?p=130412#p130412
+                if (econet_output_raw == 1'b0 && econet_ones_count == 4 && econet_shifter[0] == 1'b1) begin
+                    // set next bit to 0 for stuffing
                     econet_ones_count <= 0;
+                    econet_shifter[0] <= 1'b0;
                 end else begin
-                    // shift out a bit (LSB first) and increment/zero ones count as necessary
                     if (econet_shifter[0] == 1'b1) begin
                         econet_ones_count <= econet_ones_count + 1;
                     end else begin
                         econet_ones_count <= 0;
                     end
-                    econet_data_out <= econet_shifter[0];
                     econet_shifter <= {1'b1, econet_shifter[7:1]};
                     econet_bit_count <= econet_bit_count + 1;
+                end
 
-                    // econet_bit_count counts from 0-7 as the 8 bits are shifted out.
-                    if (econet_bit_count == 7) begin
-                        // we just finished transmitting a byte.  signal to controller
-                        // that we need our shifter refilled.
-                        econet_transmitting <= 1'b0;
-                    end
+                // econet_bit_count counts from 0-7 as the 8 bits are shifted out.
+                if (econet_bit_count == 7) begin
+                    // we just finished transmitting a byte.  signal to controller
+                    // that we need our shifter refilled.
+                    econet_transmitting <= 1'b0;
                 end
             end
         end
@@ -320,7 +326,18 @@ always @(posedge clock_24m) begin
                 // Just received a flag
                 // Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
                 $display("received flag: put 1+%02x (1+%b) in serial shifter", {econet_shifter[6:0], 1'b0}, {econet_shifter[6:0], 1'b0});
-                serial_shifter <= {1'b1, econet_shifter[6:0], 1'b0, 1'b0};
+                serial_shifter <= {
+                    1'b1, // it's a flag
+                    {econet_data_sync[2],
+                     econet_shifter[0],
+                     econet_shifter[1],
+                     econet_shifter[2],
+                     econet_shifter[3],
+                     econet_shifter[4],
+                     econet_shifter[5],
+                     econet_shifter[6]}, // flag byte
+                    1'b0  // start bit
+                };
                 serial_bit_count <= 11;
                 econet_ones_count <= 1'b0;
                 econet_bit_count <= 0;
@@ -343,7 +360,18 @@ always @(posedge clock_24m) begin
                 if (econet_bit_count == 7) begin
                     // Probably safe to assume this will never cause a serial overrun, as this would require an Econet line rate over 2MHz.
                     $display("received byte: put 0+%02x (0+%b) in serial shifter", {econet_shifter[6:0], econet_data_sync[2]}, {econet_shifter[6:0], econet_data_sync[2]});
-                    serial_shifter <= {1'b0, {econet_shifter[6:0], econet_data_sync[2]}, 1'b0};
+                    serial_shifter <= {
+                        1'b0, // it's data (not a flag)
+                        {econet_data_sync[2],
+                         econet_shifter[0],
+                         econet_shifter[1],
+                         econet_shifter[2],
+                         econet_shifter[3],
+                         econet_shifter[4],
+                         econet_shifter[5],
+                         econet_shifter[6]}, // data byte
+                        1'b0  // start bit
+                    };
                     serial_bit_count <= 11;
                 end
             end

@@ -6,11 +6,115 @@ http://myelin.nz/acorn/ecostd
 Can we implement an Econet interface from scratch, without having to use a BBC
 Master Econet module or MC68B54 chip?
 
-Untested.
+I've built one of these, and am working on the RTL and firmware.
 
 ![PCB front](pcb/pcb-front.png)
 
 ![PCB back](pcb/pcb-back.png)
+
+Design overview
+---------------
+
+This board will allow a computer with a USB port to communicate on an Econet
+network. A CPLD handles the wire protocol and a microcontroller handles
+framing and communicating with the attached computer.
+
+Econet uses a "four way handshake", where a transmitting station sends out a
+"scout frame" to the intended receiver, the receiver acknowledges the scout
+frame if it has buffer space available and can receive a message, the
+transmitter sends the message, and the receiver acknowledges the message.
+
+There are also broadcast messages, which I believe are sent as scout frames
+and don't expect any acknowledgement.  Presumably a station receiving a
+broadcast may contact the broadcaster using the usual four way handshake.
+
+Bringup
+-------
+
+Sampled serial output while connected to an A3000 during bootup:
+
+- FLAG x 8
+- FLAG FF FF 80 00 41 39 42 4E 96 26 E6 A6 39 00 7D FB FLAG
+
+It looks like the bits are sent in reverse order on the line.  Reversing that gives:
+
+	ff -> ff
+	ff -> ff
+	80 -> 01
+	00 -> 00
+	41 -> 82
+	39 -> 9c
+	42 -> 42
+	4e -> 72
+	96 -> 69
+	26 -> 64
+	e6 -> 67
+	a6 -> 65
+	39 -> 9c
+	00 -> 00
+	7d -> be
+	fb -> df
+
+This is what we expect, and the CRC is BEDF or 7DFB (or FB7D or DFBE).
+
+https://www.lammertbies.nl/comm/info/crc-calculation.html gives 0x1D0F as the CRC-CCITT with 0xFFFF preset for the bytes on the line without bit reversal (FFFF80004139424E9626E6A639007DFB), which looks correct.
+
+Calculating CRC for the reversed (fixed) bits, FFFF0100829C4272696467659C00BEDF, doesn't give anything useful.  The MC6854 datasheet says the CRC residue should be F0B8, which is 1D0F reversed.
+
+    short_c = 0x00ff & (unsigned short) *ptr;
+    tmp     = (crc >> 8) ^ short_c;
+    crc     = (crc << 8) ^ crc_tabccitt[tmp];
+
+Bytes read from the serial connection on boot:
+
+7E 7E 7E 7E 7E 7E 7E FF FF 80 39 39 96 E6 39 39 FB FB 
+         7E 7E 7E 7E 7E FF 80 41 42 96 96 A6  0 FB FB
+expect:              FF FF 80 00 41 39 42 4E 96 26 E6 A6 39 00 7D FB FLAG
+analyzer:    ... 17E FF FF 80 00 41 39 42 4E 96 26 E6 A6 39 00 7D FB 17E
+
+so it looks like it's not making it back through the serial port so well.
+"Data input on the RxD pin is sampled at the opposite XCK clock edge when data is driven on the TxD pin"
+"When CTRLA.CPOL is '1', the data will be changed on the falling edge of XCK, and sampled on the rising
+edge of XCK."
+-- ATSAMD21 datasheet 26.6.2.3
+This is correct.
+
+Bytes read from the serial connection when connected to an an A3000 that's trying to connect to 0.254 (00 FE):
+* 0 0 11 0 0 0 35 7E 
+* 7F 0 0 0 0 0 53 7E 
+* 7F 0 0 0 0 0 53 7E 7E 
+[...]
+
+And when connecting to 123.55 (7B.37)
+* EC EC 0 0 0 0 34 34 DC 
+* EC EC 0 0 0 0 0 DC DC 
+* DE DE 11 11 0 0 34 
+[...]
+
+Saleae: 17E 7F 00 80 00 11 00 00 00 00 00 35 53 17E
+(After fixing code to not throw out chars)
+Bytes read from serial connection when trying to connect to 0.254:
+
+* 17E 7F 80 11 0 0 0 0 53 
+* 17E 7F 0 80 11 0 0 0 53 
+* 17E 0 80 11 0 0 0 35 53
+
+After buffering frame in code rather than dumping bytes one by one, I get lots of these:
+* 7F 0 80 0 11 0 0 0 0 0 35 53 (appears bit-reversed)
+* FE 00 01 00 88 00 00 00 00 00 AC CA
+
+"FS List" command in RISC OS sends this:
+* FF FF 80 0 1 99 80 70 0 0 0 0 20 0 6B 8D (appears bit-reversed)
+* FF FF 01 00 80 99 01 0E 00 00 00 00 04 00 D6 B1
+* FF FF 01 00 80 99 01 0E 00 00 00 00 04 00 D6 B1; CRC ACE7 (BAD)
+
+On boot:
+* FF FF 01 00 82 9C 42 72 69 64 67 65 9C 00 BE DF
+
+
+Frame: FF FF 01 00 82 9C 42 72 69 64 67 65 9C 00 BE DF; CRC F0B8 (ok)
+Frame: FE 00 01 00 88 00 00 00 00 00 AC CA; CRC F0B8 (ok)
+Frame: FF FF 01 00 80 99 01 0E 00 00 00 00 04 00 D6 B1; CRC F0B8 (ok)
 
 Econet wire protocol
 --------------------

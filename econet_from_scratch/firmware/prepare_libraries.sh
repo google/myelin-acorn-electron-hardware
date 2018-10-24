@@ -1,14 +1,18 @@
 #!/bin/bash
 
-# This script copies various files from //third_party/libxsvf into
-# ./libraries/libxsvf, to make it buildable as an Arduino library.
-
 set -e
+
+cd $(dirname $0)
+
+# Copy crcccitt.c from //third_party/libcrc
+cp -a ../../third_party/libcrc/src/crceconet.c ../../third_party/libcrc/include/checksum.h .
+
+# Copy various files from //third_party/libxsvf into
+# ./libraries/libxsvf, to make it buildable as an Arduino library.
 
 SRC=../../third_party/libxsvf
 DEST=libraries/libxsvf
 
-cd $(dirname $0)
 rm -rf $DEST
 mkdir -p $DEST
 cp -a $SRC/*.c $SRC/*.cpp $SRC/*.h $DEST/

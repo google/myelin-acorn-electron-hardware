@@ -18,6 +18,11 @@
 // For libxsvf, so we can program the CPLD
 #include "libxsvf.h"
 
+// For libcrc, so we can calculate the CCITT CRC16
+extern "C" {
+#include "checksum.h"
+}
+
 // This code is for the ATSAMD21E18A onboard an econet_from_scratch PCB.
 // Functions provided:
 // - USB serial interface for all control
@@ -182,7 +187,69 @@ uint16_t serial_read_addr() {
   return addr;
 }
 
+/* CRC calculation:
+
+polynomial = x^16 + x^12 + x^5 + 1
+-> 1000 1000 0001 0000
+or 0001 0000 0010 0001 <-- CRC-CCITT
+transmitter and receiver polynomial registers are initialized to all '1's prior to calculation
+FCS = complement of remainder after calculating FCS on all bits of message
+receiver performs FCS calculation on message + FCS, and result should be F0B8.
+
+Using libcrc to do this.  Some notes:
+
+https://stardot.org.uk/forums/viewtopic.php?p=125428#p125428
+"It looks as though the 68B54 chip is specified for use in a big endian system (with D0 being the most significant bit), but Acorn have wired it up little endian (with D0 being the least significant bit). This means that, in the CRC calculation, all the bytes need to be bit-flipped before adding, and the result needs to be flipped back again!"
+
+Probably need to snoop some packets on the wire to see how this works!
+
+*/
+
+// Disable USB serial commands (CPLD programming etc) by commenting this out:
+#define ENABLE_USB_SERIAL
+
+uint16_t buffer[256];
+uint16_t buf_pos = 0;
+uint16_t buf_crc = CRC_START_CCITT_FFFF;
+
 void loop() {
+
+  // Forward bytes from CPLD through to USB serial port
+  while (sercom2.availableDataUART()) {
+    uint16_t rd = SERCOM2->USART.DATA.bit.DATA;  // sercom2.readDataUART()
+    if (rd == 0x17E) {
+      if (buf_pos) {
+        // We just got a frame; dump it to the serial port
+        Serial.print("Frame:");
+        for (uint16_t i = 0; i < buf_pos; ++i) {
+          Serial.print(" ");
+          if (buffer[i] < 16) Serial.print("0");
+          Serial.print(buffer[i], HEX);
+        }
+        Serial.print("; CRC ");
+        Serial.print(buf_crc, HEX);
+        if (buf_crc == 0xf0b8) {
+          Serial.print(" (ok)");
+        } else {
+          Serial.print(" (BAD)");
+        }
+        Serial.print("\r\n");
+        buf_pos = 0;  // Ready for next frame
+        buf_crc = CRC_START_CCITT_FFFF;  // Reset CRC
+      } else {
+        // Ignore -- repeated flag byte
+      }
+    } else {
+      // Data byte
+      if (buf_pos < 250) {
+        buffer[buf_pos++] = rd;
+        buf_crc = update_crc_econet(buf_crc, (uint8_t)rd);
+      }
+    }
+  }
+
+// DEBUG: Output a bunch of frames full of 0x42
+#if 0
   // static uint8_t econet_clock_state = 0;
   // digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, econet_clock_state ? HIGH : LOW);
   // econet_clock_state = !econet_clock_state;
@@ -197,7 +264,6 @@ void loop() {
     chars_to_write = 20;
     is_first_char = 1;
   }
-
 
   if (sercom2.isDataRegisterEmptyUART()
       && digitalRead(PIN_SERIAL_BUFFER_EMPTY) == HIGH
@@ -224,7 +290,9 @@ void loop() {
   // if (serial_state == 3 && millis() > serial_state_time + 21) {
   //   serial_state = 0;
   // }
+#endif
 
+#ifdef ENABLE_USB_SERIAL
   static uint8_t serial_active = 0;
   static unsigned long serial_active_when = 0;
   if (!Serial.dtr()) {
@@ -252,9 +320,6 @@ void loop() {
   //   digitalWrite(PIN_DRIVE_ECONET_CLOCK, HIGH);
   //   econet_clock_drive = 0;
   // }
-
-#define LINE_SIZE 16
-  uint8_t buf[LINE_SIZE];
 
   if (Serial.available()) {
     int c = Serial.read();
@@ -301,5 +366,6 @@ void loop() {
       }
     }
   }
+#endif // ENABLE_USB_SERIAL
 
 }

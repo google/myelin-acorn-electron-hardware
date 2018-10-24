@@ -55,7 +55,8 @@ module econet_tb;
     reg [56:0] test_econet_receive_shifter;
     reg [7:0] test_bits_to_shift_into_econet = 0;
 
-    always @(negedge econet_clock_R) begin
+    // write to econet line on falling clock edge
+    always @(negedge econet_clock_R_pre) begin
         if (test_bits_to_shift_into_econet != 0) begin
             econet_data_R_pre <= test_econet_receive_shifter[56];
             test_econet_receive_shifter <= {test_econet_receive_shifter[55:0], 1'b1};
@@ -94,6 +95,8 @@ module econet_tb;
                         test_serial_input_full <= 1'b1;
                         test_serial_received_byte <= test_serial_input_buffer;
                     end
+                end else begin
+                    $display("FRAMING ERROR receiving byte from serial port");
                 end
                 test_serial_input_bit <= 0;
             end else begin
