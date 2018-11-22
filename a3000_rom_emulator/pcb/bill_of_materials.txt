@@ -1,0 +1,31 @@
+Identifier	Value	Description	KiCad package
+C6	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C7	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC0	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC6	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC7	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC8	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC9	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CPLD	XC95144XL-10CSG144		myelin-kicad:xilinx_csg144
+EXTPWR	ext pwr	1x3 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm
+FC0	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FLASH0	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+FLASH1	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+FLASH2	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+FLASH3	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+FLASH4	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+FLASH5	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
+JP	jumpers	1x4 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
+JTAG1	jtag	2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.	Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
+REG	MCP1700T-3302E/MB	3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.	TO_SOT_Packages_SMD:SOT-89-3
+ROM	MOS ROM	Adapter to emulate a 600mil 28-pin DIP, e.g. Digikey 1175-1525-5-ND	Housings_DIP:DIP-28_W15.24mm
