@@ -560,7 +560,7 @@ flash = [
             # Pin( 48, "A16",     "flash0_A16"),
         ],
     )
-    for flash_id in (0, 1, 2, 3, 4, 5)
+    for flash_id in (0, 1)
 ]
 # Three capacitors per chip (2 x Vio, 1 x Vcc)
 flash_caps = [
@@ -568,43 +568,51 @@ flash_caps = [
     for n in range(6)
 ]
 
-# 28-pin ROM footprint, to plug into the BBC Master motherboard
-connector = myelin_kicad_pcb.Component(
-    footprint="Housings_DIP:DIP-28_W15.24mm",
-    identifier="ROM",
-    value="MOS ROM",
-    desc="Adapter to emulate a 600mil 28-pin DIP, e.g. Digikey 1175-1525-5-ND",
-    pins=[
-        Pin( "1", "A15", ["bbc_A15"]),
-        Pin( "2", "A12", ["bbc_A12"]),
-        Pin( "3", "A7",  ["bbc_A7"]),
-        Pin( "4", "A6",  ["bbc_A6"]),
-        Pin( "5", "A5",  ["bbc_A5"]),
-        Pin( "6", "A4",  ["bbc_A4"]),
-        Pin( "7", "A3",  ["bbc_A3"]),
-        Pin( "8", "A2",  ["bbc_A2"]),
-        Pin( "9", "A1",  ["bbc_A1"]),
-        Pin("10", "A0",  ["bbc_A0"]),
-        Pin("11", "D0",  ["D0"]),
-        Pin("12", "D1",  ["D1"]),
-        Pin("13", "D2",  ["D2"]),
-        Pin("14", "VSS", ["GND"]),
-        Pin("15", "D3",  ["D3"]),
-        Pin("16", "D4",  ["D4"]),
-        Pin("17", "D5",  ["D5"]),
-        Pin("18", "D6",  ["D6"]),
-        Pin("19", "D7",  ["D7"]),
-        Pin("20", "nCS", ),  # bbc /CS ignored because it's tied to GND on the motherboard
-        Pin("21", "A10", ["bbc_A10"]),
-        Pin("22", "A16", ["bbc_A16"]),
-        Pin("23", "A11", ["bbc_A11"]),
-        Pin("24", "A9",  ["bbc_A9"]),
-        Pin("25", "A8",  ["bbc_A8"]),
-        Pin("26", "A13", ["bbc_A13"]),
-        Pin("27", "A14", ["bbc_A14"]),
-        Pin("28", "VCC", ["5V"]),
-    ],
-)
+# 4 x 32-pin ROM footprint, to plug into the A3000 motherboard
+rom_headers = [
+    myelin_kicad_pcb.Component(
+        footprint=("Package_DIP:DIP-32_W15.24mm" if rom_id == 0 else "myelin-kicad:dip32_rom_data_only"),
+        identifier="ROM%d" % (rom_id + 1),
+        value="ROM header",
+        desc="Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???",
+        pins=[
+            Pin("13", "D0", "rom_D%d" % (rom_id * 8 + 0)),
+            Pin("14", "D1", "rom_D%d" % (rom_id * 8 + 1)),
+            Pin("15", "D2", "rom_D%d" % (rom_id * 8 + 2)),
+            Pin("16", "GND",  "GND"),
+            Pin("17", "D3", "rom_D%d" % (rom_id * 8 + 3)),
+            Pin("18", "D4", "rom_D%d" % (rom_id * 8 + 4)),
+            Pin("19", "D5", "rom_D%d" % (rom_id * 8 + 5)),
+            Pin("20", "D6", "rom_D%d" % (rom_id * 8 + 6)),
+            Pin("21", "D7", "rom_D%d" % (rom_id * 8 + 7)),
+        ] + ([
+            Pin( "1", "Vpp"),  # On A5000 this can be A12; safest to leave NC
+            Pin( "2", "A16",    "rom_A16"),
+            Pin( "3", "A15",    "rom_A15"),
+            Pin( "4", "A12",    "rom_A12"),
+            Pin( "5", "A7",     "rom_A7"),
+            Pin( "6", "A6",     "rom_A6"),
+            Pin( "7", "A5",     "rom_A5"),
+            Pin( "8", "A4",     "rom_A4"),
+            Pin( "9", "A3",     "rom_A3"),
+            Pin("10", "A2",     "rom_A2"),
+            Pin("11", "A1",     "rom_A1"),
+            Pin("12", "A0",     "rom_A0"),
+            Pin("22", "nROMCS", "rom_nCS"),
+            Pin("23", "A10",    "rom_A10"),
+            Pin("24", "nOE"),  # grounded on A3000 depending on jumpers
+            Pin("25", "A11",    "rom_A11"),
+            Pin("26", "A9",     "rom_A9"),
+            Pin("27", "A8",     "rom_A8"),
+            Pin("28", "A13",    "rom_A13"),
+            Pin("29", "A14",    "rom_A14"),
+            Pin("30", "A17",    "rom_A17"),
+            Pin("31", "A18",    "rom_A18"),
+            Pin("32", "VCC",    "5V"),
+        ] if rom_id == 0 else []),
+    )
+    for rom_id in range(4)
+]
 
 staples = [
     myelin_kicad_pcb.Component(
