@@ -111,26 +111,6 @@ FLASH1
 - Description: 
 - KiCad package: myelin-kicad:cypress_lae064_fbga
 
-FLASH2
-- Value: S29GL064S70DHI010
-- Description: 
-- KiCad package: myelin-kicad:cypress_lae064_fbga
-
-FLASH3
-- Value: S29GL064S70DHI010
-- Description: 
-- KiCad package: myelin-kicad:cypress_lae064_fbga
-
-FLASH4
-- Value: S29GL064S70DHI010
-- Description: 
-- KiCad package: myelin-kicad:cypress_lae064_fbga
-
-FLASH5
-- Value: S29GL064S70DHI010
-- Description: 
-- KiCad package: myelin-kicad:cypress_lae064_fbga
-
 JP
 - Value: jumpers
 - Description: 1x4 0.1 inch male header
@@ -149,7 +129,7 @@ REG
 ROM1
 - Value: ROM header
 - Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
-- KiCad package: Package_DIP:DIP-32_W15.24mm
+- KiCad package: myelin-kicad:dip32_rom
 
 ROM2
 - Value: ROM header

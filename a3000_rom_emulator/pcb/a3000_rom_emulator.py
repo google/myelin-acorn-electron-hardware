@@ -571,7 +571,7 @@ flash_caps = [
 # 4 x 32-pin ROM footprint, to plug into the A3000 motherboard
 rom_headers = [
     myelin_kicad_pcb.Component(
-        footprint=("Package_DIP:DIP-32_W15.24mm" if rom_id == 0 else "myelin-kicad:dip32_rom_data_only"),
+        footprint=("myelin-kicad:dip32_rom" if rom_id == 0 else "myelin-kicad:dip32_rom_data_only"),
         identifier="ROM%d" % (rom_id + 1),
         value="ROM header",
         desc="Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???",

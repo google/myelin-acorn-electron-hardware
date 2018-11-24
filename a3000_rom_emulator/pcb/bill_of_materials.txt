@@ -21,14 +21,10 @@ FC4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x
 FC5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FLASH0	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
 FLASH1	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-FLASH2	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-FLASH3	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-FLASH4	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-FLASH5	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
 JP	jumpers	1x4 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
 JTAG1	jtag	2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.	Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
 REG	MCP1700T-3302E/MB	3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.	TO_SOT_Packages_SMD:SOT-89-3
-ROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	Package_DIP:DIP-32_W15.24mm
+ROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
 ROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
 ROM3	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
 ROM4	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
