@@ -1,6 +1,31 @@
 This is the human-readable bill of materials.
 See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 
+AEXT
+- Value: Extras
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+
+C1
+- Value: 10u
+- Description: 10u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C10
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C11
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C12
+- Value: 1u
+- Description: 1u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 C6
 - Value: 1u
 - Description: 1u capacitor in 0805 package
@@ -23,53 +48,63 @@ CC1
 
 CC2
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC3
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC4
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC5
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC6
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC7
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC8
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC9
 - Value: 100n
-- Description: 100n capacitor in 0805 package
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+- Description: 100n capacitor in 0402 package
+- KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CPLD
 - Value: XC95144XL-10CSG144
 - Description: 
 - KiCad package: myelin-kicad:xilinx_csg144
 
+D1
+- Value: S1ATR
+- Description: Rectifier diode
+- KiCad package: Diode_SMD:D_SMA
+
+D2
+- Value: S1ATR
+- Description: Rectifier diode
+- KiCad package: Diode_SMD:D_SMA
+
 EXTPWR
 - Value: ext pwr
 - Description: 1x3 0.1 inch male header
-- KiCad package: Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
 
 FC0
 - Value: 100n
@@ -111,20 +146,40 @@ FLASH1
 - Description: 
 - KiCad package: myelin-kicad:cypress_lae064_fbga
 
-JP
-- Value: jumpers
-- Description: 1x4 0.1 inch male header
-- KiCad package: Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
+GPIO
+- Value: gpio
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
 
-JTAG1
-- Value: jtag
-- Description: 2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.
-- KiCad package: Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
+MCU
+- Value: ATSAMD21E18A
+- Description: 
+- KiCad package: Package_QFP:TQFP-32_7x7mm_P0.8mm
+
+OSC
+- Value: osc
+- Description: 
+- KiCad package: Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering
+
+R1
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R2
+- Value: 1k
+- Description: 1k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R4
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 REG
-- Value: MCP1700T-3302E/MB
-- Description: 3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.
-- KiCad package: TO_SOT_Packages_SMD:SOT-89-3
+- Value: AP7365-33YG-XX
+- Description: 3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.
+- KiCad package: Package_TO_SOT_SMD:SOT-89-3
 
 ROM1
 - Value: ROM header
@@ -145,4 +200,19 @@ ROM4
 - Value: ROM header
 - Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
 - KiCad package: myelin-kicad:dip32_rom_data_only
+
+SWD
+- Value: swd
+- Description: 
+- KiCad package: Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical
+
+SWD2
+- Value: swd
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+
+USB
+- Value: usb
+- Description: Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.
+- KiCad package: myelin-kicad:micro_usb_b_smd_molex
 

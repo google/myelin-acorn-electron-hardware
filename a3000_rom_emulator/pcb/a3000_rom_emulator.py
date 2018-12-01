@@ -21,7 +21,22 @@
 # by Phillip Pearson
 
 # A board that replaces the 4 x 512kB ROM chips in the A3000 with a flash chip
-# and a big CPLD, to allow it to be updated without removing it from the machine.
+# and a big CPLD, to allow it to be updated without removing it from the
+# machine.
+
+# A note on address line numbering.  The ARM provides address lines LA0-LA25,
+# which address individual bytes.  The ROM is four bytes wide, so its A0
+# connects to LA2. 2MB ROM = 512k x 32; LA2-LA20 connect to ROM A0-18.  On the
+# A3000, LA16-18 (A18-20) are wired via jumpers, but on the A3xx, these
+# jumpers aren't always fitted, so this board provides headers to solder them
+# in (or just jumper them, if your motherboard provides them).
+
+# Design rules for this board:
+# JLCPCB 4 layer service: https://jlcpcb.com/capabilities/Capabilities
+# - min trace/space: 0.0889mm (3.5mil)
+# - min via-to-trace: 0.127mm (5mil)
+# - min via: 0.45mm dia, 0.2mm drill
+# - vias inside BGA: 0.51mm (20.1 mil) dia, 0.25mm (9.8 mil) drill.
 
 PROJECT_NAME = "a3000_rom_emulator"
 PATH_TO_CPLD = "../cpld"
@@ -37,25 +52,45 @@ Pin = myelin_kicad_pcb.Pin
 # TODO add 3 x FID
 # TODO add soldermask chevrons in 3 corners of board to detect misregistration http://iconnect007.media/index.php/article/47987/soldermask-registration-considerations-for-fine-pitch-area-array-package-ass
 # TODO make sure the BOM comes out OK
+# TODO read stencil design guidelines in IPC-7525A
 
 # (done) can I use BGA?  xc95144 comes in cs144 package, which is 0.8mm 12x12mm (c.f. 22x22mm for TQ144) and flash comes in 1mm pitch 13x11 64-ball BGA
 
 # (done) Figure out how to correctly route the flash.  Can we use a daisy chain with stubs?  Rule of thumb from https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/an/an224.pdf is that TDstub < 1/3 of rise time.  In our case rise time is about 1.5-2ns, so worst case Tdstub should be < 0.5ns, so 7.5cm.
 
-# TODO figure out how to correctly daisy chain all the flash address and control signals through the three BGAs. FLASH2/FLASH3 are the best bet so far: 8 data lines out top and bottom, 26 signals coming out the left side: A0-21 plus four.  need to get these out the right side too.
+# (done) figure out how to correctly daisy chain all the flash address and control signals through the three BGAs. FLASH2/FLASH3 are the best bet so far: 8 data lines out top and bottom, 26 signals coming out the left side: A0-21 plus four.  need to get these out the right side too.
 
-# TODO read stencil design guidelines in IPC-7525A
+# (done) add 3v3 reg
+# (done) use tag-connect instead of SWD, for low profile? -- http://www.tag-connect.com/Materials/TC2030-CTX.pdf
+# (done) add power diodes so we can power from USB or arc
 
-# TODO add power diodes so we can power from USB or arc
-# TODO add 10k pullup for flash_READY
-# TODO add 10k pullup for arc_nROMCS to help when not plugged in
-# TODO add jumpers so we can get LA18, LA19 and LA20 from flying leads on pre-A3000 machines (IC28 on A3xx)
-# TODO add pin to wire to A21, so we can support 4MB ROMs
-# TODO add pin to wire to reset, so we can re-reset the machine once the board is alive
-# TODO make footprint for xilinx_csg144
-# TODO make footprint for s29 flash
-# TODO add USB MCU (atsamd51 or 21?)
-# TODO add 96MHz (64MHz?) oscillator footprint, in case we want that clock
+# (done) add 10k pullup for Romcs* to help when not plugged in
+mcu_reset_pullup = myelin_kicad_pcb.R0805("10k", "rom_nCS", "5V", ref="R4")
+# (done) add jumpers so we can get LA18, LA19 and LA20 from flying leads on pre-A3000 machines (IC28 on A3xx)
+# (done) add pin to wire to A21, so we can support 4MB ROMs
+# (done) add pin to wire to reset, so we can re-reset the machine once the board is alive
+# (done) make footprint for xilinx_csg144
+# (done) make footprint for s29 flash
+# (done) add USB MCU (atsamd51 or 21?)
+# (done) add 96MHz (64MHz?) oscillator footprint, in case we want that clock
+
+osc = myelin_kicad_pcb.Component(
+    footprint="Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering",
+    identifier="OSC",
+    value="osc",
+    # When ordering: double check it's the 3.2x2.5mm package
+    # http://ww1.microchip.com/downloads/en/DeviceDoc/20005529B.pdf
+    #    DSC100X-C-X-X-096.000-X
+    pins=[
+        Pin(1, "STANDBY#",  "3V3"),
+        Pin(2, "GND",       "GND"),
+        Pin(3, "OUT",       "osc_output"),
+        Pin(4, "VDD",       "3V3"),
+    ],
+)
+
+
+# TODO bring out spare GPIOs and CPLD pins for future work
 
 # Notes on BGA soldering (I'm using NSMD everywhere):
 # - https://forum.kicad.info/t/how-to-build-a-nsmd-footprint-in-kicad/4889/2
@@ -68,370 +103,226 @@ Pin = myelin_kicad_pcb.Pin
     # version still isn't quick enough for single cycle access on
     # a 12MHz bus (e.g. A5000).
 
-# TODO switch to CSG144
 cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
     value="XC95144XL-10CSG144",
     buses=[""],
     pins=[
-        Pin( "A1", "",         ""),
-        Pin( "A2", "",         ""),
-        Pin( "A3", "",         ""),
-        Pin( "A4", "",         ""),
-        Pin( "A5", "",         ""),
-        Pin( "A6", "",         ""),
-        Pin( "A7", "",         ""),
-        Pin( "A8", "",         ""),
-        Pin( "A9", "",         ""),
-        Pin("A10", "",         ""),
-        Pin("A11", "",         ""),
-        Pin("A12", "",         ""),
-        Pin("A13", "",         ""),
-        Pin( "B1", "",         ""),
-        Pin( "B2", "",         ""),
-        Pin( "B3", "",         ""),
-        Pin( "B4", "",         ""),
-        Pin( "B5", "",         ""),
-        Pin( "B6", "",         ""),
-        Pin( "B7", "",         ""),
-        Pin( "B8", "",         ""),
-        Pin( "B9", "",         ""),
-        Pin("B10", "",         ""),
-        Pin("B11", "",         ""),
-        Pin("B12", "",         ""),
-        Pin("B13", "",         ""),
-        Pin( "C1", "",         ""),
-        Pin( "C2", "",         ""),
-        Pin( "C3", "",         ""),
-        Pin( "C4", "",         ""),
-        Pin( "C5", "",         ""),
-        Pin( "C6", "",         ""),
-        Pin( "C7", "",         ""),
-        Pin( "C8", "",         ""),
-        Pin( "C9", "",         ""),
-        Pin("C10", "",         ""),
-        Pin("C11", "",         ""),
-        Pin("C12", "",         ""),
-        Pin("C13", "",         ""),
-        Pin( "D1", "",         ""),
-        Pin( "D2", "",         ""),
-        Pin( "D3", "",         ""),
-        Pin( "D4", "",         ""),
-        Pin( "D5", "",         ""),
-        Pin( "D6", "",         ""),
-        Pin( "D7", "",         ""),
-        Pin( "D8", "",         ""),
-        Pin( "D9", "",         ""),
-        Pin("D10", "",         ""),
-        Pin("D11", "",         ""),
-        Pin("D12", "",         ""),
-        Pin("D13", "",         ""),
+        # TODO flash_* - A*22, D*32, ctl*3 (57)
+        # TODO rom_A0-19, rom_nROMCS, arc_D0-31, arc_nRESET (54)
+        # TODO SPI to MCU x 4 (4)
+        # TODO clock -- one from oscillator, one from MCU (separate from SCK)
+        # == 117
+        # MCU can drive flash_nRESET if necessary
+        Pin( "A1", "VCCIO",    "3V3"),
+        Pin( "A2", "",         "arc_RESET"),
+        Pin( "A3", "",         "dummy_A3"),
+        Pin( "A4", "",         "dummy_A4"),
+        Pin( "A5", "",         "dummy_A5"),
+        Pin( "A6", "",         "dummy_A6"),
+        Pin( "A7", "",         "dummy_A7"),
+        Pin( "A8", "",         "dummy_A8"),
+        Pin( "A9", "",         "dummy_A9"),
+        Pin("A10", "",         "dummy_A10"),
+        Pin("A11", "",         "dummy_A11"),
+        Pin("A12", "",         "dummy_A12"),
+        Pin("A13", "VCCIO",    "3V3"),
+        Pin( "B1", "",         "dummy_B1"),
+        Pin( "B2", "GND",      "GND"),
+        Pin( "B3", "VCCINT",   "3V3"),
+        Pin( "B4", "",         "dummy_B4"),
+        Pin( "B5", "",         "dummy_B5"),
+        Pin( "B6", "",         "dummy_B6"),
+        Pin( "B7", "",         "dummy_B7"),
+        Pin( "B8", "GND",      "GND"),
+        Pin( "B9", "",         "dummy_B9"),
+        Pin("B10", "",         "dummy_B10"),
+        Pin("B11", "",         "dummy_B11"),
+        Pin("B12", "GND",      "GND"),
+        Pin("B13", "",         "dummy_B13"),
+        Pin( "C1", "",         "dummy_C1"),
+        Pin( "C2", "",         "dummy_C2"),
+        Pin( "C3", "",         "dummy_C3"),
+        Pin( "C4", "",         "dummy_C4"),
+        Pin( "C5", "",         "dummy_C5"),
+        Pin( "C6", "",         "dummy_C6"),
+        Pin( "C7", "VCCIO",    "3V3"),
+        Pin( "C8", "TDO",      "cpld_TDO"),
+        Pin( "C9", "",         "dummy_C9"),
+        Pin("C10", "GND",      "GND"),
+        Pin("C11", "",         "dummy_C11"),
+        Pin("C12", "",         "dummy_C12"),
+        Pin("C13", "",         "dummy_C13"),
+        Pin( "D1", "VCCINT",   "3V3"),
+        Pin( "D2", "",         "dummy_D2"),
+        Pin( "D3", "",         "dummy_D3"),
+        Pin( "D4", "",         "dummy_D4"),
+        Pin( "D5", "",         "dummy_D5"),
+        Pin( "D6", "",         "dummy_D6"),
+        Pin( "D7", "",         "dummy_D7"),
+        Pin( "D8", "",         "dummy_D8"),
+        Pin( "D9", "",         "dummy_D9"),
+        Pin("D10", "",         "dummy_D10"),
+        Pin("D11", "",         "dummy_D11"),
+        Pin("D12", "",         "dummy_D12"),
+        Pin("D13", "",         "dummy_D13"),
 
-        Pin( "E1", "",         ""),
-        Pin( "E2", "",         ""),
-        Pin( "E3", "",         ""),
-        Pin( "E4", "",         ""),
-        Pin("E10", "",         ""),
-        Pin("E11", "",         ""),
-        Pin("E12", "",         ""),
-        Pin("E13", "",         ""),
-        Pin( "F1", "",         ""),
-        Pin( "F2", "",         ""),
-        Pin( "F3", "",         ""),
-        Pin( "F4", "",         ""),
-        Pin("F10", "",         ""),
-        Pin("F11", "",         ""),
-        Pin("F12", "",         ""),
-        Pin("F13", "",         ""),
-        Pin( "G1", "",         ""),
-        Pin( "G2", "",         ""),
-        Pin( "G3", "",         ""),
-        Pin( "G4", "",         ""),
-        Pin("G10", "",         ""),
-        Pin("G11", "",         ""),
-        Pin("G12", "",         ""),
-        Pin("G13", "",         ""),
-        Pin( "H1", "",         ""),
-        Pin( "H2", "",         ""),
-        Pin( "H3", "",         ""),
-        Pin( "H4", "",         ""),
-        Pin("H10", "",         ""),
-        Pin("H11", "",         ""),
-        Pin("H12", "",         ""),
-        Pin("H13", "",         ""),
-        Pin( "J1", "",         ""),
-        Pin( "J2", "",         ""),
-        Pin( "J3", "",         ""),
-        Pin( "J4", "",         ""),
-        Pin("J10", "",         ""),
-        Pin("J11", "",         ""),
-        Pin("J12", "",         ""),
-        Pin("J13", "",         ""),
+        Pin( "E1", "",         "dummy_E1"),
+        Pin( "E2", "",         "dummy_E2"),
+        Pin( "E3", "",         "dummy_E3"),
+        Pin( "E4", "",         "dummy_E4"),
+        Pin("E10", "",         "dummy_E10"),
+        Pin("E11", "GND",      "GND"),
+        Pin("E12", "",         "dummy_E12"),
+        Pin("E13", "",         "dummy_E13"),
+        Pin( "F1", "",         "dummy_F1"),
+        Pin( "F2", "",         "dummy_F2"),
+        Pin( "F3", "",         "dummy_F3"),
+        Pin( "F4", "",         "dummy_F4"),
+        Pin("F10", "",         "dummy_F10"),
+        Pin("F11", "",         "dummy_F11"),
+        Pin("F12", "",         "dummy_F12"),
+        Pin("F13", "",         "dummy_F13"),
+        Pin( "G1", "GND",      "GND"),
+        Pin( "G2", "",         "dummy_G2"),
+        Pin( "G3", "",         "dummy_G3"),
+        Pin( "G4", "",         "dummy_G4"),
+        Pin("G10", "",         "dummy_G10"),
+        Pin("G11", "",         "dummy_G11"),
+        Pin("G12", "GND",      "GND"),
+        Pin("G13", "GND",      "GND"),
+        Pin( "H1", "",         "dummy_H1"),
+        Pin( "H2", "",         "dummy_H2"),
+        Pin( "H3", "",         "dummy_H3"),
+        Pin( "H4", "",         "dummy_H4"),
+        Pin("H10", "",         "dummy_H10"),
+        Pin("H11", "",         "dummy_H11"),
+        Pin("H12", "",         "dummy_H12"),
+        Pin("H13", "",         "dummy_H13"),
+        Pin( "J1", "",         "dummy_J1"),
+        Pin( "J2", "",         "dummy_J2"),
+        Pin( "J3", "",         "dummy_J3"),
+        Pin( "J4", "",         "dummy_J4"),
+        Pin("J10", "",         "dummy_J10"),
+        Pin("J11", "",         "dummy_J11"),
+        Pin("J12", "",         "dummy_J12"),
+        Pin("J13", "VCCINT",   "3V3"),
 
-        Pin( "K1", "",         ""),
-        Pin( "K2", "",         ""),
-        Pin( "K3", "",         ""),
-        Pin( "K4", "",         ""),
-        Pin( "K5", "",         ""),
-        Pin( "K6", "",         ""),
-        Pin( "K7", "",         ""),
-        Pin( "K8", "",         ""),
-        Pin( "K9", "",         ""),
-        Pin("K10", "",         ""),
-        Pin("K11", "",         ""),
-        Pin("K12", "",         ""),
-        Pin("K13", "",         ""),
-        Pin( "L1", "",         ""),
-        Pin( "L2", "",         ""),
-        Pin( "L3", "",         ""),
-        Pin( "L4", "",         ""),
-        Pin( "L5", "",         ""),
-        Pin( "L6", "",         ""),
-        Pin( "L7", "",         ""),
-        Pin( "L8", "",         ""),
-        Pin( "L9", "",         ""),
-        Pin("L10", "",         ""),
-        Pin("L11", "",         ""),
-        Pin("L12", "",         ""),
-        Pin("L13", "",         ""),
-        Pin( "M1", "",         ""),
-        Pin( "M2", "",         ""),
-        Pin( "M3", "",         ""),
-        Pin( "M4", "",         ""),
-        Pin( "M5", "",         ""),
-        Pin( "M6", "",         ""),
-        Pin( "M7", "",         ""),
-        Pin( "M8", "",         ""),
-        Pin( "M9", "",         ""),
-        Pin("M10", "",         ""),
-        Pin("M11", "",         ""),
-        Pin("M12", "",         ""),
-        Pin("M13", "",         ""),
-        Pin( "N1", "",         ""),
-        Pin( "N2", "",         ""),
-        Pin( "N3", "",         ""),
-        Pin( "N4", "",         ""),
-        Pin( "N5", "",         ""),
-        Pin( "N6", "",         ""),
-        Pin( "N7", "",         ""),
-        Pin( "N8", "",         ""),
-        Pin( "N9", "",         ""),
-        Pin("N10", "",         ""),
-        Pin("N11", "",         ""),
-        Pin("N12", "",         ""),
-        Pin("N13", "",         ""),
+        Pin( "K1", "GND",      "GND"),
+        Pin( "K2", "GCK1",     "dummy_K2_GCK1"),
+        Pin( "K3", "",         "dummy_K3"),
+        Pin( "K4", "",         "dummy_K4"),
+        Pin( "K5", "",         "dummy_K5"),
+        Pin( "K6", "",         "dummy_K6"),
+        Pin( "K7", "",         "dummy_K7"),
+        Pin( "K8", "",         "dummy_K8"),
+        Pin( "K9", "",         "dummy_K9"),
+        Pin("K10", "",         "dummy_K10"),
+        Pin("K11", "",         "dummy_K11"),
+        Pin("K12", "",         "dummy_K12"),
+        Pin("K13", "",         "dummy_K13"),
+        Pin( "L1", "GCK2",     "dummy_L1_GCK2"),
+        Pin( "L2", "",         "dummy_L2"),
+        Pin( "L3", "",         "dummy_L3"),
+        Pin( "L4", "VCCINT",   "3V3"),
+        Pin( "L5", "",         "dummy_L5"),
+        Pin( "L6", "",         "dummy_L6"),
+        Pin( "L7", "VCCIO",    "3V3"),
+        Pin( "L8", "",         "dummy_L8"),
+        Pin( "L9", "TDI",      "cpld_TDI"),
+        Pin("L10", "TCK",      "cpld_TCK"),
+        Pin("L11", "",         "dummy_L11"),
+        Pin("L12", "",         "dummy_L12"),
+        Pin("L13", "",         "dummy_L13"),
+        Pin( "M1", "",         "dummy_M1"),
+        Pin( "M2", "GND",      "GND"),
+        Pin( "M3", "",         "dummy_M3"),
+        Pin( "M4", "",         "dummy_M4"),
+        Pin( "M5", "GND",      "GND"),
+        Pin( "M6", "",         "dummy_M6"),
+        Pin( "M7", "",         "dummy_M7"),
+        Pin( "M8", "",         "dummy_M8"),
+        Pin( "M9", "GND",      "GND"),
+        Pin("M10", "",         "dummy_M10"),
+        Pin("M11", "",         "dummy_M11"),
+        Pin("M12", "GND",      "GND"),
+        Pin("M13", "",         "dummy_M13"),
+        Pin( "N1", "VCCIO",    "3V3"),
+        Pin( "N2", "GCK3",     "dummy_N2_GCK3"),
+        Pin( "N3", "",         "dummy_N3"),
+        Pin( "N4", "",         "dummy_N4"),
+        Pin( "N5", "",         "dummy_N5"),
+        Pin( "N6", "",         "dummy_N6"),
+        Pin( "N7", "",         "dummy_N7"),
+        Pin( "N8", "",         "dummy_N8"),
+        Pin( "N9", "",         "dummy_N9"),
+        Pin("N10", "TMS",      "cpld_TMS"),
+        Pin("N11", "",         "dummy_N11"),
+        Pin("N12", "",         "dummy_N12"),
+        Pin("N13", "VCCIO",    "3V3"),
     ],
 )
-
-# Xilinx XC95144XL CPLD, in 144-pin 0.5mm TQFP package
-# cpld = myelin_kicad_pcb.Component(
-#     footprint="myelin-kicad:xilinx_tqg144",
-#     identifier="CPLD1",
-#     value="XC95144XL-10TQG144",
-#     buses=[""],
-#     pins=[
-#         Pin(  1, "VCCIO_2V5_3V3", "3V3"),
-#         Pin(  2, "P2.5-I/O/GTS3", "I/O/GTS3"),
-#         Pin(  3, "P2.6-I/O/GTS4", "I/O/GTS4"),
-#         Pin(  4, "P2.4", [""]),
-#         Pin(  5, "P2.8-I/O/GTS1", "I/O/GTS1"),
-#         Pin(  6, "P2.9-I/O/GTS2", "I/O/GTS2"),
-#         Pin(  7, "P2.10", [""]),
-#         Pin(  8, "VCCINT_3V3", "3V3"),
-#         Pin(  9, "P2.11", [""]),
-#         Pin( 10, "P2.12", [""]),
-#         Pin( 11, "P2.14", [""]),
-#         Pin( 12, "P2.13", [""]),
-#         Pin( 13, "P2.15", [""]),
-#         Pin( 14, "P2.16", [""]),
-#         Pin( 15, "P2.17", [""]),
-#         Pin( 16, "P1.2", [""]),
-#         Pin( 17, "P1.3", [""]),
-#         Pin( 18, "GND", "GND"),
-#         Pin( 19, "P1.5", [""]),
-#         Pin( 20, "P1.6", [""]),
-#         Pin( 21, "P1.8", [""]),
-#         Pin( 22, "P1.9", [""]),
-#         Pin( 23, "P1.1", [""]),
-#         Pin( 24, "P1.11", [""]),
-#         Pin( 25, "P1.4", [""]),
-#         Pin( 26, "P1.12", [""]),
-#         Pin( 27, "P1.14", [""]),
-#         Pin( 28, "P1.15", [""]),
-#         Pin( 29, "GND", "GND"),
-#         Pin( 30, "P1.17-I/O/GCK1", "I/O/GCK1"),
-#         Pin( 31, "P1.10", [""]),
-#         Pin( 32, "P3.2-I/O/GCK2", "I/O/GCK2"),
-#         Pin( 33, "P3.5", [""]),
-#         Pin( 34, "P3.6", [""]),
-#         Pin( 35, "P1.16", [""]),
-#         Pin( 36, "GND", "GND"),
-#         Pin( 37, "VCCIO_2V5_3V3", "3V3"),
-#         Pin( 38, "P3.8-I/O/GCK3", "I/O/GCK3"),
-#         Pin( 39, "P3.1", [""]),
-#         Pin( 40, "P3.9", [""]),
-#         Pin( 41, "P3.3", [""]),
-#         Pin( 42, "VCCINT_3V3", "3V3"),
-#         Pin( 43, "P3.11", [""]),
-#         Pin( 44, "P3.4", [""]),
-#         Pin( 45, "P3.12", [""]),
-#         Pin( 46, "P3.7", [""]),
-#         Pin( 47, "GND", "GND"),
-#         Pin( 48, "P3.10", [""]),
-#         Pin( 49, "P3.14", [""]),
-#         Pin( 50, "P3.15", [""]),
-#         Pin( 51, "P3.17", [""]),
-#         Pin( 52, "P5.2", [""]),
-#         Pin( 53, "P5.5", [""]),
-#         Pin( 54, "P5.6", [""]),
-#         Pin( 55, "VCCIO_2V5_3V3", "3V3"),
-#         Pin( 56, "P5.8", [""]),
-#         Pin( 57, "P5.9", [""]),
-#         Pin( 58, "P5.11", [""]),
-#         Pin( 59, "P5.3", [""]),
-#         Pin( 60, "P5.12", [""]),
-#         Pin( 61, "P5.14", [""]),
-#         Pin( 62, "GND", "GND"),
-#         Pin( 63, "TDI", "cpld_TDI"),
-#         Pin( 64, "P5.15", [""]),
-#         Pin( 65, "TMS", "cpld_TMS"),
-#         Pin( 66, "P5.7", [""]),
-#         Pin( 67, "TCK", "cpld_TCK"),
-#         Pin( 68, "P5.10", [""]),
-#         Pin( 69, "P5.17", [""]),
-#         Pin( 70, "P5.13", [""]),
-#         Pin( 71, "P7.2", [""]),
-#         Pin( 72, "GND", "GND"),
-#         Pin( 73, "VCCIO_2V5_3V3", "3V3"),
-#         Pin( 74, "P7.5", [""]),
-#         Pin( 75, "P7.3", [""]),
-#         Pin( 76, "P7.6", [""]),
-#         Pin( 77, "P7.7", [""]),
-#         Pin( 78, "P7.8", [""]),
-#         Pin( 79, "P7.10", [""]),
-#         Pin( 80, "P7.9", [""]),
-#         Pin( 81, "P7.13", [""]),
-#         Pin( 82, "P7.11", [""]),
-#         Pin( 83, "P7.16", [""]),
-#         Pin( 84, "VCCINT_3V3", "3V3"),
-#         Pin( 85, "P7.12", [""]),
-#         Pin( 86, "P7.14", [""]),
-#         Pin( 87, "P7.15", [""]),
-#         Pin( 88, "P7.17", [""]),
-#         Pin( 89, "GND", "GND"),
-#         Pin( 90, "GND", "GND"),
-#         Pin( 91, "P8.2", [""]),
-#         Pin( 92, "P8.5", [""]),
-#         Pin( 93, "P8.6", [""]),
-#         Pin( 94, "P8.8", [""]),
-#         Pin( 95, "P8.3", [""]),
-#         Pin( 96, "P8.9", [""]),
-#         Pin( 97, "P8.4", [""]),
-#         Pin( 98, "P8.11", [""]),
-#         Pin( 99, "GND", "GND"),
-#         Pin(100, "P8.12", [""]),
-#         Pin(101, "P8.10", [""]),
-#         Pin(102, "P8.14", [""]),
-#         Pin(103, "P8.13", [""]),
-#         Pin(104, "P8.15", [""]),
-#         Pin(105, "P8.17", [""]),
-#         Pin(106, "P6.2", [""]),
-#         Pin(107, "P8.16", [""]),
-#         Pin(108, "GND", "GND"),
-#         Pin(109, "VCCIO_2V5_3V3", "3V3"),
-#         Pin(110, "P6.5", [""]),
-#         Pin(111, "P6.4", [""]),
-#         Pin(112, "P6.6", [""]),
-#         Pin(113, "P6.8", [""]),
-#         Pin(114, "GND", "GND"),
-#         Pin(115, "P6.10", [""]),
-#         Pin(116, "P6.9", [""]),
-#         Pin(117, "P6.16", [""]),
-#         Pin(118, "P4.1", [""]),
-#         Pin(119, "P6.11", [""]),
-#         Pin(120, "P6.12", [""]),
-#         Pin(121, "P6.14", [""]),
-#         Pin(122, "TDO", "cpld_TDO"),
-#         Pin(123, "GND", "GND"),
-#         Pin(124, "P6.15", [""]),
-#         Pin(125, "P6.17", [""]),
-#         Pin(126, "P4.2", [""]),
-#         Pin(127, "VCCIO_2V5_3V3", "3V3"),
-#         Pin(128, "P4.5", [""]),
-#         Pin(129, "P4.6", [""]),
-#         Pin(130, "P4.8", [""]),
-#         Pin(131, "P4.9", [""]),
-#         Pin(132, "P4.11", [""]),
-#         Pin(133, "P4.3", [""]),
-#         Pin(134, "P4.12", [""]),
-#         Pin(135, "P4.10", [""]),
-#         Pin(136, "P4.14", [""]),
-#         Pin(137, "P4.13", [""]),
-#         Pin(138, "P4.15", [""]),
-#         Pin(139, "P4.16", [""]),
-#         Pin(140, "P4.17", [""]),
-#         Pin(141, "VCCINT_3V3", "3V3"),
-#         Pin(142, "P2.1", [""]),
-#         Pin(143, "P2.2-I/O/GSR", "I/O/GSR"),
-#         Pin(144, "GND", "GND"),
-#     ],
-# )
 # This chip has a ton of power pins!  Add a ton of capacitors.
 cpld_caps = [
     myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="CC%d" % n)
-    for n in range(10)
+    for n in range(2)
+] + [
+    myelin_kicad_pcb.C0402("100n", "3V3", "GND", ref="CC%d" % n)
+    for n in range(2, 10)
 ]
 myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, PATH_TO_CPLD, "constraints.ucf"))
 
-# altera jtag header, like in the lc-electronics xc9572xl board
-# left column: tck tdo tms nc tdi
-# right column: gnd vcc nc nc gnd
-cpld_jtag = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm",
-    identifier="JTAG1",
-    value="jtag",
-    desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
-    pins=[
-        Pin(1, "TCK", ["cpld_TCK"]), # top left
-        Pin(2, "GND", ["GND"]), # top right
-        Pin(3, "TDO", ["cpld_TDO"]),
-        Pin(4, "3V3", ["3V3"]),
-        Pin(5, "TMS", ["cpld_TMS"]),
-        Pin(6, "NC"),
-        Pin(7, "NC"),
-        Pin(8, "NC"),
-        Pin(9, "TDI", ["cpld_TDI"]),
-        Pin(10, "GND", ["GND"]),
-    ],
-)
+# Diode and rectifier calculations:
+# - CPLD uses max 250mA, realistically 60-120mA.
+# - MCU uses max 10mA
+# - flash uses max 60mA during erase and 80mA during powerup (so 120-160 mA)
+# So 190-290 mA for the whole board.
 
+# 1A diode: Diode_SMD:D_SMA package for S1ATR diode -- https://www.digikey.com/product-detail/en/S1ATR/1655-1502-1-ND/6022947/?itemSeq=278232946
+diodes = [
+    myelin_kicad_pcb.Component(
+        footprint="Diode_SMD:D_SMA",
+        identifier="D?",
+        value="S1ATR",
+        desc="Rectifier diode",
+        pins=[
+            Pin(1, "1", "5V"),
+            Pin(2, "2", src),
+        ],
+    )
+    for src in ("rom_5V", "VUSB")
+]
 
-# to allow a user to select which flash block to use
-cpld_jumpers = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm",
-    identifier="JP",
-    value="jumpers",
-    desc="1x4 0.1 inch male header",
-    pins=[
-        Pin(1, "GND", ["GND"]),
-        Pin(2, "JP0", ["cpld_JP0"]),
-        Pin(3, "JP1", ["cpld_JP1"]),
-        Pin(4, "3V3", ["5V"]),
-    ],
-)
+# 10uf capacitor on 5V input
+power_in_cap = myelin_kicad_pcb.C0805("10u", "GND", "5V", ref="C1")
 
+# Power regulation from 5V down to 3.3V.
+# Power comes through a diode, so we have 4.3V, which means max Vdo is 1V.
+
+# MCP1700 is good but maxes out at 250 mA.
+# Use the AP7365 instead.  0.3Vdo (max 0.4Vdo) at 600mA, which means 0.18W (0.24W max).
+# At 190mA 57mW, at 290mA 87mW
+# Thermal resistance in SOT-89 package is 133 C/W, so 0.24W->32C, 0.18W->24C, 0.087W->12C, 0.057->8C.
+# Thermal protection kicks in when junction hits 145C, so we're OK as long as ambient < 113C :)
+# Pinout: Y: 1=out 2=gnd 3=in; YR: 1=gnd 2=in 3=out.
 
 # 3v3 regulator for buffers and whatever's on the other side of the connector
 regulator = myelin_kicad_pcb.Component(
-    footprint="TO_SOT_Packages_SMD:SOT-89-3",
+    footprint="Package_TO_SOT_SMD:SOT-89-3",
     identifier="REG",
-    value="MCP1700T-3302E/MB",
-    desc="3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.",
+    value="AP7365-33YG-XX",  # 600 mA, 0.3V dropout
+    desc="3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.",
+    # TODO verify pinout on PCB against datasheet
     pins=[
-        Pin(2, "VIN", ["5V"]),
-        Pin(3, "VOUT", ["3V3"]),
-        Pin(1, "GND", ["GND"]),
+        # MCP1700 and AP7365-YR: GND VIN VOUT
+        # Pin(1, "GND", ["GND"]),
+        # Pin(2, "VIN", ["5V"]),  # sot-89 tab
+        # Pin(3, "VOUT", ["3V3"]),
+        # AP7365-Y: VOUT GND VIN  AP7365-33YG-...
+        Pin(1, "VOUT", ["3V3"]),
+        Pin(2, "GND", ["GND"]),  # sot-89 tab
+        Pin(3, "VIN", ["5V"]),
     ],
 )
 reg_in_cap = myelin_kicad_pcb.C0805("1u", "GND", "5V", ref="C6")
@@ -439,14 +330,14 @@ reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C7")
 
 # Helpful power input/output
 ext_power = myelin_kicad_pcb.Component(
-    footprint="Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm",
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
     identifier="EXTPWR",
     value="ext pwr",
     desc="1x3 0.1 inch male header",
     pins=[
         Pin(1, "A", ["GND"]),
         Pin(2, "B", ["3V3"]),
-        Pin(3, "C", ["5V"]),
+        Pin(3, "C", ["rom_5V"]),
     ],
 )
 
@@ -455,7 +346,6 @@ flash = [
     myelin_kicad_pcb.Component(
         footprint="myelin-kicad:cypress_lae064_fbga",
         identifier="FLASH%d" % flash_id,
-#        value="S29GL064N90TFI040",  # Note that pinout differs a lot between the suffixes; only 03 and 04 are OK
         value="S29GL064S70DHI010",  # 64-ball FBGA, 1mm pitch, 9x9mm (c.f. 20x14 in TQFP)
         buses=[""],
         pins=[
@@ -476,7 +366,7 @@ flash = [
             Pin("F3", "DQ8",     "flash%d_DQ8" % flash_id),
             Pin("G3", "DQ9",     "flash%d_DQ9" % flash_id),
             Pin("H3", "DQ1",     "flash%d_DQ1" % flash_id),
-            Pin("A4", "RY/BY#",  "flash_READY"),  # open drain
+            Pin("A4", "RY/BY#",  "flash_READY"),
             Pin("B4", "WP#/ACC"),  # contains an internal pull-up so we can leave it NC
             Pin("C4", "A18",     "flash_A18"),
             Pin("D4", "A20",     "flash_A20"),
@@ -510,54 +400,6 @@ flash = [
             Pin("H7", "VSS",     "GND"),
             Pin("D8", "Vio",     "3V3"),
             Pin("E8", "VSS",     "GND"),
-            # Pin(  1, "A15",     "flash_A15"),
-            # Pin(  2, "A14",     "flash_A14"),
-            # Pin(  3, "A13",     "flash_A13"),
-            # Pin(  4, "A12",     "flash_A12"),
-            # Pin(  5, "A11",     "flash_A11"),
-            # Pin(  6, "A10",     "flash_A10"),
-            # Pin(  7, "A9",      "flash_A9"),
-            # Pin(  8, "A8",      "flash_A8"),
-            # Pin(  9, "A19",     "flash_A19"),
-            # Pin( 10, "A20",     "flash_A20"),
-            # Pin( 11, "WE#",     "flash_nWE"),
-            # Pin( 12, "RESET#",  "flash_nRESET"),
-            # Pin( 13, "A21",     "flash_A21"),
-            # Pin( 14, "WP#/ACC", "flash_nWP"),  # TODO probably tie to 3V3 (low=WP#, 12V=accelerate)
-            # Pin( 15, "RY/BY#",  "flash_RY"),  # TODO pull up to 3V3 (open drain)
-            # Pin( 16, "A18",     "flash_A18"),
-            # Pin( 17, "A17",     "flash_A17"),
-            # Pin( 18, "A7",      "flash_A7"),
-            # Pin( 19, "A6",      "flash_A6"),
-            # Pin( 20, "A5",      "flash_A5"),
-            # Pin( 21, "A4",      "flash_A4"),
-            # Pin( 22, "A3",      "flash_A3"),
-            # Pin( 23, "A2",      "flash_A2"),
-            # Pin( 24, "A1",      "flash_A1"),
-            # Pin( 25, "A0",      "flash_A0"),
-            # Pin( 26, "CE#",     "flash_nCE"),
-            # Pin( 27, "VSS",     "GND"),
-            # Pin( 28, "OE#",     "flash_nOE"),
-            # Pin( 29, "DQ0",     "flash%d_DQ0" % flash_id),
-            # Pin( 30, "DQ8",     "flash%d_DQ8" % flash_id),
-            # Pin( 31, "DQ1",     "flash%d_DQ1" % flash_id),
-            # Pin( 32, "DQ9",     "flash%d_DQ9" % flash_id),
-            # Pin( 33, "DQ2",     "flash%d_DQ2" % flash_id),
-            # Pin( 34, "DQ10",    "flash%d_DQ10" % flash_id),
-            # Pin( 35, "DQ3",     "flash%d_DQ3" % flash_id),
-            # Pin( 36, "DQ11",    "flash%d_DQ11" % flash_id),
-            # Pin( 37, "VCC",     "3V3"),
-            # Pin( 38, "DQ4",     "flash%d_DQ4" % flash_id),
-            # Pin( 39, "DQ12",    "flash%d_DQ12" % flash_id),
-            # Pin( 40, "DQ5",     "flash%d_DQ5" % flash_id),
-            # Pin( 41, "DQ13",    "flash%d_DQ13" % flash_id),
-            # Pin( 42, "DQ6",     "flash%d_DQ6" % flash_id),
-            # Pin( 43, "DQ14",    "flash%d_DQ14" % flash_id),
-            # Pin( 44, "DQ7",     "flash%d_DQ7" % flash_id),
-            # Pin( 45, "DQ15",    "flash%d_DQ15" % flash_id),
-            # Pin( 46, "VSS",     "GND"),
-            # Pin( 47, "BYTE#",   "3V3"),  # tied high for permanent word config
-            # Pin( 48, "A16",     "flash0_A16"),
         ],
     )
     for flash_id in (0, 1)
@@ -569,6 +411,7 @@ flash_caps = [
 ]
 
 # 4 x 32-pin ROM footprint, to plug into the A3000 motherboard
+# 32 pins = D0-7, A0-18, CS, OE, WE, 5V, GND.
 rom_headers = [
     myelin_kicad_pcb.Component(
         footprint=("myelin-kicad:dip32_rom" if rom_id == 0 else "myelin-kicad:dip32_rom_data_only"),
@@ -587,7 +430,7 @@ rom_headers = [
             Pin("21", "D7", "rom_D%d" % (rom_id * 8 + 7)),
         ] + ([
             Pin( "1", "Vpp"),  # On A5000 this can be A12; safest to leave NC
-            Pin( "2", "A16",    "rom_A16"),
+            Pin( "2", "A16",    "rom_A16_ext"),
             Pin( "3", "A15",    "rom_A15"),
             Pin( "4", "A12",    "rom_A12"),
             Pin( "5", "A7",     "rom_A7"),
@@ -606,23 +449,156 @@ rom_headers = [
             Pin("27", "A8",     "rom_A8"),
             Pin("28", "A13",    "rom_A13"),
             Pin("29", "A14",    "rom_A14"),
-            Pin("30", "A17",    "rom_A17"),
-            Pin("31", "A18",    "rom_A18"),
-            Pin("32", "VCC",    "5V"),
+            Pin("30", "A17",    "rom_A17_ext"),
+            Pin("31", "A18",    "rom_A18_ext"),
+            Pin("32", "VCC",    "rom_5V"),
         ] if rom_id == 0 else []),
     )
     for rom_id in range(4)
 ]
 
-staples = [
-    myelin_kicad_pcb.Component(
-        footprint="myelin-kicad:via_single",
-        identifier="staple_single%d" % (n+1),
-        value="",
-        pins=[Pin(1, "GND", ["GND"])],
-    )
-    for n in range(10)
-]
+# Jumpers / connectors for address lines not present on all boards
+address_jumpers = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
+    identifier="AEXT",
+    value="Extras",
+    pins=[
+        # ARM LA18 / ROM A16
+        Pin(1, "arc_A16_LA18",   "rom_A16_ext"),  
+        Pin(2, "cpld_A16_LA18",  "rom_A16"),
+        # ARM LA19 / ROM A17
+        Pin(3, "arc_A17_LA19",   "rom_A17_ext"),
+        Pin(4, "cpld_A17_LA19",  "rom_A17"),
+        # ARM LA20 / ROM A18
+        Pin(5, "arc_A18_LA20",   "rom_A18_ext"),
+        Pin(6, "cpld_A18_LA20",  "rom_A18"),
+        # ARM LA21 / ROM A19 (optional extra, for 4MB ROM space)
+        Pin(7, "cpld_A19_LA21",  "rom_A19"),
+        # Resetter -- so we can reset the system once everything has started up (if necessary).
+        # This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
+        Pin(8, "reset",          "arc_RESET"),
+    ],
+)
+
+
+# Micro USB socket
+micro_usb = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:micro_usb_b_smd_molex",
+    identifier="USB",
+    value="usb",
+    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
+    pins=[
+        Pin(1, "V", ["VUSB"]),
+        Pin(2, "-", ["USBDM"]),
+        Pin(3, "+", ["USBDP"]),
+        Pin(4, "ID", ["USB_ID"]),
+        Pin(5, "G", ["GND"]),
+    ],
+)
+
+
+mcu = myelin_kicad_pcb.Component(
+    footprint="Package_QFP:TQFP-32_7x7mm_P0.8mm",
+    identifier="MCU",
+    value="ATSAMD21E18A",  # 256k flash, 32k sram, 32 pins
+    pins=[
+        # It looks like SECOM4 and SERCOM5 don't exist on the D21E, so we only
+        # have SERCOM0-3.
+
+        # TODO flash_nRESET (no room on the cpld)
+        # TODO flash_READY (enable pullup)
+        Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_debug_TXD"),
+        Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
+        Pin(3, "PA02/AIN0/DAC_OUT"),
+        Pin(4, "PA03/ADC_VREFA/AIN1"),
+        Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"), # sercom0 is mcu comms
+        Pin(6, "PA05/SERCOM0.1/AIN5", "cpld_TCK"),
+        Pin(7, "PA06/SERCOM0.2/AIN6", "cpld_TMS"), # TXD0/RXD0
+        Pin(8, "PA07/SERCOM0.3/AIN7", "cpld_TDI"), # XCK0
+        Pin(9, "VDDANA", ["3V3"]),  # decouple to GND
+        Pin(10, "GND", ["GND"]),
+        Pin(11, "PA08/NMI/SERCOM2.0/0.0/AIN16", "cpld_MOSI"), # TXRX0/2 -> cpld
+        Pin(12, "PA09/SERCOM2.1/0.1/AIN17", "cpld_SCK"), # XCK0/2 -> cpld
+        Pin(13, "PA10/SERCOM2.2/0.2/AIN18", "cpld_SS"), # TXRX0/2 -> cpld
+        Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "cpld_MISO"), # XCK0/2 -> cpld
+        Pin(15, "PA14/XIN/SERCOM4.2/2.2", "flash_nRESET"), # TXRX2/4 -> cpld GCK
+        Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "flash_READY"), # XCK2/4 -> cpld GCK
+        Pin(17, "PA16/SERCOM1.0/3.0", "mcu_GPIO5"), # TXRX1/3
+        Pin(18, "PA17/SERCOM1.1/3.1", "mcu_GPIO4"), # XCK1/3 -> cpld GCK
+        Pin(19, "PA18/SERCOM1.2/3.2", "mcu_GPIO3"), # TXRX1/3.  Not connected to an Arduino pin.
+        Pin(20, "PA19/SERCOM1.3/3.3", "mcu_GPIO2"), # XCK1/3.  Not connected to an Arduino pin.
+        Pin(21, "PA22/SERCOM3.0/5.0", "mcu_GPIO1"), # TXRX3/5
+        Pin(22, "PA23/SERCOM3.1/5.1/USBSOF", "mcu_GPIO0"), # XCK3/5
+        Pin(23, "PA24/USBDM", ["USBDM"]),
+        Pin(24, "PA25/USBDP", ["USBDP"]),
+        Pin(25, "PA27"),
+        Pin(26, "nRESET", ["mcu_RESET"]),
+        Pin(27, "PA28"),
+        Pin(28, "GND", ["GND"]),
+        Pin(29, "VDDCORE", ["VDDCORE"]),  # regulated output, needs cap to GND
+        Pin(30, "VDDIN", ["3V3"]),  # decouple to GND
+        Pin(31, "PA30/SWCLK", ["mcu_SWCLK"]),
+        Pin(32, "PA31/SWDIO", ["mcu_SWDIO"]),
+    ],
+)
+mcu_cap1 = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C10")
+mcu_cap2 = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C11")
+mcu_cap3 = myelin_kicad_pcb.C0805("1u", "GND", "VDDCORE", ref="C12")
+# SAM D21 has an internal pull-up, so this is optional
+mcu_reset_pullup = myelin_kicad_pcb.R0805("10k", "mcu_RESET", "3V3", ref="R1")
+# The SAM D21 datasheet says a 1k pullup on SWCLK is critical for reliability
+mcu_swclk_pullup = myelin_kicad_pcb.R0805("1k", "mcu_SWCLK", "3V3", ref="R2")
+
+# SWD header for programming and debug using a Tag-Connect TC2030-CTX
+swd = myelin_kicad_pcb.Component(
+    footprint="Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical",
+    identifier="SWD",
+    value="swd",
+    pins=[
+        # Tag-Connect SWD layout: http://www.tag-connect.com/Materials/TC2030-CTX.pdf
+        Pin(1, "VCC",       "3V3"),
+        Pin(2, "SWDIO/TMS", "mcu_SWDIO"),
+        Pin(3, "nRESET",    "mcu_RESET"),
+        Pin(4, "SWCLK/TCK", "mcu_SWCLK"),
+        Pin(5, "GND",       "GND"),
+        Pin(6, "SWO/TDO"),  # NC because Cortex-M0 doesn't use these
+    ],
+)
+
+# 0.1" SWD header so people can debug without a Tag-Connect
+swd_alt = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
+    identifier="SWD2",
+    value="swd",
+    pins=[
+        Pin(1, "SWDIO/TMS", "mcu_SWDIO"),
+        Pin(2, "VCC",       "3V3"),
+        Pin(3, "SWCLK/TCK", "mcu_SWCLK"),
+        Pin(4, "GND",       "GND"),
+        Pin(5, "nRESET",    "mcu_RESET"),
+        Pin(6, "GND",       "GND"),
+        Pin(7, "TXD",       "mcu_debug_TXD"),
+        Pin(8, "RXD",       "mcu_debug_RXD"),
+    ],
+)
+
+# 0.1" header for a few more MCU pins
+mcu_gpio = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
+    identifier="GPIO",
+    value="gpio",
+    pins=[
+        Pin(1, "GND",    "GND"),
+        Pin(2, "VCC",    "3V3"),
+        Pin(3, "GPIO0",  "mcu_GPIO0"),
+        Pin(4, "GPIO1",  "mcu_GPIO1"),
+        Pin(5, "GPIO2",  "mcu_GPIO2"),
+        Pin(6, "GPIO3",  "mcu_GPIO3"),
+        Pin(7, "GPIO4",  "mcu_GPIO4"),
+        Pin(8, "GPIO5",  "mcu_GPIO5"),
+    ],
+)
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
