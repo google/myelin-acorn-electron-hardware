@@ -1,6 +1,5 @@
 [Stardot thread](https://stardot.org.uk/forums/viewtopic.php?f=16&t=16043)
 
-
 Orientation is A3000-relative:
 
 - "Left" is the direction of pin 1 of the four ROM sockets.  "Top" is the top edge of ROM 1.  "Bottom" is the bottom edge of ROM 4.  
@@ -18,3 +17,10 @@ Board placement:
 
 - CPLD at the top left (around ROM 1 pin 1).
 - USB socket at bottom left (around ROM 4 pin 1).
+
+Pictures
+--------
+
+![PCB front](pcb/pcb-front.png)
+
+![PCB back](pcb/pcb-back.png)
