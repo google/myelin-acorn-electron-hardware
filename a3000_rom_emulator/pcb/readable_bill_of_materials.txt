@@ -216,3 +216,43 @@ USB
 - Description: Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.
 - KiCad package: myelin-kicad:micro_usb_b_smd_molex
 
+mech_pin1
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin2
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin3
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin4
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin5
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin6
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin7
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+
+mech_pin8
+- Value: 
+- Description: 
+- KiCad package: myelin-kicad:dip_rom_single_pin
+

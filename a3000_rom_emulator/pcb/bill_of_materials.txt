@@ -42,3 +42,11 @@ ROM4	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-
 SWD	swd		Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical
 SWD2	swd		Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
 USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
+mech_pin1			myelin-kicad:dip_rom_single_pin
+mech_pin2			myelin-kicad:dip_rom_single_pin
+mech_pin3			myelin-kicad:dip_rom_single_pin
+mech_pin4			myelin-kicad:dip_rom_single_pin
+mech_pin5			myelin-kicad:dip_rom_single_pin
+mech_pin6			myelin-kicad:dip_rom_single_pin
+mech_pin7			myelin-kicad:dip_rom_single_pin
+mech_pin8			myelin-kicad:dip_rom_single_pin

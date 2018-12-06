@@ -48,6 +48,8 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
+# TODO add some pins to the top end of ROM4 for mechanical support for the USB connector (suggestion from IanS)
+
 # TODO consider DFM - https://rheingoldheavy.com/design-assembly-kicad/
 # TODO add 3 x FID
 # TODO add soldermask chevrons in 3 corners of board to detect misregistration http://iconnect007.media/index.php/article/47987/soldermask-registration-considerations-for-fine-pitch-area-array-package-ass
@@ -84,13 +86,11 @@ osc = myelin_kicad_pcb.Component(
     pins=[
         Pin(1, "STANDBY#",  "3V3"),
         Pin(2, "GND",       "GND"),
-        Pin(3, "OUT",       "osc_output"),
+        Pin(3, "OUT",       "cpld_clock_osc"),
         Pin(4, "VDD",       "3V3"),
     ],
 )
 
-
-# TODO bring out spare GPIOs and CPLD pins for future work
 
 # Notes on BGA soldering (I'm using NSMD everywhere):
 # - https://forum.kicad.info/t/how-to-build-a-nsmd-footprint-in-kicad/4889/2
@@ -107,14 +107,14 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
     value="XC95144XL-10CSG144",
-    buses=[""],
+    buses=["rom_A", "rom_D", "flash_A", "flash0_DQ", "flash1_DQ"],
     pins=[
         # cpld has 28 signals out N, 29 out E, 32-4=28 S, 31 W = 116 -- approx correct :)
-        # TODO rom_A0-19, rom_nROMCS, arc_D0-31, arc_nRESET (54)
+        # (done) rom_A0-19, rom_nROMCS, arc_D0-31, arc_nRESET (54)
             # 17 pins from directly above cpld, 13 from top right, 24 from right
-        # TODO flash_* - A*22, D*32, ctl*3 (57)
-        # TODO SPI to MCU x 4 (4)
-        # TODO clock -- one from oscillator, one from MCU (separate from SCK)
+        # (done) flash_* - A*22, ctl*3, D*32 (57)
+        # (done) SPI to MCU x 4 (4)
+        # (done) clock -- one from oscillator, one from MCU (separate from SCK)
         # == 117
         # MCU can drive flash_nRESET and read flash_READY
         Pin( "A1", "VCCIO",    "3V3"),
@@ -128,9 +128,9 @@ cpld = myelin_kicad_pcb.Component(
         Pin( "A9", "",         "rom_A16"),
         Pin("A10", "",         "rom_D6"),
         Pin("A11", "",         "rom_A3"),
-        Pin("A12", "",         "dummy_A12"),
+        Pin("A12", "",         "rom_D5"),
         Pin("A13", "VCCIO",    "3V3"),
-        Pin( "B1", "",         "dummy_B1"),
+        Pin( "B1", "",         "flash1_DQ3"),
         Pin( "B2", "GND",      "GND"),
         Pin( "B3", "VCCINT",   "3V3"),
         Pin( "B4", "",         "rom_A8"),
@@ -142,126 +142,126 @@ cpld = myelin_kicad_pcb.Component(
         Pin("B10", "",         "rom_D7"),
         Pin("B11", "",         "rom_A4"),
         Pin("B12", "GND",      "GND"),
-        Pin("B13", "",         "dummy_B13"),
-        Pin( "C1", "",         "dummy_C1"),
-        Pin( "C2", "",         "dummy_C2"),
-        Pin( "C3", "",         "dummy_C3"),
+        Pin("B13", "",         "rom_A0"),
+        Pin( "C1", "",         "flash1_DQ1"),
+        Pin( "C2", "",         "flash1_DQ5"),
+        Pin( "C3", "",         "flash1_DQ11"),
         Pin( "C4", "",         "rom_A15"),
         Pin( "C5", "",         "rom_A14"),
         Pin( "C6", "",         "rom_nCS"),
         Pin( "C7", "VCCIO",    "3V3"),
         Pin( "C8", "TDO",      "cpld_TDO"),
-        Pin( "C9", "",         "dummy_C9"),
+        Pin( "C9", "",         "rom_D19"),
         Pin("C10", "GND",      "GND"),
         Pin("C11", "",         "rom_A2"),
-        Pin("C12", "",         "dummy_C12"),
-        Pin("C13", "",         "dummy_C13"),
+        Pin("C12", "",         "rom_A1"),
+        Pin("C13", "",         "rom_D1"),
         Pin( "D1", "VCCINT",   "3V3"),
-        Pin( "D2", "",         "dummy_D2"),
-        Pin( "D3", "",         "dummy_D3"),
-        Pin( "D4", "",         "dummy_D4"),
-        Pin( "D5", "",         "dummy_D5"),
+        Pin( "D2", "",         "flash1_DQ9"),
+        Pin( "D3", "",         "flash0_DQ3"),
+        Pin( "D4", "",         "flash0_DQ11"),
+        Pin( "D5", "",         "flash0_DQ5"),
         Pin( "D6", "",         "rom_A12"),
-        Pin( "D7", "",         "dummy_D7"),
-        Pin( "D8", "",         "dummy_D8"),
-        Pin( "D9", "",         "dummy_D9"),
-        Pin("D10", "",         "dummy_D10"),
-        Pin("D11", "",         "dummy_D11"),
-        Pin("D12", "",         "dummy_D12"),
-        Pin("D13", "",         "dummy_D13"),
+        Pin( "D7", "",         "rom_D4"),
+        Pin( "D8", "",         "rom_D3"),
+        Pin( "D9", "",         "rom_D10"),
+        Pin("D10", "",         "rom_D25"),
+        Pin("D11", "",         "rom_D0"),
+        Pin("D12", "",         "rom_D2"),
+        Pin("D13", "",         "rom_D15"),
 
-        Pin( "E1", "",         "dummy_E1"),
-        Pin( "E2", "",         "dummy_E2"),
-        Pin( "E3", "",         "dummy_E3"),
-        Pin( "E4", "",         "dummy_E4"),
-        Pin("E10", "",         "dummy_E10"),
+        Pin( "E1", "",         "flash1_DQ2"),
+        Pin( "E2", "",         "flash1_DQ8"),
+        Pin( "E3", "",         "flash_nOE"),
+        Pin( "E4", "",         "flash_A4"),
+        Pin("E10", "",         "rom_D18"),
         Pin("E11", "GND",      "GND"),
-        Pin("E12", "",         "dummy_E12"),
-        Pin("E13", "",         "dummy_E13"),
-        Pin( "F1", "",         "dummy_F1"),
-        Pin( "F2", "",         "dummy_F2"),
-        Pin( "F3", "",         "dummy_F3"),
-        Pin( "F4", "",         "dummy_F4"),
-        Pin("F10", "",         "dummy_F10"),
-        Pin("F11", "",         "dummy_F11"),
-        Pin("F12", "",         "dummy_F12"),
-        Pin("F13", "",         "dummy_F13"),
+        Pin("E12", "",         "rom_D14"),
+        Pin("E13", "",         "rom_D13"),
+        Pin( "F1", "",         "flash0_DQ1"),
+        Pin( "F2", "",         "flash1_DQ0"),
+        Pin( "F3", "",         "flash_A3"),
+        Pin( "F4", "",         "flash_A6"),
+        Pin("F10", "",         "rom_D20"),
+        Pin("F11", "",         "rom_D17"),
+        Pin("F12", "",         "rom_D12"),
+        Pin("F13", "",         "rom_D11"),
         Pin( "G1", "GND",      "GND"),
-        Pin( "G2", "",         "dummy_G2"),
-        Pin( "G3", "",         "dummy_G3"),
-        Pin( "G4", "",         "dummy_G4"),
-        Pin("G10", "",         "dummy_G10"),
-        Pin("G11", "",         "dummy_G11"),
+        Pin( "G2", "",         "flash0_DQ9"),
+        Pin( "G3", "",         "flash_A7"),
+        Pin( "G4", "",         "flash_A0"),
+        Pin("G10", "",         "rom_D9"),
+        Pin("G11", "",         "rom_D26"),
         Pin("G12", "GND",      "GND"),
         Pin("G13", "GND",      "GND"),
-        Pin( "H1", "",         "dummy_H1"),
-        Pin( "H2", "",         "dummy_H2"),
-        Pin( "H3", "",         "dummy_H3"),
-        Pin( "H4", "",         "dummy_H4"),
-        Pin("H10", "",         "dummy_H10"),
-        Pin("H11", "",         "dummy_H11"),
-        Pin("H12", "",         "dummy_H12"),
-        Pin("H13", "",         "dummy_H13"),
-        Pin( "J1", "",         "dummy_J1"),
-        Pin( "J2", "",         "dummy_J2"),
-        Pin( "J3", "",         "dummy_J3"),
-        Pin( "J4", "",         "dummy_J4"),
-        Pin("J10", "",         "dummy_J10"),
-        Pin("J11", "",         "dummy_J11"),
-        Pin("J12", "",         "dummy_J12"),
+        Pin( "H1", "",         "flash0_DQ2"),
+        Pin( "H2", "",         "flash0_DQ8"),
+        Pin( "H3", "",         "flash_A18"),
+        Pin( "H4", "",         "flash_A21"),
+        Pin("H10", "",         "rom_D16"),
+        Pin("H11", "",         "rom_D28"),
+        Pin("H12", "",         "rom_D8"),
+        Pin("H13", "",         "rom_D24"),
+        Pin( "J1", "",         "flash_nCE"),
+        Pin( "J2", "",         "flash0_DQ0"),
+        Pin( "J3", "",         "flash_A20"),
+        Pin( "J4", "",         "flash_A19"),
+        Pin("J10", "",         "flash1_DQ10"),
+        Pin("J11", "",         "flash1_DQ4"),
+        Pin("J12", "",         "rom_D27"),
         Pin("J13", "VCCINT",   "3V3"),
 
         Pin( "K1", "GND",      "GND"),
-        Pin( "K2", "GCK1",     "osc_output"),
-        Pin( "K3", "",         "dummy_K3"),
-        Pin( "K4", "",         "dummy_K4"),
-        Pin( "K5", "",         "dummy_K5"),
-        Pin( "K6", "",         "dummy_K6"),
-        Pin( "K7", "",         "dummy_K7"),
-        Pin( "K8", "",         "dummy_K8"),
-        Pin( "K9", "",         "dummy_K9"),
-        Pin("K10", "",         "dummy_K10"),
-        Pin("K11", "",         "dummy_K11"),
-        Pin("K12", "",         "dummy_K12"),
-        Pin("K13", "",         "dummy_K13"),
-        Pin( "L1", "GCK2",     "dummy_L1_GCK2"),
-        Pin( "L2", "",         "dummy_L2"),
-        Pin( "L3", "",         "dummy_L3"),
+        Pin( "K2", "GCK1",     "cpld_clock_osc"),
+        Pin( "K3", "",         "cpld_SS"),
+        Pin( "K4", "",         "flash_A11"),
+        Pin( "K5", "",         "flash_A9"),
+        Pin( "K6", "",         "flash_A14"),
+        Pin( "K7", "",         "flash0_DQ14"),
+        Pin( "K8", "",         "flash1_DQ7"),
+        Pin( "K9", "",         "flash1_DQ14"),
+        Pin("K10", "",         "flash1_DQ6"),
+        Pin("K11", "",         "rom_D30"),
+        Pin("K12", "",         "rom_D29"),
+        Pin("K13", "",         "rom_D21"),
+        Pin( "L1", "GCK2",     "cpld_SCK"),
+        Pin( "L2", "",         "cpld_MISO"),
+        Pin( "L3", "",         "flash_A17"),
         Pin( "L4", "VCCINT",   "3V3"),
-        Pin( "L5", "",         "dummy_L5"),
-        Pin( "L6", "",         "dummy_L6"),
+        Pin( "L5", "",         "flash_A13"),
+        Pin( "L6", "",         "flash0_DQ7"),
         Pin( "L7", "VCCIO",    "3V3"),
-        Pin( "L8", "",         "dummy_L8"),
+        Pin( "L8", "",         "flash0_DQ15"),
         Pin( "L9", "TDI",      "cpld_TDI"),
         Pin("L10", "TCK",      "cpld_TCK"),
-        Pin("L11", "",         "dummy_L11"),
-        Pin("L12", "",         "dummy_L12"),
-        Pin("L13", "",         "dummy_L13"),
-        Pin( "M1", "",         "dummy_M1"),
+        Pin("L11", "",         "flash1_DQ12"),
+        Pin("L12", "",         "rom_D23"),
+        Pin("L13", "",         "rom_D22"),
+        Pin( "M1", "",         "cpld_MOSI"),
         Pin( "M2", "GND",      "GND"),
-        Pin( "M3", "",         "dummy_M3"),
-        Pin( "M4", "",         "dummy_M4"),
+        Pin( "M3", "",         "flash_A1"),
+        Pin( "M4", "",         "flash_A2"),
         Pin( "M5", "GND",      "GND"),
-        Pin( "M6", "",         "dummy_M6"),
-        Pin( "M7", "",         "dummy_M7"),
-        Pin( "M8", "",         "dummy_M8"),
+        Pin( "M6", "",         "flash_A12"),
+        Pin( "M7", "",         "flash_A16"),
+        Pin( "M8", "",         "flash0_DQ12"),
         Pin( "M9", "GND",      "GND"),
-        Pin("M10", "",         "dummy_M10"),
-        Pin("M11", "",         "dummy_M11"),
+        Pin("M10", "",         "flash0_DQ10"),
+        Pin("M11", "",         "flash1_DQ15"),
         Pin("M12", "GND",      "GND"),
-        Pin("M13", "",         "dummy_M13"),
+        Pin("M13", "",         "rom_D31"),
         Pin( "N1", "VCCIO",    "3V3"),
-        Pin( "N2", "GCK3",     "dummy_N2_GCK3"),
-        Pin( "N3", "",         "dummy_N3"),
-        Pin( "N4", "",         "dummy_N4"),
-        Pin( "N5", "",         "dummy_N5"),
-        Pin( "N6", "",         "dummy_N6"),
-        Pin( "N7", "",         "dummy_N7"),
-        Pin( "N8", "",         "dummy_N8"),
-        Pin( "N9", "",         "dummy_N9"),
+        Pin( "N2", "GCK3",     "cpld_clock_from_mcu"),
+        Pin( "N3", "",         "flash_A5"),
+        Pin( "N4", "",         "flash_nWE"),
+        Pin( "N5", "",         "flash_A10"),
+        Pin( "N6", "",         "flash_A8"),
+        Pin( "N7", "",         "flash_A15"),
+        Pin( "N8", "",         "flash0_DQ13"),
+        Pin( "N9", "",         "flash0_DQ6"),
         Pin("N10", "TMS",      "cpld_TMS"),
-        Pin("N11", "",         "dummy_N11"),
-        Pin("N12", "",         "dummy_N12"),
+        Pin("N11", "",         "flash0_DQ4"),
+        Pin("N12", "",         "flash1_DQ13"),
         Pin("N13", "VCCIO",    "3V3"),
     ],
 )
@@ -507,8 +507,6 @@ mcu = myelin_kicad_pcb.Component(
         # It looks like SECOM4 and SERCOM5 don't exist on the D21E, so we only
         # have SERCOM0-3.
 
-        # TODO flash_nRESET (no room on the cpld)
-        # TODO flash_READY (enable pullup)
         Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_debug_TXD"),
         Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
         Pin(3, "PA02/AIN0/DAC_OUT"),
@@ -535,7 +533,7 @@ mcu = myelin_kicad_pcb.Component(
         Pin(24, "PA25/USBDP", ["USBDP"]),
         Pin(25, "PA27"),
         Pin(26, "nRESET", ["mcu_RESET"]),
-        Pin(27, "PA28"),
+        Pin(27, "PA28", "cpld_clock_from_mcu"), # probably unused, extra GCK connection
         Pin(28, "GND", ["GND"]),
         Pin(29, "VDDCORE", ["VDDCORE"]),  # regulated output, needs cap to GND
         Pin(30, "VDDIN", ["3V3"]),  # decouple to GND
@@ -601,8 +599,21 @@ mcu_gpio = myelin_kicad_pcb.Component(
     ],
 )
 
+# Extra holes near ROM4 to provide mechanical stability for the USB connector
+mechanical_holes = [
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:dip_rom_single_pin",
+        identifier="mech_pin%d" % (n+1),
+        value="",
+        pins=[Pin(1, "")],
+    )
+    for n in range(8)
+]
+
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
                           "readable_bill_of_materials.txt")
+
 
