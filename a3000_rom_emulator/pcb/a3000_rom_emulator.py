@@ -608,6 +608,15 @@ mechanical_holes = [
     for n in range(8)
 ]
 
+staples = [
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:via_single",
+        identifier="staple_single%d" % (n+1),
+        value="",
+        pins=[Pin(1, "GND", ["GND"])],
+    )
+    for n in range(30)
+]
 
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
