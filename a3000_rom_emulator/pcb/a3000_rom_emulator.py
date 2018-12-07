@@ -48,8 +48,6 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
-# TODO add some pins to the top end of ROM4 for mechanical support for the USB connector (suggestion from IanS)
-
 # TODO consider DFM - https://rheingoldheavy.com/design-assembly-kicad/
 # TODO add 3 x FID
 # TODO add soldermask chevrons in 3 corners of board to detect misregistration http://iconnect007.media/index.php/article/47987/soldermask-registration-considerations-for-fine-pitch-area-array-package-ass
@@ -599,7 +597,7 @@ mcu_gpio = myelin_kicad_pcb.Component(
     ],
 )
 
-# Extra holes near ROM4 to provide mechanical stability for the USB connector
+# Extra holes near ROM4 to provide mechanical stability for the USB connector (suggestion from IanS)
 mechanical_holes = [
     myelin_kicad_pcb.Component(
         footprint="myelin-kicad:dip_rom_single_pin",
