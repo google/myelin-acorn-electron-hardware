@@ -632,7 +632,7 @@ staples = [
         value="",
         pins=[Pin(1, "GND", ["GND"])],
     )
-    for n in range(30)
+    for n in range(33)
 ]
 
 
