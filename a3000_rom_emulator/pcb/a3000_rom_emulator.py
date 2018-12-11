@@ -480,6 +480,23 @@ address_jumpers = myelin_kicad_pcb.Component(
     ],
 )
 
+# Second address hookup area, nearer ICs on A310/A3000
+address_hookup_2 = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+    identifier="AEXT2",
+    value="Addresses",
+    pins=[
+        # ARM LA18 / ROM A16
+        Pin(1, "cpld_A16_LA18",  "rom_A16"),
+        # ARM LA19 / ROM A17
+        Pin(2, "cpld_A17_LA19",  "rom_A17"),
+        # ARM LA20 / ROM A18
+        Pin(3, "cpld_A18_LA20",  "rom_A18"),
+        # ARM LA21 / ROM A19 (optional extra, for 4MB ROM space)
+        Pin(4, "cpld_A19_LA21",  "rom_A19"),
+    ],
+)
+
 
 # Micro USB socket
 micro_usb = myelin_kicad_pcb.Component(
@@ -622,5 +639,6 @@ staples = [
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
                           "readable_bill_of_materials.txt")
+
 
 

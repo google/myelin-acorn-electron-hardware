@@ -1,5 +1,6 @@
 Identifier	Value	Description	KiCad package
 AEXT	Extras		Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+AEXT2	Addresses		Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
 C1	10u	10u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C10	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C11	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder

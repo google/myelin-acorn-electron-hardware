@@ -6,6 +6,11 @@ AEXT
 - Description: 
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
 
+AEXT2
+- Value: Addresses
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+
 C1
 - Value: 10u
 - Description: 10u capacitor in 0805 package
