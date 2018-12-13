@@ -101,6 +101,7 @@ osc = myelin_kicad_pcb.Component(
     # version still isn't quick enough for single cycle access on
     # a 12MHz bus (e.g. A5000).
 
+# TODO verify cpld pinout against datasheet
 cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
@@ -272,6 +273,7 @@ cpld_caps = [
     for n in range(2, 10)
 ]
 myelin_kicad_pcb.update_xilinx_constraints(cpld, os.path.join(here, PATH_TO_CPLD, "constraints.ucf"))
+myelin_kicad_pcb.check_xc9500xl_pinout(cpld, os.path.join(here, PATH_TO_CPLD), PROJECT_NAME)
 
 # Diode and rectifier calculations:
 # - CPLD uses max 250mA, realistically 60-120mA.
@@ -341,7 +343,8 @@ ext_power = myelin_kicad_pcb.Component(
     ],
 )
 
-# Flash (low halfword)
+# (done) verify flash pinout against datasheet
+# Two flash chips
 flash = [
     myelin_kicad_pcb.Component(
         footprint="myelin-kicad:cypress_lae064_fbga",
