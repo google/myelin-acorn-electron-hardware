@@ -23,6 +23,9 @@ SCHEMATIC?=$(NAME).py
 # Change OUTPUT_NAME if you don't want your .zip file to use $NAME
 OUTPUT_NAME?=$(NAME)
 
+# Change LAYERS if you want other than two layers
+LAYERS?=2
+
 # -----
 
 ifndef SKIP_NETLIST
@@ -54,7 +57,8 @@ fab: $(OUTPUT_NAME).zip
 $(OUTPUT_NAME).zip: $(NAME).kicad_pcb
 	rm -rf gerber_tmp
 	# This will only work in macOS, and only if you've copied the system Python executable into kicad.app: cp /System/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python /Applications/Kicad/kicad.app/Contents/Applications/pcbnew.app/Contents/MacOS/python
-	PYTHONPATH=/Applications/Kicad/kicad.app/Contents/Frameworks/python/site-packages /Applications/Kicad/kicad.app/Contents/Applications/pcbnew.app/Contents/MacOS/python $(ROOT)/common/build_fab_outputs.py $<
+	# PYTHONPATH=/Applications/Kicad/kicad.app/Contents/Frameworks/python/site-packages /Applications/Kicad/kicad.app/Contents/Applications/pcbnew.app/Contents/MacOS/python $(ROOT)/common/build_fab_outputs.py $<
+	PYTHONPATH=/Applications/KiCad/kicad.app/Contents/Frameworks/python/site-packages LAYERS=$(LAYERS) /Applications/KiCad/kicad.app/Contents/Frameworks/Python.framework/Versions/2.7/bin/python $(ROOT)/common/build_fab_outputs.py $<
 	cd gerber_tmp && zip ../$(OUTPUT_NAME) *
-	# Build gerber previews using pcb-tools
+	# Build gerber previews using pcb-tools.  If this fails, sudo easy_install pip && sudo pip install pcb-tools
 	python $(ROOT)/common/build_gerber_previews.py

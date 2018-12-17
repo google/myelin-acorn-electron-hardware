@@ -17,6 +17,8 @@ import os
 from pcbnew import *
 import sys
 
+layer_count = int(os.environ['LAYERS'])
+
 def generate_outputs(fn, fab_output_path, preview_output_path):
 
     # Open the .kicad_pcb file
@@ -51,7 +53,7 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
     options.SetLineWidth(FromMM(0.1))
 
     # Plot everything needed for fabrication
-    for file_suffix, layer, description in [
+    layers_to_plot = [
         ("F.Cu", F_Cu, "Top copper"),
         ("B.Cu", B_Cu, "Bottom copper"),
         ("F.Mask", F_Mask, "Top solder mask"),
@@ -61,7 +63,19 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
         ("F.SilkS", F_SilkS, "Top silkscreen"),
         ("B.SilkS", B_SilkS, "Bottom silkscreen"),
         ("Edge.Cuts", Edge_Cuts, "Board edge"),
-    ]:
+    ]
+    if layer_count == 2:
+        print("plotting 2 layers")
+    elif layer_count == 4:
+        print("plotting 4 layers")
+        layers_to_plot += [
+            ("In1.Cu", In1_Cu, "Internal copper 1"),
+            ("In2.Cu", In2_Cu, "Internal copper 2"),
+        ]
+    else:
+        raise Exception("invalid layer count %d" % layer_count)
+
+    for file_suffix, layer, description in layers_to_plot:
         print "Plotting %s" % file_suffix
         plotter.SetLayer(layer)
         plotter.OpenPlotfile(file_suffix, PLOT_FORMAT_GERBER, description)
