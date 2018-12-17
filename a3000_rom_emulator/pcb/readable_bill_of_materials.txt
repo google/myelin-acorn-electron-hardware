@@ -181,6 +181,11 @@ R4
 - Description: 10k resistor in 0805 package
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+R5
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 REG
 - Value: AP7365-33YG-XX
 - Description: 3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.

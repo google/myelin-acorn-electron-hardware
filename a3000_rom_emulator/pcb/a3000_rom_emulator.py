@@ -65,7 +65,8 @@ Pin = myelin_kicad_pcb.Pin
 # (done) add power diodes so we can power from USB or arc
 
 # (done) add 10k pullup for Romcs* to help when not plugged in
-mcu_reset_pullup = myelin_kicad_pcb.R0805("10k", "rom_nCS", "5V", ref="R4")
+romcs_pullup = myelin_kicad_pcb.R0805("10k", "rom_nCS", "5V", ref="R4")
+a21_pullup = myelin_kicad_pcb.R0805("10k", "rom_A19", "5V", ref="R5")
 # (done) add jumpers so we can get LA18, LA19 and LA20 from flying leads on pre-A3000 machines (IC28 on A3xx)
 # (done) add pin to wire to A21, so we can support 4MB ROMs
 # (done) add pin to wire to reset, so we can re-reset the machine once the board is alive
@@ -508,11 +509,11 @@ micro_usb = myelin_kicad_pcb.Component(
     value="usb",
     desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
     pins=[
-        Pin(1, "V", ["VUSB"]),
-        Pin(2, "-", ["USBDM"]),
-        Pin(3, "+", ["USBDP"]),
-        Pin(4, "ID", ["USB_ID"]),
-        Pin(5, "G", ["GND"]),
+        Pin(1, "V", "VUSB"),
+        Pin(2, "-", "USBDM"),
+        Pin(3, "+", "USBDP"),
+        Pin(4, "ID"),
+        Pin(5, "G", "GND"),
     ],
 )
 

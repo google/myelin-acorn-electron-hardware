@@ -35,6 +35,7 @@ OSC	osc		Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering
 R1	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R2	1k	1k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R4	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R5	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 REG	AP7365-33YG-XX	3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.	Package_TO_SOT_SMD:SOT-89-3
 ROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
 ROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
