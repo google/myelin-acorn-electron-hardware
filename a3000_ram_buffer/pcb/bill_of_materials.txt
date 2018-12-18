@@ -1,0 +1,30 @@
+Identifier	Value	Description	KiCad package
+BUF1	74LVC245		Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+BUF2	74LVC245		Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+BUF3	74LVC245		Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+BUF4	74LVC245		Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+BUF5	74LVC245		Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+C1	10u	10u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C2	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C3	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CB1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CB2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CB3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CB4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CB5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+EXTPWR	ext pwr	1x3 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+RAM	Extension socket to connect to RAM header on A3000 motherboard, and mezzanine RAM board		myelin-kicad:a3000_ram_header
+REG	MCP1700T-3302E/MB	3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.	Package_TO_SOT_SMD:SOT-89-3
+RP1	resistor pack	8 x 68R	myelin-kicad:bourns_cat16_j8_resistor_array
+RP2	resistor pack	8 x 68R	myelin-kicad:bourns_cat16_j8_resistor_array
+RP3	resistor pack	8 x 68R	myelin-kicad:bourns_cat16_j8_resistor_array
+RP4	resistor pack	8 x 68R	myelin-kicad:bourns_cat16_j8_resistor_array
+RP5	resistor pack	8 x 68R	myelin-kicad:bourns_cat16_j8_resistor_array
+SIGA	signal header A	2x17 0.1 inch male header	Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+SIGB	signal header B	2x17 0.1 inch male header	Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+SIGC	signal header C	2x17 0.1 inch male header	Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+STAPLE1	via array		myelin-kicad:via_array_1x7_55mil
+STAPLE2	via array		myelin-kicad:via_array_1x7_55mil
+STAPLE3	via array		myelin-kicad:via_array_1x7_55mil
+STAPLE4	via array		myelin-kicad:via_array_1x7_55mil
+STAPLE5	via array		myelin-kicad:via_array_1x7_55mil

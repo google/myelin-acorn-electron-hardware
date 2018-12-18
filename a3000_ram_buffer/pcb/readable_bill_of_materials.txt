@@ -1,0 +1,148 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+BUF1
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+BUF2
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+BUF3
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+BUF4
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+BUF5
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+C1
+- Value: 10u
+- Description: 10u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C2
+- Value: 1u
+- Description: 1u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C3
+- Value: 1u
+- Description: 1u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB1
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB2
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB3
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB4
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB5
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+EXTPWR
+- Value: ext pwr
+- Description: 1x3 0.1 inch male header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+
+RAM
+- Value: Extension socket to connect to RAM header on A3000 motherboard, and mezzanine RAM board
+- Description: 
+- KiCad package: myelin-kicad:a3000_ram_header
+
+REG
+- Value: MCP1700T-3302E/MB
+- Description: 3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.
+- KiCad package: Package_TO_SOT_SMD:SOT-89-3
+
+RP1
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+RP2
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+RP3
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+RP4
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+RP5
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+SIGA
+- Value: signal header A
+- Description: 2x17 0.1 inch male header
+- KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+
+SIGB
+- Value: signal header B
+- Description: 2x17 0.1 inch male header
+- KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+
+SIGC
+- Value: signal header C
+- Description: 2x17 0.1 inch male header
+- KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
+
+STAPLE1
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE2
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE3
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE4
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE5
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
