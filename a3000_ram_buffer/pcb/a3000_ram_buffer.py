@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
-# TODO Female headers to connect to RAM header on A3000 motherboard -- use long ones that can take a RAM card on top
+# (done) Female headers to connect to RAM header on A3000 motherboard -- use long ones that can take a RAM card on top
 # 60 pins: 20, big gap, 20, small gap, 20
 a3000_ram_header = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:a3000_ram_header",
@@ -284,7 +284,7 @@ power_in_cap = myelin_kicad_pcb.C0805("10u", "GND", "5V", ref="C1")
 
 # 3v3 regulator for buffers and whatever's on the other side of the connector
 regulator = myelin_kicad_pcb.Component(
-    footprint="Package_TO_SOT_SMD:SOT-89-3",  # TODO check still works with mcp1700t
+    footprint="Package_TO_SOT_SMD:SOT-89-3",  # (done) check still works with mcp1700t
     identifier="REG",
     value="MCP1700T-3302E/MB",
     desc="3.3V LDO regulator, e.g. Digikey MCP1700T3302EMBCT-ND.  Search for the exact part number because there are many variants.",
