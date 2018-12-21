@@ -13,4 +13,5 @@
 # limitations under the License.
 
 NAME=a3000_rom_emulator
+LAYERS=4
 include ../../common/Makefile.pcb
