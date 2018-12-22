@@ -1,0 +1,2 @@
+Identifier	Value	Description	KiCad package
+FPGA	LCMXO2-2000HC-4FTG256C		myelin-kicad:lattice_ftg256_fbga

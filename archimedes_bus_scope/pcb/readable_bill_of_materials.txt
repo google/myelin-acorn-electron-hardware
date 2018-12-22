@@ -1,0 +1,8 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+FPGA
+- Value: LCMXO2-2000HC-4FTG256C
+- Description: 
+- KiCad package: myelin-kicad:lattice_ftg256_fbga
+
