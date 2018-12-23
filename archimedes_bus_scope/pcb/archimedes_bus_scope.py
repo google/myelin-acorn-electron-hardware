@@ -125,9 +125,20 @@ fpga = [
             Pin("H7", "VCCIO4", "3V3"),
             Pin("J7", "VCCIO4", "3V3"),
             Pin("E4", "VCCIO5", "3V3"),
-            Pin("A2", "NC"),
+            Pin("A2", "NC", "NC"),
         ] + [
+            # Reserved during startup -- better leave NC or bring out to FX3
+            Pin("A13", "INITN", "fpga_INITN"),
+            Pin("B10", "PROGRAMN", "fpga_PROGRAMN"),
+            Pin("C13", "DONE", "fpga_DONE"),
 
+            # JTAG
+            Pin("A6", "TDI", "fpga_TDI"),
+            Pin("A7", "TCK", "fpga_TCK"),
+            Pin("B8", "TMS", "fpga_TMS"),
+            Pin("C6", "TDO", "fpga_TDO"),
+        ] + [
+            # User IO
         ],
     )
 ]
