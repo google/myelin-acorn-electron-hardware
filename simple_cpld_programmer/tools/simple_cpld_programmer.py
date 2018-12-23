@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,9 +29,9 @@ class Port:
         if not port:
             raise Exception("Could not guess serial port")
 
-        print "Opening port %s" % port
+        print("Opening port %s" % port)
         self.ser = serial.Serial(port, timeout=0)
-        print "Serial port opened: %s" % `self.ser`
+        print("Serial port opened: %s" % repr(self.ser))
 
     def __enter__(self):
         return self.ser

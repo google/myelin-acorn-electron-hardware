@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +25,11 @@ def prog():
 
 last = hash(src)
 prog()
-while 1:
+while True:
     now = hash(src)
     if now != last:
-        print "changed hash to %s" % now
+        print("changed hash to %s" % now)
         prog()
         last = now
-    print "%s programmed %.2f mins ago" % (now, float(time.time() - prog.last_prog_time) / 60.0)
+    print("%s programmed %.2f mins ago" % (now, float(time.time() - prog.last_prog_time) / 60.0))
     time.sleep(1)

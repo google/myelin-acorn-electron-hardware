@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +77,7 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
         raise Exception("invalid layer count %d" % layer_count)
 
     for file_suffix, layer, description in layers_to_plot:
-        print "Plotting %s" % file_suffix
+        print("Plotting %s" % file_suffix)
         plotter.SetLayer(layer)
         plotter.OpenPlotfile(file_suffix, PLOT_FORMAT_GERBER, description)
         plotter.PlotLayer()
@@ -120,7 +121,7 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
     # Generate drill file
     drill = EXCELLON_WRITER(board)
     drill.SetFormat(False, EXCELLON_WRITER.DECIMAL_FORMAT)
-    print "Writing drill file"
+    print("Writing drill file")
     drill.CreateDrillandMapFilesSet(fab_output_path, True, False)
 
 if __name__ == '__main__':

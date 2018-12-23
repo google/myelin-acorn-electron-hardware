@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,10 +30,10 @@ def guess_port():
         if matches:
             return matches[0]
 
-print "Opening port"
+print("Opening port")
 USE_TIMEOUT = 0
 ser = serial.Serial(guess_port(), timeout=0, write_timeout=0.5 if USE_TIMEOUT else None)
-print "Set baudrate"
+print("Set baudrate")
 ser.baudrate = 115200
 
 fn = None
@@ -41,23 +42,23 @@ for arg in sys.argv[1:]:
 
 data = open(fn).read()
 
-print "Sending %s to port and dumping whatever comes back" % fn
+print("Sending %s to port and dumping whatever comes back" % fn)
 
 n_out = n_in = 0
 received = []
 n_retries = 0
-print "Writing %d (%x) bytes" % (len(data), len(data))
+print("Writing %d (%x) bytes" % (len(data), len(data)))
 addr = 0
 for c in data:
-    while 1:
+    while True:
         v = ord(c)
-        print "%04x: %02x %c" % (addr, v, c if 32 < v < 127 else '.')
+        print("%04x: %02x %c" % (addr, v, c if 32 < v < 127 else '.'))
         addr += 1
         try:
             n = ser.write(c)
         except SerialTimeoutException:
             n = 0
-        print n
+        print(n)
         #time.sleep(0.01)
         #print `ser.read(3)`
         if not USE_TIMEOUT: break
@@ -65,16 +66,16 @@ for c in data:
         # try receiving
         r = ser.read(1000)
         if r:
-            print "RECEIVED", `r`
+            print("RECEIVED", repr(r))
             received.append(r)
 
         if n:
             break # next char
         time.sleep(0.01)
-        print "RETRY",
+        print("RETRY", end=' ')
         n_retries += 1
 
-print "Waiting for final serial loopback"
+print("Waiting for final serial loopback")
 start = time.time()
 while (time.time() - start) < 0.5:
     r = ser.read()
@@ -83,12 +84,12 @@ while (time.time() - start) < 0.5:
         continue
     # we got something, so reset the timeout
     start = time.time()
-    print `r`
+    print(repr(r))
     received.append(r)
 
-print "ALL SENT"
+print("ALL SENT")
 received = ''.join(received)
-print "This is what we received:"
-print `received`
+print("This is what we received:")
+print(repr(received))
 n = len(received)
-print "%d (0x%x) bytes (%d missing).  %d retries." % (n, n, len(data) - n, n_retries)
+print("%d (0x%x) bytes (%d missing).  %d retries." % (n, n, len(data) - n, n_retries))
