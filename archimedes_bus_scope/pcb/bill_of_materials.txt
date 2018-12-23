@@ -1,2 +1,7 @@
 Identifier	Value	Description	KiCad package
 FPGA	LCMXO2-2000HC-4FTG256C		myelin-kicad:lattice_ftg256_fbga
+JTAG	jtag	2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.	Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical
+R1	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R2	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R3	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R4	4k7	4k7 resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder

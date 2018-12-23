@@ -143,6 +143,44 @@ fpga = [
     )
 ]
 
+# MachXO2 needs a pullup on INITN to complete configuration, and pullups are also recommended on PROGRAMN and DONE.
+# For JTAG, TMS, TDI, TDO have internal weak pullups, and TCK needs a 4k7 pulldown.
+fpga_pullups = [
+    myelin_kicad_pcb.R0805("10k", "3V3", "fpga_INITN"),
+    myelin_kicad_pcb.R0805("10k", "3V3", "fpga_PROGRAMN"),
+    myelin_kicad_pcb.R0805("10k", "3V3", "fpga_DONE"),
+    myelin_kicad_pcb.R0805("4k7", "GND", "fpga_TCK"),
+]
+
+# TODO MachXO2 JTAG header, Lattice format
+# See: https://github.com/google/myelin-acorn-electron-hardware/blob/master/notes/pld_programming_and_jtag.md
+cpld_jtag = myelin_kicad_pcb.Component(
+    footprint="Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical",
+    identifier="JTAG",
+    value="jtag",
+    desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
+    pins=[
+        Pin( 1, "TCK",  "fpga_TCK"), # top left
+        Pin( 2, "GND",  "GND"),      # top right
+        Pin( 3, "TMS",  "fpga_TMS"),
+        Pin( 4, "GND",  "GND"),
+        Pin( 5, "TDI",  "fpga_TDI"),
+        Pin( 6, "VCC",  "3V3"),
+        Pin( 7, "TDO",  "fpga_TDO"),
+        Pin( 8, "INIT", "fpga_INITN"),
+        Pin( 9, "TRST", "fpga_DONE"),
+        Pin(10, "PROG", "fpga_PROGRAMN"),
+    ],
+)
+# I wasn't sure whether to put INIT on pin 8 or not -- uncomment this to make a test point for it
+# cpld_INITN_TP = cpld_jtag = myelin_kicad_pcb.Component(
+#     footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+#     identifier="INITN",
+#     value="INITN test point",
+#     desc="single header pin",
+#     pins=[Pin(1, "INITN", "fpga_INITN")],
+# )
+
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
                           "readable_bill_of_materials.txt")
