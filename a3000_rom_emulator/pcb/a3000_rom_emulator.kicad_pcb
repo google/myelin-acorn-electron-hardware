@@ -101,7 +101,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory "gerbers/"))
+      (outputdirectory "./"))
   )
 
   (net 0 "")
@@ -3263,15 +3263,15 @@
       (net 27 GND) (zone_connect 2))
   )
 
-  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C1C49A6) (tstamp 5C3F97DD)
+  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C267F5E) (tstamp 5C3F97DD)
     (at 142.9766 48.7934)
     (descr "Circular Fiducial, 1mm bare copper top; 2mm keepout (Level A)")
     (tags marker)
-    (attr virtual)
+    (attr smd)
     (fp_text reference FID1 (at 0 -2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value Fiducial_1mm_Dia_2mm_Outer (at 0 2) (layer F.Fab)
+    (fp_text value FIDUCIAL (at 0 2) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_circle (center 0 0) (end 1.25 0) (layer F.CrtYd) (width 0.05))
@@ -3283,15 +3283,15 @@
       (solder_mask_margin 0.5) (clearance 0.5))
   )
 
-  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C1C49C5) (tstamp 5C3F9DCA)
+  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C267D89) (tstamp 5C3F9DCA)
     (at 170.434 88.5698)
     (descr "Circular Fiducial, 1mm bare copper top; 2mm keepout (Level A)")
     (tags marker)
-    (attr virtual)
-    (fp_text reference REF** (at 0 -2) (layer F.SilkS) hide
+    (attr smd)
+    (fp_text reference FID3 (at 0 -2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value Fiducial_1mm_Dia_2mm_Outer (at 0 2) (layer F.Fab)
+    (fp_text value FIDUCIAL (at 0 2) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_circle (center 0 0) (end 1.25 0) (layer F.CrtYd) (width 0.05))
@@ -3303,15 +3303,15 @@
       (solder_mask_margin 0.5) (clearance 0.5))
   )
 
-  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C1C4A14) (tstamp 5C3FA3A9)
+  (module Fiducial:Fiducial_1mm_Dia_2mm_Outer (layer F.Cu) (tedit 5C267CC7) (tstamp 5C3FA3A9)
     (at 142.9766 88.5698)
     (descr "Circular Fiducial, 1mm bare copper top; 2mm keepout (Level A)")
     (tags marker)
-    (attr virtual)
-    (fp_text reference REF** (at 0 -2) (layer F.SilkS) hide
+    (attr smd)
+    (fp_text reference FID2 (at 0 -2) (layer F.SilkS) hide
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value Fiducial_1mm_Dia_2mm_Outer (at 0 2) (layer F.Fab)
+    (fp_text value FIDUCIAL (at 0 2) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_circle (center 0 0) (end 1.25 0) (layer F.CrtYd) (width 0.05))

@@ -27,6 +27,9 @@ FC2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x
 FC3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FID1	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
+FID2	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
+FID3	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
 FLASH0	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
 FLASH1	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
 GPIO	gpio		Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical

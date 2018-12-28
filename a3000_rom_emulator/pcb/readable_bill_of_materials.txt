@@ -141,6 +141,21 @@ FC5
 - Description: 100n capacitor in 0805 package
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+FID1
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
+FID2
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
+FID3
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
 FLASH0
 - Value: S29GL064S70DHI010
 - Description: 

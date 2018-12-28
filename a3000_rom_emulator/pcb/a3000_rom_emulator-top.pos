@@ -1,0 +1,36 @@
+### Module positions - created on Friday, December 28, 2018 at 11:54:34 AM ###
+### Printed by Pcbnew version kicad (5.0.1-3-g963ef8bb5)
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val             Package                                                       PosX       PosY       Rot  Side
+C1        10u             C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               157.3800   -36.4850   90.0000  top
+C6        1u              C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               155.3700   -36.4800   90.0000  top
+C7        1u              C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               155.3700   -40.3000   90.0000  top
+C10       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               163.2700   -92.5900    0.0000  top
+C11       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               162.4250  -105.4700  180.0000  top
+C12       1u              C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               158.7250  -105.4700    0.0000  top
+CC2       100n            C_0402_1005Metric                                         162.9900   -59.5900   90.0000  top
+CC3       100n            C_0402_1005Metric                                         147.6900   -59.5700   90.0000  top
+CC4       100n            C_0402_1005Metric                                         160.1750   -47.9300  180.0000  top
+CC5       100n            C_0402_1005Metric                                         153.7750   -62.4600    0.0000  top
+CC6       100n            C_0402_1005Metric                                         149.8200   -47.5800    0.0000  top
+CC7       100n            C_0402_1005Metric                                         147.2450   -52.7200  180.0000  top
+CC8       100n            C_0402_1005Metric                                         162.9800   -55.8450   90.0000  top
+CC9       100n            C_0402_1005Metric                                         152.3550   -47.4800    0.0000  top
+D1        S1ATR           D_SMA                                                     144.4800   -34.8900  180.0000  top
+D2        S1ATR           D_SMA                                                     144.4800   -38.7200  180.0000  top
+FC0       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               159.7700   -70.2450  270.0000  top
+FC1       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               147.4500   -70.7750   90.0000  top
+FC3       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               159.8400   -82.3350  270.0000  top
+FC4       100n            C_0805_2012Metric_Pad1.15x1.40mm_HandSolder               147.2600   -82.5650   90.0000  top
+FID1      FIDUCIAL        Fiducial_1mm_Dia_2mm_Outer                                142.9766   -48.7934    0.0000  top
+FID2      FIDUCIAL        Fiducial_1mm_Dia_2mm_Outer                                142.9766   -88.5698    0.0000  top
+FID3      FIDUCIAL        Fiducial_1mm_Dia_2mm_Outer                                170.4340   -88.5698    0.0000  top
+MCU       ATSAMD21E18A    TQFP-32_7x7mm_P0.8mm                                      159.7700   -99.0100  180.0000  top
+OSC       osc             Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering   142.8100   -54.3450  270.0000  top
+R1        10k             R_0805_2012Metric_Pad1.15x1.40mm_HandSolder               174.7850  -104.2800  180.0000  top
+R2        1k              R_0805_2012Metric_Pad1.15x1.40mm_HandSolder               174.8050   -93.6500  180.0000  top
+R4        10k             R_0805_2012Metric_Pad1.15x1.40mm_HandSolder               159.3900   -36.4850   90.0000  top
+R5        10k             R_0805_2012Metric_Pad1.15x1.40mm_HandSolder               162.8140   -36.5670   90.0000  top
+REG       AP7365-33YG-XX  SOT-89-3                                                  151.6400   -38.4200  180.0000  top
+## End

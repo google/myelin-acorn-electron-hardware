@@ -639,6 +639,16 @@ staples = [
     for n in range(36)
 ]
 
+fiducials = [
+    myelin_kicad_pcb.Component(
+        footprint="Fiducial:Fiducial_1mm_Dia_2mm_Outer",
+        identifier="FID%d" % (n+1),
+        value="FIDUCIAL",
+        pins=[],
+    )
+    for n in range(3)
+]
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
