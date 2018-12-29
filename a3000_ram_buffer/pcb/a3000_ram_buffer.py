@@ -32,6 +32,13 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
+def chop_into_groups(group_size, list):
+    assert not len(list) % group_size, "list has %d elements, which is not a multiple of %d" % (len(list), group_size)
+    return [
+        list[i * group_size:(i + 1) * group_size]
+        for i in range(len(list) / group_size)
+    ]
+
 # (done) Female headers to connect to RAM header on A3000 motherboard -- use long ones that can take a RAM card on top
 # 60 pins: 20, big gap, 20, small gap, 20
 a3000_ram_header = myelin_kicad_pcb.Component(
@@ -48,18 +55,19 @@ a3000_ram_header = myelin_kicad_pcb.Component(
         Pin( 6, "GND",   "GND"),
         Pin( 7, "Wr2",   "ram_nWR2"),
         Pin( 8, "Ras*",  "ram_nRAS"),
-        Pin( 9, "Ra0",   ""),
+        Pin( 9, "Ra0",   "ram_RA0"),
         Pin(10, "Cas0*", "ram_nCAS0"),
-        Pin(11, "Ra1",   ""),
+        Pin(11, "Ra1",   "ram_RA1"),
         Pin(12, "5V",    "5V"),
-        Pin(13, "Ra8",   ""),
-        Pin(14, "Ra3",   ""),
+        Pin(13, "Ra8",   "ram_RA8"),
+        Pin(14, "Ra3",   "ram_RA3"),
         Pin(15, "Rd27",  "ram_D27"),
         Pin(16, "Cas1*", "ram_nCAS1"),
         Pin(17, "Rd3",   "ram_D3"),
         Pin(18, "GND",   "GND"),
         Pin(19, "Rd2",   "ram_D2"),
         Pin(20, "Rd4",   "ram_D4"),
+
         Pin(21, "Rd5",   "ram_D5"),
         Pin(22, "Rd7",   "ram_D7"),
         Pin(23, "Rd6",   "ram_D6"),
@@ -73,22 +81,23 @@ a3000_ram_header = myelin_kicad_pcb.Component(
         Pin(31, "Rd15",  "ram_D15"),
         Pin(32, "Rd14",  "ram_D14"),
         Pin(33, "Cas2*", "ram_nCAS2"),
-        Pin(34, "Ra4",   ""),
+        Pin(34, "Ra4",   "ram_RA4"),
         Pin(35, "Rd16",  "ram_D16"),
         Pin(36, "GND",   "GND"),
         Pin(37, "Rd17",  "ram_D17"),
         Pin(38, "Rd19",  "ram_D19"),
         Pin(39, "Rd18",  "ram_D18"),
-        Pin(40, "Ra5",   ""),
+        Pin(40, "Ra5",   "ram_RA5"),
+        
         Pin(41, "Rd20",  "ram_D20"),
         Pin(42, "GND",   "GND"),
         Pin(43, "Rd21",  "ram_D21"),
-        Pin(44, "Ra9",   ""),
+        Pin(44, "Ra9",   "ram_RA9"),
         Pin(45, "Rd23",  "ram_D23"),
-        Pin(46, "Ra7",   ""),
-        Pin(47, "Ra6",   ""),
+        Pin(46, "Ra7",   "ram_RA7"),
+        Pin(47, "Ra6",   "ram_RA6"),
         Pin(48, "5V",    "5V"),
-        Pin(49, "Ra2",   ""),
+        Pin(49, "Ra2",   "ram_RA2"),
         Pin(50, "Cas3*", "ram_nCAS3"),
         Pin(51, "Rd25",  "ram_D25"),
         Pin(52, "Rd24",  "ram_D24"),
@@ -103,6 +112,19 @@ a3000_ram_header = myelin_kicad_pcb.Component(
     ],
 )
 
+# extra signal because we have one more pin :)
+ext_signal = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+    identifier="EXTSIG",
+    value="ext signal",
+    desc="1x2 0.1 inch male header",
+    pins=[
+        Pin(1, "", "GND"),
+        Pin(2, "", "ext_signal"),
+    ],
+)
+
+
 # 5 x 74LVT245 in SOIC package to minimize trace lengths
 buffers = sum([
     [
@@ -112,23 +134,23 @@ buffers = sum([
             value="74LVC245",
             pins=[
                 Pin( 1, "A->B", "GND"),  # Bn are inputs, An are outputs
-                Pin( 2, "A0",   "%s_buf" % signals[0]),
-                Pin( 3, "A1",   "%s_buf" % signals[1]),
-                Pin( 4, "A2",   "%s_buf" % signals[2]),
-                Pin( 5, "A3",   "%s_buf" % signals[3]),
-                Pin( 6, "A4",   "%s_buf" % signals[4]),
-                Pin( 7, "A5",   "%s_buf" % signals[5]),
-                Pin( 8, "A6",   "%s_buf" % signals[6]),
-                Pin( 9, "A7",   "%s_buf" % signals[7]),
+                Pin( 2, "A0",   "%s_buf" % signals[0] if signals[0] else ""),
+                Pin( 3, "A1",   "%s_buf" % signals[1] if signals[1] else ""),
+                Pin( 4, "A2",   "%s_buf" % signals[2] if signals[2] else ""),
+                Pin( 5, "A3",   "%s_buf" % signals[3] if signals[3] else ""),
+                Pin( 6, "A4",   "%s_buf" % signals[4] if signals[4] else ""),
+                Pin( 7, "A5",   "%s_buf" % signals[5] if signals[5] else ""),
+                Pin( 8, "A6",   "%s_buf" % signals[6] if signals[6] else ""),
+                Pin( 9, "A7",   "%s_buf" % signals[7] if signals[7] else ""),
                 Pin(10, "GND",  "GND"),
-                Pin(11, "B7",   signals[7]),
-                Pin(12, "B6",   signals[6]),
-                Pin(13, "B5",   signals[5]),
-                Pin(14, "B4",   signals[4]),
-                Pin(15, "B3",   signals[3]),
-                Pin(16, "B2",   signals[2]),
-                Pin(17, "B1",   signals[1]),
-                Pin(18, "B0",   signals[0]),
+                Pin(11, "B7",   signals[7] if signals[7] else "GND"),
+                Pin(12, "B6",   signals[6] if signals[6] else "GND"),
+                Pin(13, "B5",   signals[5] if signals[5] else "GND"),
+                Pin(14, "B4",   signals[4] if signals[4] else "GND"),
+                Pin(15, "B3",   signals[3] if signals[3] else "GND"),
+                Pin(16, "B2",   signals[2] if signals[2] else "GND"),
+                Pin(17, "B1",   signals[1] if signals[1] else "GND"),
+                Pin(18, "B0",   signals[0] if signals[0] else "GND"),
                 Pin(19, "nCE",  "GND"),  # always enable
                 Pin(20, "VCC",  "3V3"),
             ],
@@ -141,8 +163,8 @@ buffers = sum([
             desc="8 x 68R",
             pins=sum([
                 [
-                    Pin("%dB" % (n+1), "%dB" % (n+1), "%s_buf" % signal),
-                    Pin("%dA" % (n+1), "%dA" % (n+1), "%s_term" % signal),
+                    Pin("%dB" % (n+1), "%dB" % (n+1), "%s_buf" % signal if signal else "GND"),
+                    Pin("%dA" % (n+1), "%dA" % (n+1), "%s_term" % signal if signal else "GND"),
                 ] for n, signal in enumerate(signals)
             ], []),
         ),
@@ -157,13 +179,71 @@ buffers = sum([
             ],
         ),
     ]
-    for signals in [
-        ["ram_D1", "ram_D0", "ram_BANK", "ram_nOE2", "ram_nWR2", "ram_nRAS", "ram_nCAS0", "ram_D27"],
-        ["ram_nCAS1", "ram_D3", "ram_D2", "ram_D4", "ram_D5", "ram_D7", "ram_D6", "ram_D8"],
-        ["ram_D9", "ram_D11", "ram_D10", "ram_D12", "ram_D13", "ram_D15", "ram_D14", "ram_nCAS2"],
-        ["ram_D16", "ram_D17", "ram_D19", "ram_D18", "ram_D20", "ram_D21", "ram_D23", "ram_nCAS3"],
-        ["ram_D25", "ram_D24", "ram_D26", "ram_D22", "ram_D29", "ram_D30", "ram_D28", "ram_D31"],
-    ]
+    for signals in chop_into_groups(8, [
+        "ram_D1",
+        "ram_D0",
+        "ram_BANK",
+        "ram_nOE2",
+        "ram_nWR2",
+        "ram_nRAS",
+        "ram_RA0",
+        "ram_nCAS0",
+        "ram_RA1",
+        "ram_RA8",
+        "ram_RA3",
+        "ram_D27",
+        "ram_nCAS1",
+        "ram_D3",
+        "ram_D2",
+        "ram_D4",
+        "ram_D5",
+        "ram_D7",
+        "ram_D6",
+        "ram_D8",
+        "ram_D9",
+        "ram_D11",
+        "ram_D10",
+        "ram_D12",
+        "ram_D13",
+        "ram_D15",
+        "ram_D14",
+        "ram_nCAS2",
+        "ram_RA4",
+        "ram_D16",
+        "ram_D17",
+        None,
+        "ram_D19",
+        "ram_D18",
+        "ram_RA5",
+        None,
+        None,
+        "ram_D20",
+        "ram_D21",
+        "ram_RA9",
+        "ram_D23",
+        "ram_RA7",
+        "ram_RA6",
+        None,
+        "ram_RA2",
+        "ram_nCAS3",
+        "ram_D25",
+        "ram_D24",
+        "ram_D26",
+        "ram_D22",
+        "ram_D29",
+        None,
+        "ram_D30",
+        "ram_D28",
+        "ram_D31",
+        "ext_signal",
+        # [
+        # "ram_D1", "ram_D0", "ram_BANK", "ram_nOE2", "ram_nWR2", "ram_nRAS", "ram_RA0" "ram_nCAS0", "ram_RA1",
+        # "ram_RA8", "ram_RA3", "ram_D27", "ram_nCAS1", "ram_D3", "ram_D2", "ram_D4", "ram_D5", 
+        # "ram_D7", "ram_D6", "ram_D8", "ram_D9", "ram_D11", "ram_D10", "ram_D12", "ram_D13", 
+        # "ram_D15", "ram_D14", "ram_nCAS2", "ram_RA4", "ram_D16", "ram_D17", "ram_D19", "ram_D18", 
+        # "ram_RA5", "ram_D20", "ram_D21", "ram_RA9", "ram_D23", "ram_RA7", "ram_RA6", "ram_RA2", 
+        # "ram_nCAS3", "ram_D25", "ram_D24", "ram_D26", "ram_D22", "ram_D29", "ram_D30", "ram_D28", "ram_D31",
+    ])
 ], [])
 
 # Original plan: 74LVT16245 x 2 to buffer signals, output to sig{A, B}{1-16}_pre
@@ -261,23 +341,25 @@ signal_headers = [
         desc="2x17 0.1 inch male header",
         pins=[
             Pin(n * 2 + 1, str(n * 2 + 1), ("%s_term" % signals[n]) if signals[n] else "GND")
-            for n in range(16)
-        ] + [
-            Pin(33, "33", ""),  # This is 3V3 from upstream, which we don't use
+            for n in range(17)
         ] + [
             Pin( n,  str(n), "GND")
             for n in range(2, 36, 2)
         ]
     )
     for bank, signals in [
-        ("A", ["ram_BANK", "ram_nOE2", "ram_nWR2", "ram_nRAS", "ram_nCAS0", "ram_nCAS1", "ram_nCAS2", "ram_nCAS3",
-            None, None, None, None, None, None, None, None]),
-        ("B", ["ram_D1", "ram_D0", "ram_D27", "ram_D3", "ram_D2", "ram_D4", "ram_D5", "ram_D7",
-            "ram_D6", "ram_D8", "ram_D9", "ram_D11", "ram_D10", "ram_D12", "ram_D13", "ram_D15"]),
-        ("C", ["ram_D14", "ram_D16", "ram_D17", "ram_D19", "ram_D18", "ram_D20", "ram_D21", "ram_D23",
-            "ram_D25", "ram_D24", "ram_D26", "ram_D22", "ram_D29", "ram_D30", "ram_D28", "ram_D31"]),
+        ("RAMD1", ["ram_D1", "ram_D0", "ram_D27", "ram_D3", "ram_D2", "ram_D4", "ram_D5", "ram_D7",
+            "ram_D6", "ram_D8", "ram_D9", "ram_D11", "ram_D10", "ram_D12", "ram_D13", "ram_D15", "ram_BANK"]),
+        ("RAMD2", ["ram_D14", "ram_D16", "ram_D17", "ram_D19", "ram_D18", "ram_D20", "ram_D21", "ram_D23",
+            "ram_D25", "ram_D24", "ram_D26", "ram_D22", "ram_D29", "ram_D30", "ram_D28", "ram_D31", "ram_nOE2"]),
+        ("RAMCS", ["ram_nWR2", "ram_nRAS", "ram_RA0", "ram_nCAS0", "ram_RA1", "ram_RA8", "ram_RA3", "ram_nCAS1",
+            "ram_nCAS2", "ram_RA4", "ram_RA5", "ram_RA9", "ram_RA7", "ram_RA6", "ram_RA2", "ram_nCAS3", "ext_signal"]),
     ]
 ]
+
+"""
+"ram_nWR2", "ram_nRAS", "ram_RA0", "ram_nCAS0", "ram_RA1", "ram_RA8", "ram_RA3", "ram_nCAS1", "ram_nCAS2", "ram_RA4", "ram_RA5", "ram_RA9", "ram_RA7", "ram_RA6", "ram_RA2", "ram_nCAS3",
+"""
 
 # 10uf capacitor on 5V input
 power_in_cap = myelin_kicad_pcb.C0805("10u", "GND", "5V", ref="C1")
@@ -309,6 +391,17 @@ ext_power = myelin_kicad_pcb.Component(
         Pin(3, "C", ["5V"]),
     ],
 )
+
+fiducials = [
+    myelin_kicad_pcb.Component(
+        footprint="Fiducial:Fiducial_1mm_Dia_2mm_Outer",
+        identifier="FID%d" % (n+1),
+        value="FIDUCIAL",
+        pins=[],
+    )
+    for n in range(4)
+]
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",

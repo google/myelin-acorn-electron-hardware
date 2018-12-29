@@ -26,6 +26,16 @@ BUF5
 - Description: 
 - KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
 
+BUF6
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
+BUF7
+- Value: 74LVC245
+- Description: 
+- KiCad package: Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm
+
 C1
 - Value: 10u
 - Description: 10u capacitor in 0805 package
@@ -66,10 +76,45 @@ CB5
 - Description: 100n capacitor in 0805 package
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+CB6
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CB7
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 EXTPWR
 - Value: ext pwr
 - Description: 1x3 0.1 inch male header
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+
+EXTSIG
+- Value: ext signal
+- Description: 1x2 0.1 inch male header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
+
+FID1
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
+FID2
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
+FID3
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
+
+FID4
+- Value: FIDUCIAL
+- Description: 
+- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
 
 RAM
 - Value: Extension socket to connect to RAM header on A3000 motherboard, and mezzanine RAM board
@@ -106,18 +151,28 @@ RP5
 - Description: 8 x 68R
 - KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
 
-SIGA
-- Value: signal header A
+RP6
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+RP7
+- Value: resistor pack
+- Description: 8 x 68R
+- KiCad package: myelin-kicad:bourns_cat16_j8_resistor_array
+
+SIGRAMCS
+- Value: signal header RAMCS
 - Description: 2x17 0.1 inch male header
 - KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
 
-SIGB
-- Value: signal header B
+SIGRAMD1
+- Value: signal header RAMD1
 - Description: 2x17 0.1 inch male header
 - KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
 
-SIGC
-- Value: signal header C
+SIGRAMD2
+- Value: signal header RAMD2
 - Description: 2x17 0.1 inch male header
 - KiCad package: Connector_Multicomp:Multicomp_MC9A12-3434_2x17_P2.54mm_Vertical
 
@@ -142,6 +197,16 @@ STAPLE4
 - KiCad package: myelin-kicad:via_array_1x7_55mil
 
 STAPLE5
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE6
+- Value: via array
+- Description: 
+- KiCad package: myelin-kicad:via_array_1x7_55mil
+
+STAPLE7
 - Value: via array
 - Description: 
 - KiCad package: myelin-kicad:via_array_1x7_55mil
