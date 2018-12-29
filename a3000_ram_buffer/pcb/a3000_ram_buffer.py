@@ -392,6 +392,16 @@ ext_power = myelin_kicad_pcb.Component(
     ],
 )
 
+staples = [
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:via_single",
+        identifier="staple_single%d" % (n+1),
+        value="",
+        pins=[Pin(1, "GND", ["GND"])],
+    )
+    for n in range(36)
+]
+
 fiducials = [
     myelin_kicad_pcb.Component(
         footprint="Fiducial:Fiducial_1mm_Dia_2mm_Outer",
