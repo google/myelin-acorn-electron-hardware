@@ -1,0 +1,4 @@
+build-*
+libraries/libxsvf
+crceconet.c
+checksum.h
