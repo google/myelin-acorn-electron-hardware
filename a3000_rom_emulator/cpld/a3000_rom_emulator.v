@@ -122,7 +122,7 @@ assign flash1_DQ = allowing_arm_access == 1'b1 ? 16'bZ : (accessing_flash == 1'b
 
 // Flash chip control lines
 assign flash_nCE = allowing_arm_access == 1'b1 ? rom_nCS : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
-assign flash_nOE = allowing_arm_access == 1'b1 ? rom_nCS : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
+assign flash_nOE = allowing_arm_access == 1'b1 ? rom_nCS : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
 assign flash_nWE = allowing_arm_access == 1'b1 ? 1'b1 : (writing_flash == 1'b1 ? 1'b0 : 1'b1);
 
 
@@ -157,7 +157,7 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
 
     if (spi_bit_count == 0) begin
       allowing_arm_access <= cpld_MOSI;
-      $display("\nSPI: Set allowing_arm_access to %d", cpld_MOSI);
+      // $display("SPI: Set allowing_arm_access to %d", cpld_MOSI);
     end else if (spi_bit_count == 1) begin
       spi_rnw <= cpld_MOSI;
     end else if (spi_bit_count < 24) begin  // 22 bit address in spi bits 2-23
@@ -170,8 +170,8 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
         accessing_flash <= 1'b1;
       end else if (spi_bit_count == 31) begin
         // end read
+        spi_D <= {flash1_DQ, flash0_DQ};
         accessing_flash <= 1'b0;
-        spi_D <= rom_D;
       end else if (spi_bit_count >= 32) begin
         spi_D <= {spi_D[30:0], 1'b0};
       end

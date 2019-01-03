@@ -34,6 +34,8 @@ module a3000_rom_emulator_tb;
   wire flash_nOE;
   wire flash_nWE;
 
+  assign flash_D = (flash_nCE == 1'b0 && flash_nOE == 1'b0) ? {10'b1010101010, flash_A} : 32'bZ;
+
   // test spi feeder
   reg spi_ss = 1'b1;
   reg spi_sck = 1'b0;
@@ -44,6 +46,8 @@ module a3000_rom_emulator_tb;
   reg [63:0] spi_d;
   reg spi_start = 0; // drive this high for one clk pulse to start an spi transaction
   reg [6:0] spi_count;
+
+  reg rom_nCS = 1'b0;
 
   // module under test
   a3000_rom_emulator dut(
@@ -106,14 +110,11 @@ module a3000_rom_emulator_tb;
   end
 
   always @(negedge flash_nOE) begin
-    $display("flash_nOE low with flash_A=%x", flash_A);
+    $display("flash_nOE low with flash_A=%x (flash_D=%x)", flash_A, flash_D);
   end
 
-  // flash fixture always reads 0x42
-  assign D = (flash_nOE == 1'b0) ? 8'h42 : 8'hZZ;
-
   always @(posedge flash_nOE) begin
-    $display("flash_nOE high with flash_A=%x", flash_A);
+    $display("flash_nOE high with flash_A=%x (flash_D=%x)", flash_A, flash_D);
   end
 
   always @(negedge flash_nWE) begin
