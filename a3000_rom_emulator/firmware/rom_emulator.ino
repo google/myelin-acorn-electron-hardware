@@ -63,23 +63,43 @@
 
 // PA28 - cpld_clock_from_mcu
 
-//#define NOISY
+
+// Uncomment this to show every byte sent and received over SPI
+// #define SHOW_ALL_SPI_TRANSFERS
+
+// Disable USB serial commands (CPLD programming etc) by commenting this out:
+#define ENABLE_USB_SERIAL
+
+
+// We have the S29GL064S70DHI010 (S29GL064S 70-ns D-LAE064-BGA-pkg H-halogen/lead-free I-industrial 01-uniform sector 0-tray)
+// 2 x 64 (4Mwordx16) megabit flash chips, so addresses are 22 bits long
+#define CHIP_SIZE (4 * 1048576L)
+// Sectors are 32k word / 64kB long
+#define SECTOR_SIZE (32768L)
+#define SECTOR_MASK ((CHIP_SIZE * 4 - 1) & ~(SECTOR_SIZE - 1))
+
 
 // libxsvf (xsvftool-arduino) entry point
 extern void arduino_play_svf(int tms_pin, int tdi_pin, int tdo_pin, int tck_pin, int trst_pin);
 
+// SPI on SERCOM2 to talk to the CPLD at 24MHz
 SPIClass cpld_spi(&sercom2, CPLD_MISO_PIN, CPLD_SCK_PIN, CPLD_MOSI_PIN, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
 
+
+// Send/receive a byte over SPI, optionally dumping details to the serial port
 uint8_t spi_transfer(uint8_t b) {
   uint8_t r = cpld_spi.transfer(b);
+#ifdef SHOW_ALL_SPI_TRANSFERS
   Serial.print("[");
   Serial.print(b, HEX);
   Serial.print(" -> ");
   Serial.print(r, HEX);
   Serial.print("]");
+#endif
   return r;
 }
 
+// Write a 32-bit word to the flash chips
 void flash_write(uint32_t A, uint32_t D) {
   // Write a 32-bit word to the flash, leaving allowing_arm_access == 0
   digitalWrite(CPLD_SS_PIN, LOW);
@@ -94,6 +114,13 @@ void flash_write(uint32_t A, uint32_t D) {
   digitalWrite(CPLD_SS_PIN, HIGH);
 }
 
+// Write a 16-bit word to the same address on both flash chips
+void flash_write_both(uint32_t A, uint16_t D) {
+  uint32_t D32 = D;
+  flash_write(A, D32 | (D32 << 16));
+}
+
+// Read a 32-bit word from the flash chips
 uint32_t flash_read(uint32_t A) {
   // Read a 32-bit word from the flash, leaving allowing_arm_access == 0
   digitalWrite(CPLD_SS_PIN, LOW);
@@ -109,6 +136,7 @@ uint32_t flash_read(uint32_t A) {
   return D;
 }
 
+// Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
   // Reset allowing_arm_access to 1 in the CPLD
   digitalWrite(CPLD_SS_PIN, LOW);
@@ -116,6 +144,15 @@ void flash_unlock() {
   digitalWrite(CPLD_SS_PIN, HIGH);
 }
 
+// Pulse NRESET on the flash chips
+void flash_reset() {
+  pinMode(FLASH_NRESET_PIN, OUTPUT);
+  digitalWrite(FLASH_NRESET_PIN, LOW);
+  digitalWrite(FLASH_NRESET_PIN, HIGH);
+  pinMode(FLASH_NRESET_PIN, INPUT_PULLUP);
+}
+
+// System startup
 void setup() {
   // Set pin directions for CPLD JTAG.
   pinMode(TDO_PIN, INPUT);
@@ -127,16 +164,10 @@ void setup() {
 	digitalWrite(TCK_PIN, LOW);
 
   // Set up pullups for flash pins
-  pinMode(FLASH_NRESET_PIN, OUTPUT);
-  digitalWrite(FLASH_NRESET_PIN, LOW);
-  digitalWrite(FLASH_NRESET_PIN, HIGH);
-  pinMode(FLASH_NRESET_PIN, INPUT_PULLUP);
+  flash_reset();
   pinMode(FLASH_NREADY_PIN, INPUT_PULLUP);
 
-  // Set up SPI comms on SERCOM2 with CPLD: MOSI=PA08, SCK=PA09, SS=PA10, MISO=PA11
-  // pinMode(CPLD_MOSI_PIN, OUTPUT);
-  // pinMode(CPLD_SCK_PIN, OUTPUT);
-  // pinMode(CPLD_MISO_PIN, INPUT);
+  // Set up fast SPI comms on SERCOM2 with CPLD
   pinMode(CPLD_SS_PIN, OUTPUT);
   digitalWrite(CPLD_SS_PIN, HIGH);
   cpld_spi.begin();
@@ -149,19 +180,257 @@ void setup() {
   Serial.begin(9600);
 }
 
+// Read a byte from the USB serial port
 uint8_t serial_get_uint8() {
   while (!Serial.available());
   return (uint8_t)Serial.read();
 }
 
-uint16_t serial_read_addr() {
-  uint16_t addr = (uint16_t)serial_get_uint8() << 8;
-  addr |= (uint16_t)serial_get_uint8();
+// Read a big-endian uint32 from the USB serial port
+uint32_t serial_get_uint32() {
+  uint32_t addr = (uint32_t)serial_get_uint8() << 24L;
+  addr |= (uint32_t)serial_get_uint8() << 16L;
+  addr |= (uint32_t)serial_get_uint8() << 8L;
+  addr |= (uint32_t)serial_get_uint8();
   return addr;
 }
 
-// Disable USB serial commands (CPLD programming etc) by commenting this out:
-#define ENABLE_USB_SERIAL
+// Programming chunks: write 128 words (512 bytes) at a time
+#define CHUNK_SIZE 128
+#define BUF_SIZE (CHUNK_SIZE + 1)
+
+// TODO move all these vars into the programming code -- we have more RAM in this chip than the atmega32u4 this was originally written for
+static uint32_t read_buf[BUF_SIZE];
+
+// count of chars read into read_buf
+static int buf_pos = 0;
+
+// flash chip size
+uint32_t chip_end = 0L;
+
+// for range programming state
+uint32_t range_start = 0L, range_end = 0L; // range left to program
+int range_chunk_size = 0; // how many bytes to expect in the buffer
+
+
+// true if we've seen dtr=1, false if we're disconnected or reset
+static bool connected = false;
+
+void reset() {
+  // reset read buffer
+  buf_pos = 0;
+  // reset connection flag
+  connected = false;
+  // clear out any unread input
+  while (Serial.available() && !Serial.dtr()) {
+    Serial.read();
+  }
+  // leave flash accessible by host machine
+  flash_unlock();
+}
+
+uint32_t chip_size() {
+  flash_write(0x55, 0x00980098L);  // Enter CFI mode
+  uint32_t size_log2 = flash_read(0x27) & 0xffff;
+  flash_write(0x00, 0xf0);  // Exit CFI mode
+  flash_unlock();  // Allow host access again
+
+  uint32_t size = 1;
+  while (size_log2--) size <<= 1;
+  return size;
+}
+
+// returns true if we're disconnected and have been reset
+bool check_disconnect() {
+  if (Serial.dtr()) {
+    return false; // all is well
+  }
+
+  // remote has disconnected -- reset everything / keep it reset
+  reset();
+  return true;
+}
+
+// request bytes from remote
+bool get_range(uint32_t range_start, uint32_t range_end) {
+  if (check_disconnect()) return false;
+
+  Serial.print(range_start, DEC);
+  Serial.print("+");
+  Serial.println(range_end - range_start, DEC);
+
+  long start_time = millis();
+  buf_pos = 0;
+  while (buf_pos < (int)(range_end - range_start)) {
+    if (check_disconnect()) return false;
+    if (millis() - start_time > 1000) {
+      Serial.print("Timeout reading data after ");
+      Serial.print(buf_pos);
+      Serial.println(" bytes");
+      return false;
+    }
+    if (!Serial.available()) continue;
+
+    uint32_t c = serial_get_uint32();
+    read_buf[buf_pos++] = c;
+  }
+
+  return true;
+}
+
+// kick off a range-program operation
+void program_range(uint32_t start_addr, uint32_t end_addr) {
+
+  // verify addresses
+  if (start_addr != (start_addr & SECTOR_MASK)) {
+    Serial.println("ERR Start addr must be sector aligned");
+    reset();
+    return;
+  }
+  if (end_addr != (end_addr & SECTOR_MASK)) {
+    Serial.println("ERR End addr must be sector aligned");
+    Serial.println(SECTOR_MASK, HEX);
+    reset();
+    return;
+  }
+
+  // Program a sector at a time
+  for (; start_addr < end_addr; start_addr += SECTOR_SIZE) {
+
+    // Read entire sector from remote host and skip it if it's already
+    // programmed
+    bool matches = true;
+    for (uint32_t chunk_start = start_addr;
+         chunk_start < start_addr + SECTOR_SIZE;
+         chunk_start += CHUNK_SIZE) {
+      // Get one chunk of data from the remote host
+      if (!get_range(chunk_start, chunk_start + CHUNK_SIZE)) return;
+      // Compare it with the data in flash
+      for (uint32_t pos = 0; pos < CHUNK_SIZE; ++pos) {
+        if (flash_read(chunk_start + pos) != read_buf[pos]) {
+          matches = false;
+          Serial.print("mismatch at ");
+          Serial.println(chunk_start + pos);
+          break;
+        }
+      }
+      if (!matches) break;
+    }
+    // If whole sector matches data from remote, skip programming
+    if (matches) {
+      Serial.println("whole sector matches");
+      continue;
+    }
+
+    // Mismatch!  Program the sector.
+    Serial.println("erasing sector");
+    flash_write_both(0x555, 0xAA); // (1) Unlock 1
+    flash_write_both(0x2AA, 0x55); // (2) Unlock 2
+    flash_write_both(0x555, 0x80); // (3) Setup
+    flash_write_both(0x555, 0xAA); // (4) Unlock
+    flash_write_both(0x2AA, 0x55); // (5) Unlock
+    flash_write_both(start_addr, 0x30); // (6) Sector address
+    while (1) {
+      uint32_t status = flash_read(start_addr);
+      if (status == 0xFFFFFFFFL) {
+        // Erase complete
+        break;
+      }
+
+      // Not done - check DQ5
+      if (!(status & 0x00200020L)) {
+        // DQ5 == 0; no timeout
+        continue;
+      }
+
+      // DQ5 == 1; double check this isn't a glitch
+      status = flash_read(start_addr);
+      if (status & 0xFFFFFFFFL) {
+        // We're ok!
+        break;
+      }
+
+      // DQ5 indicated an error -- fail and reset
+      Serial.println("ERR Flash erase failed - exceeded erase time limit");
+      // Write reset command
+      flash_write_both(0, 0xF0);
+      // Just to be safe...
+      flash_reset();
+      return;
+    }
+
+    Serial.println("programming sector");
+    for (uint32_t chunk_start = start_addr;
+         chunk_start < start_addr + SECTOR_SIZE;
+         chunk_start += CHUNK_SIZE) {
+
+      // This is the algorithm descripted in Figure 8 (Write Buffer
+      // Programming Operation) of the S29GL064S datasheet.
+
+      // Get one chunk of data from the remote host
+      if (!get_range(chunk_start, chunk_start + CHUNK_SIZE)) return;
+      // Program it into the flash
+      Serial.print("Program at ");
+      Serial.println(chunk_start);
+      // Enter Write Buffer Programming mode
+      flash_write_both(0x555, 0xAA); // (1) Unlock 1
+      flash_write_both(0x2AA, 0x55); // (2) Unlock 2
+      flash_write_both(chunk_start, 0x25); // (3) Write Buffer Load
+      flash_write_both(chunk_start, CHUNK_SIZE - 1); // (4) Sector address + Number of word locations to program minus one
+      for (uint32_t pos = 0; pos < CHUNK_SIZE; ++pos) {
+        flash_write(chunk_start + pos, read_buf[pos]);
+      }
+      flash_write_both(chunk_start, 0x29); // (n+5) Program Buffer to Flash
+
+      // Poll last address written to buffer (chunk_start + CHUNK_SIZE - 1), looking at DQ7/6/5/1
+      uint32_t poll_comparison_value = read_buf[CHUNK_SIZE-1] & 0x00800080L;  // Compare with DQ7
+      uint32_t status_addr = chunk_start + CHUNK_SIZE - 1;
+      while (1) {
+        // Poll
+        uint32_t status = flash_read(status_addr);
+        if ((status & 0x00800080L) == poll_comparison_value) {
+          // DQ7 == Data; we're done
+          break;
+        }
+
+        // Not done - check DQ5
+        if (!(status & 0x00200020L)) {
+          // DQ5 == 0; check DQ1
+          if (!(status & 0x00020002L)) {
+            // DQ1 == 0; continue
+            continue;
+          }
+        }
+
+        // Either DQ5 == 1 or DQ1 == 1; double check this isn't a glitch
+        status = flash_read(status_addr);
+        if ((status & 0x00800080L) == poll_comparison_value) {
+          // We're ok!
+          break;
+        }
+
+        // Either DQ5 or DQ1 indicated an error -- fail and reset
+        if (status & 0x00200020L) {
+          // Device failed
+          Serial.println("ERR Flash programming failed - exceeded program time limit");
+        } else if (status & 0x00020002L) {
+          // Operation aborted
+          Serial.println("ERR Flash programming aborted");
+          // Write write-to-buffer-abort command
+          flash_write_both(0x555, 0xAA);
+          flash_write_both(0x2AA, 0x55);
+          flash_write_both(0x555, 0xF0);
+        }
+        // Write reset command
+        flash_write_both(0, 0xF0);
+        // Just to be safe...
+        flash_reset();
+        return;
+      }
+      // If we got here, the chunk is programmed and we can continue
+    }
+  }
+}
 
 void loop() {
 
@@ -196,12 +465,32 @@ void loop() {
       }
       case 'I': {
         Serial.println("IDENTIFY FLASH");
-        flash_write(0x55, 0x00980098L);
-        Serial.println(" <-- write");
+
+        flash_write(0x55, 0x00980098L);  // Enter CFI mode
+
+        Serial.print("Device size: 2^");
+        Serial.print(flash_read(0x27) & 0xffff);
+        Serial.println(" bytes");
+
         for (uint32_t cfi_addr = 0x10; cfi_addr <= 0x50; ++cfi_addr) {
+          Serial.print("CFI 0x");
+          Serial.print(cfi_addr, HEX);
+          Serial.print(": ");
           Serial.println(flash_read(cfi_addr), HEX);
         }
+
+        flash_write(0x00, 0xf0);  // Exit CFI mode
+        flash_unlock();  // Allow host access again
+
+        break;
+      }
+      case 'P': {
+        chip_end = chip_size();
+        Serial.print("Program whole chip.  Size = ");
+        Serial.println(chip_end * 2);  // Because we actually have double this
+        program_range(0, chip_end);
         flash_unlock();
+        reset();
         break;
       }
       case 'Z': {
