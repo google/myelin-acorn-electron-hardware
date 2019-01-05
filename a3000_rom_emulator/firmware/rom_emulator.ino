@@ -284,7 +284,11 @@ bool get_range(uint32_t range_start, uint32_t range_end) {
 
   long start_time = millis();
   buf_pos = 0;
-  while (buf_pos < (int)(range_end - range_start)) {
+
+  uint32_t bytes_to_receive = (range_end - range_start) * 4;
+  uint32_t byte_count = 0;
+
+  while (byte_count < bytes_to_receive) { // buf_pos < (int)(range_end - range_start)) {
     if (check_disconnect()) return false;
     if (millis() - start_time > 1000) {
       Serial.print("Timeout reading data after ");
@@ -292,10 +296,19 @@ bool get_range(uint32_t range_start, uint32_t range_end) {
       Serial.println(" bytes");
       return false;
     }
-    if (!Serial.available()) continue;
 
-    uint32_t c = serial_get_uint32();
-    read_buf[buf_pos++] = c;
+    byte_count += Serial.readBytes(((char *)read_buf) + byte_count, bytes_to_receive - byte_count);
+  }
+  buf_pos += byte_count / 4;
+
+  // Endian swap.  Is there a better way than doing this?  The ROM data on disk on the host machine
+  // is big-endian.
+  for (uint32_t pos = 0; pos < (range_end - range_start); ++pos) {
+    read_buf[pos] =
+      ((read_buf[pos] & 0xFF000000L) >> 24)
+      | ((read_buf[pos] & 0xFF0000L) >> 8)
+      | ((read_buf[pos] & 0xFF00L) << 8)
+      | ((read_buf[pos] & 0xFFL) << 24);
   }
 
   return true;
@@ -328,8 +341,8 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
          chunk_start += CHUNK_SIZE) {
       // Get one chunk of data from the remote host
       if (!get_range(chunk_start, chunk_start + CHUNK_SIZE)) return;
-      Serial.print("first word in buf: ");
-      Serial.println(read_buf[0], HEX);
+      // Serial.print("first word in buf: ");
+      // Serial.println(read_buf[0], HEX);
       // Compare it with the data in flash
       for (uint32_t pos = 0; pos < CHUNK_SIZE; ++pos) {
         if (flash_read(chunk_start + pos) != read_buf[pos]) {
@@ -403,8 +416,8 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
       // Program it into the flash
       Serial.print("Program at ");
       Serial.println(chunk_start);
-      Serial.print("first word in buf: ");
-      Serial.println(read_buf[0], HEX);
+      // Serial.print("first word in buf: ");
+      // Serial.println(read_buf[0], HEX);
       // Enter Write Buffer Programming mode
       flash_write_both(0x555, 0xAA); // (1) Unlock 1
       flash_write_both(0x2AA, 0x55); // (2) Unlock 2
