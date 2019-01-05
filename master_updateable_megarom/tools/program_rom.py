@@ -71,7 +71,7 @@ def main():
                     print "All done!"
                     done = 1
                     break
-                m = re.search("^(\d+)\+(\d+)$", line)
+                m = re.search(r"^(\d+)\+(\d+)$", line)
                 if not m: continue
 
                 start, size = int(m.group(1)), int(m.group(2))
