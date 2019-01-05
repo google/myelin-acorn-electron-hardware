@@ -201,26 +201,45 @@ uint8_t serial_get_uint8() {
   return (uint8_t)Serial.read();
 }
 
-// Read a big-endian uint32 from the USB serial port
+// // Read a big-endian uint32 from the USB serial port
+// uint32_t serial_get_uint32() {
+//   uint32_t v = (uint32_t)serial_get_uint8() << 24L;
+//   v |= (uint32_t)serial_get_uint8() << 16L;
+//   v |= (uint32_t)serial_get_uint8() << 8L;
+//   v |= (uint32_t)serial_get_uint8();
+//   return v;
+// }
+
+// // Write a big-endian uint32 to the USB serial port
+// void serial_put_uint32(uint32_t v) {
+//   Serial.write((uint8_t)((v & 0xFF000000) >> 24));
+//   Serial.write((uint8_t)((v & 0xFF0000) >> 16));
+//   Serial.write((uint8_t)((v & 0xFF00) >> 8));
+//   Serial.write((uint8_t)(v & 0xFF));
+// }
+
+// Read a little-endian uint32 from the USB serial port
 uint32_t serial_get_uint32() {
-  uint32_t v = (uint32_t)serial_get_uint8() << 24L;
-  v |= (uint32_t)serial_get_uint8() << 16L;
+  uint32_t v = (uint32_t)serial_get_uint8();
   v |= (uint32_t)serial_get_uint8() << 8L;
-  v |= (uint32_t)serial_get_uint8();
+  v |= (uint32_t)serial_get_uint8() << 16L;
+  v |= (uint32_t)serial_get_uint8() << 24L;
   return v;
 }
 
 // Write a big-endian uint32 to the USB serial port
 void serial_put_uint32(uint32_t v) {
-  Serial.write((uint8_t)((v & 0xFF000000) >> 24));
-  Serial.write((uint8_t)((v & 0xFF0000) >> 16));
-  Serial.write((uint8_t)((v & 0xFF00) >> 8));
   Serial.write((uint8_t)(v & 0xFF));
+  Serial.write((uint8_t)((v & 0xFF00) >> 8));
+  Serial.write((uint8_t)((v & 0xFF0000) >> 16));
+  Serial.write((uint8_t)((v & 0xFF000000) >> 24));
 }
 
-// Programming chunks: write 128 words (512 bytes) at a time
-#define CHUNK_SIZE 128
+// USB chunks: read 16kB at a time
+#define CHUNK_SIZE (16384 / 4)
 #define BUF_SIZE (CHUNK_SIZE + 1)
+// Program 512 bytes (128 words) at a time
+#define PROGRAM_BLOCK_SIZE 128
 
 // TODO move all these vars into the programming code -- we have more RAM in this chip than the atmega32u4 this was originally written for
 static uint32_t read_buf[BUF_SIZE];
@@ -250,6 +269,7 @@ void reset() {
   }
   // leave flash accessible by host machine
   flash_unlock();
+  Serial.println("OK");
 }
 
 uint32_t chip_size() {
@@ -301,15 +321,16 @@ bool get_range(uint32_t range_start, uint32_t range_end) {
   }
   buf_pos += byte_count / 4;
 
-  // Endian swap.  Is there a better way than doing this?  The ROM data on disk on the host machine
-  // is big-endian.
-  for (uint32_t pos = 0; pos < (range_end - range_start); ++pos) {
-    read_buf[pos] =
-      ((read_buf[pos] & 0xFF000000L) >> 24)
-      | ((read_buf[pos] & 0xFF0000L) >> 8)
-      | ((read_buf[pos] & 0xFF00L) << 8)
-      | ((read_buf[pos] & 0xFFL) << 24);
-  }
+  // Endian swap.  Disabled this because I think the data coming from the host may
+  // already have the correct endianness.
+
+  // for (uint32_t pos = 0; pos < (range_end - range_start); ++pos) {
+  //   read_buf[pos] =
+  //     ((read_buf[pos] & 0xFF000000L) >> 24)
+  //     | ((read_buf[pos] & 0xFF0000L) >> 8)
+  //     | ((read_buf[pos] & 0xFF00L) << 8)
+  //     | ((read_buf[pos] & 0xFFL) << 24);
+  // }
 
   return true;
 }
@@ -413,96 +434,108 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
 
       // Get one chunk of data from the remote host
       if (!get_range(chunk_start, chunk_start + CHUNK_SIZE)) return;
-      // Program it into the flash
-      Serial.print("Program at ");
-      Serial.println(chunk_start);
-      // Serial.print("first word in buf: ");
-      // Serial.println(read_buf[0], HEX);
-      // Enter Write Buffer Programming mode
-      flash_write_both(0x555, 0xAA); // (1) Unlock 1
-      flash_write_both(0x2AA, 0x55); // (2) Unlock 2
-      flash_write_both(chunk_start, 0x25); // (3) Write Buffer Load
-      flash_write_both(chunk_start, CHUNK_SIZE - 1); // (4) Sector address + Number of word locations to program minus one
-      for (uint32_t pos = 0; pos < CHUNK_SIZE; ++pos) {
-        flash_write(chunk_start + pos, read_buf[pos]);
-      }
-      flash_write_both(chunk_start, 0x29); // (n+5) Program Buffer to Flash
 
-      Serial.println("Wait for completion");
-      // Poll last address written to buffer (chunk_start + CHUNK_SIZE - 1), looking at DQ7/6/5/1
-      uint32_t poll_comparison_value = read_buf[CHUNK_SIZE-1] & 0x00800080L;  // Compare with DQ7
-      // Serial.print("Final word: ");
-      // Serial.println(read_buf[CHUNK_SIZE-1], HEX);
-      uint32_t status_addr = chunk_start + CHUNK_SIZE - 1;
-      while (1) {
-        uint32_t status = flash_read(status_addr);
-        // Serial.print("Status & 80: ");
-        // Serial.print(status & 0x00800080L, HEX);
-        // Serial.print(" c.f. this: ");
-        // Serial.println(poll_comparison_value, HEX);
-        // Check for final state on both chips
-        if ((status & 0x00800080L) == poll_comparison_value) {
-          // We're done
-          // Serial.println("got it");
-          break;
+      // Program it into the flash, 512 bytes (128 words) at a time
+      for (uint32_t program_offset = 0;
+          program_offset < CHUNK_SIZE;
+          program_offset += PROGRAM_BLOCK_SIZE) {
+
+        uint32_t program_start = chunk_start + program_offset;
+
+        Serial.print("Program at ");
+        Serial.println(program_start);
+        // Serial.print("first word in buf: ");
+        // Serial.println(read_buf[0], HEX);
+        // Enter Write Buffer Programming mode
+        flash_write_both(0x555, 0xAA); // (1) Unlock 1
+        flash_write_both(0x2AA, 0x55); // (2) Unlock 2
+        flash_write_both(program_start, 0x25); // (3) Write Buffer Load
+        flash_write_both(program_start, PROGRAM_BLOCK_SIZE - 1); // (4) Sector address + Number of word locations to program minus one
+        for (uint32_t pos = 0; pos < PROGRAM_BLOCK_SIZE; ++pos) {
+          flash_write(program_start + pos, read_buf[program_offset + pos]);
         }
-        if (check_disconnect()) return;
+        flash_write_both(program_start, 0x29); // (n+5) Program Buffer to Flash
 
-        // Check both chips independently for failure states
-        for (uint32_t shift = 0; shift < 17; shift += 16) {
-          uint32_t mask = 0xFFFFL << shift;
-
+        Serial.println("Wait for completion");
+        // Poll last address written to buffer (program_start + PROGRAM_BLOCK_SIZE - 1), looking at DQ7/6/5/1
+        uint32_t poll_comparison_value = read_buf[program_offset + PROGRAM_BLOCK_SIZE-1] & 0x00800080L;  // Compare with DQ7
+        // Serial.print("Final word: ");
+        // Serial.println(read_buf[PROGRAM_BLOCK_SIZE-1], HEX);
+        uint32_t status_addr = program_start + PROGRAM_BLOCK_SIZE - 1;
+        while (1) {
           uint32_t status = flash_read(status_addr);
-          if ((status & 0x00800080L & mask) == (poll_comparison_value & mask)) {
-            // This chip is done
-            continue;
+          // Serial.print("Status & 80: ");
+          // Serial.print(status & 0x00800080L, HEX);
+          // Serial.print(" c.f. this: ");
+          // Serial.println(poll_comparison_value, HEX);
+          // Check for final state on both chips
+          if ((status & 0x00800080L) == poll_comparison_value) {
+            // We're done
+            // Serial.println("got it");
+            break;
           }
+          if (check_disconnect()) return;
 
-          // Not done - check DQ5
-          if (!(status & 0x00200020L & mask)) {
-            // DQ5 == 0; check DQ1
-            if (!(status & 0x00020002L & mask)) {
-              // DQ1 == 0; continue
+          // Check both chips independently for failure states
+          for (uint32_t shift = 0; shift < 17; shift += 16) {
+            uint32_t mask = 0xFFFFL << shift;
+
+            uint32_t status = flash_read(status_addr);
+            if ((status & 0x00800080L & mask) == (poll_comparison_value & mask)) {
+              // This chip is done
               continue;
             }
-          }
 
-          // Either DQ5 == 1 or DQ1 == 1; double check this isn't a glitch
-          status = flash_read(status_addr);
-          if ((status & 0x00800080L & mask) == (poll_comparison_value & mask)) {
-            // This chip is done
-            continue;
-          }
+            // Not done - check DQ5
+            if (!(status & 0x00200020L & mask)) {
+              // DQ5 == 0; check DQ1
+              if (!(status & 0x00020002L & mask)) {
+                // DQ1 == 0; continue
+                continue;
+              }
+            }
 
-          // Serial.print("Failure state: read status==");
-          // Serial.println(status & mask, HEX);
-          // Serial.print(status & 0x00800080L & mask, HEX);
-          // Serial.print(" and poll comparison value is ");
-          // Serial.println(poll_comparison_value & mask, HEX);
-          // Serial.println(((status & 0x00800080L & mask) == (poll_comparison_value & mask)) ? "condition true; wtf" : "condition false");
+            // Either DQ5 == 1 or DQ1 == 1; double check this isn't a glitch
+            status = flash_read(status_addr);
+            if ((status & 0x00800080L & mask) == (poll_comparison_value & mask)) {
+              // This chip is done
+              continue;
+            }
 
-          // Either DQ5 or DQ1 indicated an error -- fail and reset
-          if (status & 0x00200020L & mask) {
-            // Device failed
-            Serial.println("ERR Flash programming failed - exceeded program time limit");
-            // Serial.println(status, HEX);
-            // Serial.println(mask, HEX);
-          } else if (status & 0x00020002L & mask) {
-            // Operation aborted
-            Serial.println("ERR Flash programming aborted");
-            // Serial.println(status, HEX);
-            // Serial.println(mask, HEX);
-            // Write write-to-buffer-abort command
-            flash_write_both(0x555, 0xAA);
-            flash_write_both(0x2AA, 0x55);
-            flash_write_both(0x555, 0xF0);
+            Serial.print("Failure state: read status==");
+            Serial.println(status & mask, HEX);
+            Serial.print(status & 0x00800080L & mask, HEX);
+
+            Serial.print(" and poll comparison value is ");
+            Serial.println(poll_comparison_value & mask, HEX);
+
+            Serial.print("Actual value we're writing: ");
+            Serial.println(read_buf[program_offset + PROGRAM_BLOCK_SIZE-1], HEX);
+
+            // Either DQ5 or DQ1 indicated an error -- fail and reset
+            if (status & 0x00200020L & mask) {
+              // Device failed
+              Serial.println("ERR Flash programming failed - exceeded program time limit");
+              Serial.println(status, HEX);
+              Serial.println(mask, HEX);
+            } else if (status & 0x00020002L & mask) {
+              // Operation aborted
+              Serial.println("ERR Flash programming aborted");
+              Serial.println(status, HEX);
+              Serial.println(mask, HEX);
+              // Write write-to-buffer-abort command
+              flash_write_both(0x555, 0xAA);
+              flash_write_both(0x2AA, 0x55);
+              flash_write_both(0x555, 0xF0);
+            }
+            // Write reset command
+            flash_write_both(0, 0xF0);
+            // Just to be safe...
+            flash_reset();
+            return;
           }
-          // Write reset command
-          flash_write_both(0, 0xF0);
-          // Just to be safe...
-          flash_reset();
-          return;
         }
+        // Block programmed
       }
       // If we got here, the chunk is programmed and we can continue
       Serial.println("Chunk done");
@@ -577,7 +610,7 @@ void loop() {
         chip_end = chip_size();
         Serial.print("Program whole chip.  Size = ");
         Serial.println(chip_end * 2);  // Because we actually have double this
-        program_range(0, chip_end);
+        program_range(0, chip_end / 2);  // Program chip_end/2 words
         flash_unlock();
         reset();
         break;
