@@ -53,6 +53,12 @@
 #define CPLD_SCK_PIN 23
 // PA10 / SERCOM2.2 (SERCOM-ALT) - D34 - cpld_SS
 #define CPLD_SS_PIN 34
+#define CPLD_SS_PORT (PORT->Group[0])
+#define CPLD_SS_PORT_BIT 10
+#define CPLD_SS_SET() do { CPLD_SS_PORT.OUTSET.reg = 1 << CPLD_SS_PORT_BIT; } while (0)
+#define CPLD_SS_CLEAR() do { CPLD_SS_PORT.OUTCLR.reg = 1 << CPLD_SS_PORT_BIT; } while (0)
+// #define CPLD_SS_CLEAR() digitalWrite(CPLD_SS_PIN, LOW)
+// #define CPLD_SS_SET() digitalWrite(CPLD_SS_PIN, HIGH)
 // PA11 / SERCOM2.3 (SERCOM-ALT) - D22 - cpld_MISO
 #define CPLD_MISO_PIN 22
 
@@ -111,7 +117,7 @@ uint8_t spi_transfer(uint8_t b) {
 // Write a 32-bit word to the flash chips
 void flash_write(uint32_t A, uint32_t D) {
   // Write a 32-bit word to the flash, leaving allowing_arm_access == 0
-  digitalWrite(CPLD_SS_PIN, LOW);
+  CPLD_SS_CLEAR();
   spi_transfer((uint8_t)(0x00 | ((A & 0x3f0000L) >> 16L)));  // allowing_arm_access, rnw, A[21:16]
   spi_transfer((uint8_t)((A & 0xff00L) >> 8L));  // A[15:8]
   spi_transfer((uint8_t)(A & 0xffL));  // A[7:0]
@@ -120,7 +126,7 @@ void flash_write(uint32_t A, uint32_t D) {
   spi_transfer((uint8_t)((D & 0xff00L) >> 8L));  // D[15:8]
   spi_transfer((uint8_t)(D & 0xffL));  // D[7:0]
   spi_transfer(0);
-  digitalWrite(CPLD_SS_PIN, HIGH);
+  CPLD_SS_SET();
 #ifdef SHOW_ALL_FLASH_ACCESS
   Serial.print("Flash write *0x");
   Serial.print(A, HEX);
@@ -138,7 +144,7 @@ void flash_write_both(uint32_t A, uint16_t D) {
 // Read a 32-bit word from the flash chips
 uint32_t flash_read(uint32_t A) {
   // Read a 32-bit word from the flash, leaving allowing_arm_access == 0
-  digitalWrite(CPLD_SS_PIN, LOW);
+  CPLD_SS_CLEAR();
   spi_transfer((uint8_t)(0x40 | ((A & 0x3f0000) >> 16)));  // allowing_arm_access, rnw, A[21:16]
   spi_transfer((uint8_t)((A & 0xff00) >> 8));  // A[15:8]
   spi_transfer((uint8_t)(A & 0xff));  // A[7:0]
@@ -147,7 +153,7 @@ uint32_t flash_read(uint32_t A) {
   D |= ((uint32_t)spi_transfer(0)) << 16;  // D[23:16]
   D |= ((uint32_t)spi_transfer(0)) << 8;  // D[15:8]
   D |= ((uint32_t)spi_transfer(0));  // D[7:0]
-  digitalWrite(CPLD_SS_PIN, HIGH);
+  CPLD_SS_SET();
 #ifdef SHOW_ALL_FLASH_ACCESS
   Serial.print("Flash read *0x");
   Serial.print(A, HEX);
@@ -160,9 +166,9 @@ uint32_t flash_read(uint32_t A) {
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
   // Reset allowing_arm_access to 1 in the CPLD
-  digitalWrite(CPLD_SS_PIN, LOW);
+  CPLD_SS_CLEAR();
   spi_transfer(0xff);
-  digitalWrite(CPLD_SS_PIN, HIGH);
+  CPLD_SS_SET();
 }
 
 // Pulse NRESET on the flash chips
@@ -190,7 +196,7 @@ void setup() {
 
   // Set up fast SPI comms on SERCOM2 with CPLD
   pinMode(CPLD_SS_PIN, OUTPUT);
-  digitalWrite(CPLD_SS_PIN, HIGH);
+  CPLD_SS_SET();
   cpld_spi.begin();
   pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
   pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
