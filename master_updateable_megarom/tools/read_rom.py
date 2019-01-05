@@ -73,11 +73,18 @@ def main():
                     break
         input_buf = read_until(ser, input_buf, "DATA:")
         input_buf = input_buf[input_buf.find("DATA:") + 5:]
-        while len(input_buf) < chip_size:
-            r = ser.read(1024)
-            if r:
-                print `r`
-                input_buf += r
+        last_reported = 0
+        try:
+            while len(input_buf) < chip_size:
+                r = ser.read(1024)
+                if r:
+                    # print `r`, len(input_buf), chip_size
+                    input_buf += r
+                    if len(input_buf) - last_reported > 65536:
+                        print len(input_buf), chip_size
+                        last_reported = len(input_buf)
+        except KeyboardInterrupt:
+            print "Interrupted -- saving what we have"
         time_taken = time.time() - start_time
         print "Saving"
         contents, input_buf = input_buf[:chip_size], input_buf[chip_size:]

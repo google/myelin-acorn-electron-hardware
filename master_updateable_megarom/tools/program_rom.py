@@ -50,6 +50,7 @@ def main():
             raise Exception("Chip identification failed")
         chip_size = int(m.group(1))
         print "\n* Chip size = %d bytes" % chip_size
+        usb_block_size = 63 if (chip_size < 1048576) else 1024  # atmega32u4 can't handle big usb chunks, but atsamd21 can
 
         if len(rom) != chip_size:
             raise Exception("%s is %d bytes long, which does not match the flash capacity of %d bytes" % (rom_fn, len(rom), chip_size))
@@ -76,11 +77,12 @@ def main():
                 start, size = int(m.group(1)), int(m.group(2))
                 print "* Sending data from %d-%d" % (start, start+size)
                 blk = rom[start:start+size]
+                #print `blk[:64]`
                 while len(blk):
-                    n = ser.write(blk[:63])
+                    n = ser.write(blk[:usb_block_size])
                     if n:
                         blk = blk[n:]
-                        print "wrote %d bytes" % n
+                        #print "wrote %d bytes" % n
                     else:
                         time.sleep(0.01)
 
