@@ -73,6 +73,12 @@
 // Disable USB serial commands (CPLD programming etc) by commenting this out:
 #define ENABLE_USB_SERIAL
 
+// Uncomment this to disable programming flash (for performance testing)
+// #define DEBUG_DONT_PROGRAM_FLASH
+
+// Uncomment this to fake out fetching data from USB (for performance testing)
+// #define DEBUG_DONT_GET_USB_DATA
+
 
 // We have the S29GL064S70DHI010 (S29GL064S 70-ns D-LAE064-BGA-pkg H-halogen/lead-free I-industrial 01-uniform sector 0-tray)
 // 2 x 64 (4Mwordx16) megabit flash chips, so addresses are 22 bits long
@@ -272,6 +278,7 @@ void reset() {
   Serial.println("OK");
 }
 
+// Return the number of bytes of flash on this board, i.e. double the byte count of one chip
 uint32_t chip_size() {
   flash_write_both(0x55, 0x0098L);  // Enter CFI mode
   uint32_t size_log2 = flash_read(0x27) & 0xffff;
@@ -280,7 +287,8 @@ uint32_t chip_size() {
 
   uint32_t size = 1;
   while (size_log2--) size <<= 1;
-  return size;
+
+  return size * 2;  // Double it because we have two flash chips
 }
 
 // returns true if we're disconnected and have been reset
@@ -296,6 +304,9 @@ bool check_disconnect() {
 
 // request bytes from remote; range_start and range_end are word addresses
 bool get_range(uint32_t range_start, uint32_t range_end) {
+#ifdef DEBUG_DONT_GET_USB_DATA
+  return true;
+#endif
   if (check_disconnect()) return false;
 
   Serial.print(range_start * 4, DEC);
@@ -425,6 +436,7 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
     }
 
     Serial.println("programming sector");
+#ifndef DEBUG_DONT_PROGRAM_FLASH
     for (uint32_t chunk_start = start_addr;
          chunk_start < start_addr + SECTOR_SIZE;
          chunk_start += CHUNK_SIZE) {
@@ -456,7 +468,7 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
         }
         flash_write_both(program_start, 0x29); // (n+5) Program Buffer to Flash
 
-        Serial.println("Wait for completion");
+        // Serial.println("Wait for completion");
         // Poll last address written to buffer (program_start + PROGRAM_BLOCK_SIZE - 1), looking at DQ7/6/5/1
         uint32_t poll_comparison_value = read_buf[program_offset + PROGRAM_BLOCK_SIZE-1] & 0x00800080L;  // Compare with DQ7
         // Serial.print("Final word: ");
@@ -538,8 +550,10 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
         // Block programmed
       }
       // If we got here, the chunk is programmed and we can continue
-      Serial.println("Chunk done");
+      Serial.println("Chunk programmed");
     }
+    Serial.println("Sector programmed");
+#endif // DEBUG_DONT_PROGRAM_FLASH
   }
 }
 
@@ -568,11 +582,26 @@ void loop() {
   if (Serial.available()) {
     int c = Serial.read();
     switch (c) {
+      case 'B': {
+        // benchmark
+        chip_end = chip_size();
+        chip_end = 512 * 1024;
+        Serial.print("Reading ");
+        Serial.print(chip_end);
+        Serial.println(" bytes from flash...");
+        for (uint32_t addr = 0; addr < chip_end / 4; ++addr) {
+          (void)flash_read(addr);
+        }
+        Serial.println("Done.");
+        reset();
+        break;
+      }
       case 'C': {
         // program CPLD
         Serial.println("SEND SVF");
         arduino_play_svf(TMS_PIN, TDI_PIN, TDO_PIN, TCK_PIN, -1);
         Serial.println("SVF DONE");
+        reset();
         break;
       }
       case 'I': {
@@ -596,7 +625,7 @@ void loop() {
 
         chip_end = chip_size();
         Serial.print("Size = ");
-        Serial.println(chip_end * 2);  // Because we actually have double this
+        Serial.println(chip_end);
 
         Serial.println("OK");
 
@@ -609,8 +638,8 @@ void loop() {
         if (Serial.read() != '\n') break;
         chip_end = chip_size();
         Serial.print("Program whole chip.  Size = ");
-        Serial.println(chip_end * 2);  // Because we actually have double this
-        program_range(0, chip_end / 2);  // Program chip_end/2 words
+        Serial.println(chip_end);
+        program_range(0, chip_end / 4);  // Program chip_end/4 words
         flash_unlock();
         reset();
         break;
@@ -618,16 +647,20 @@ void loop() {
       case 'R': {
         chip_end = chip_size();
         Serial.print("Read whole chip.  Size = ");
-        Serial.println(chip_end * 2);
+        Serial.println(chip_end);
         Serial.print("DATA:");
         // chip_end == number of bytes in a single chip, i.e. 2 * number of words
-        for (uint32_t addr = 0; addr < chip_end / 2; ++addr) {
+        for (uint32_t chunk_start = 0; chunk_start < chip_end / 4; chunk_start += CHUNK_SIZE / 4) {
+          // Read 16kB from flash
+          for (uint32_t offset = 0; offset < CHUNK_SIZE/4; ++offset) {
+            read_buf[offset] = flash_read(chunk_start + offset);
+          }
           // fail gracefully on disconnect
+          uint32_t bytes_to_write = CHUNK_SIZE, bytes_written = 0;
           do {
             if (check_disconnect()) return;
-          } while (!Serial.availableForWrite());
-          // read a byte from flash and send it to the remote host
-          serial_put_uint32(flash_read(addr));
+            bytes_written += Serial.write(((char *)read_buf) + bytes_written, bytes_to_write);
+          } while (bytes_written < bytes_to_write);
         }
         flash_unlock();
         reset();
