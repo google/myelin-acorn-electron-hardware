@@ -1,0 +1,9 @@
+Identifier	Value	Description	KiCad package
+A3KROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
+A3KROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
+A3KROM3	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
+A3KROM4	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
+A5KROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_bottom
+A5KROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_bottom
+A5KROM3	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_bottom
+A5KROM4	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_bottom
