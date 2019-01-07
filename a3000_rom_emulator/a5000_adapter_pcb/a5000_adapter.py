@@ -39,13 +39,26 @@ rom_headers = [
         value="ROM header",
         desc="Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???",
         pins=[
+            Pin("16", "GND",  "GND"),
+            Pin("32", "VCC",    "rom_5V"),
+        ] + [
             Pin(str(pin_id), str(pin_id), "rom%d_pin%d" % (rom_id + 1, pin_id))
-            for pin_id in range(40)
+            for pin_id in range(1, 33)
+            if pin_id not in (16, 32)
         ],
     )
     for machine in ("A5K", "A3K")
     for rom_id in range(4)
 ]
+
+# Pin to connect up A21 from an A5000 to a v1 a3000_rom_emulator board
+a21_pin = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+    identifier="A21",
+    value="",
+    pins=[Pin(1, "A21", "rom1_pin1")],
+)
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
