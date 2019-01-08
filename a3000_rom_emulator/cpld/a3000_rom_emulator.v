@@ -37,7 +37,7 @@
 
 
 module a3000_rom_emulator(
-  
+
   // ground this to reset the machine
   inout wire arc_RESET,
 
@@ -56,7 +56,7 @@ module a3000_rom_emulator(
 
   // possible clocks (unused)
   input wire cpld_clock_from_mcu,
-  input wire cpld_clock_osc,
+  input wire cpld_clock_osc,  // PHI1 from a flying lead
   
   // SPI connection to MCU
   input wire cpld_MOSI,
@@ -64,6 +64,22 @@ module a3000_rom_emulator(
   input wire cpld_SCK,
   output reg cpld_MISO = 1'b1
 );
+
+
+// width of the buffer used to communicate between the ARM and MCU; requires 2x this in registers
+parameter comms_buffer_width = 8;
+
+reg [comms_buffer_width-1:0] mcu_to_arm_buffer;
+reg mcu_to_arm_write_state = 1'b0;  // toggles when cpld receives byte from MCU
+reg mcu_to_arm_write_state_sync = 1'b0;  // synchronized to cpld_clock_osc (ARM phi1)
+reg mcu_to_arm_read_state = 1'b0;  // toggles when ARM reads byte from buffer
+reg mcu_to_arm_read_state_sync = 1'b0;  // synchronized to cpld_SCK
+
+reg [comms_buffer_width-1:0] arm_to_mcu_buffer;
+reg arm_to_mcu_write_state = 1'b0;  // toggles when cpld receives byte from ARM
+reg arm_to_mcu_write_state_sync = 1'b0;  // synchronized to cpld_SCK
+reg arm_to_mcu_read_state = 1'b0;  // toggles when MCU reads byte from buffer
+reg arm_to_mcu_read_state_sync = 1'b0;  // synchronized to cpld_clock_osc (ARM phi1)
 
 
 // 1 to pass host accesses through to the flash, 0 to control flash from SPI
@@ -94,8 +110,12 @@ reg accessing_flash = 1'b0;
 reg writing_flash = 1'b0;
 
 
+// set to 1 to reset the ARM, 0 to let it run
+reg reset_arm = 1'b0;
+
 // ARM reset line; open collector
-assign arc_RESET = 1'bZ;
+assign arc_RESET = reset_arm == 1'b1 ? 1'b0 : 1'bZ;
+
 
 // ARM data bus
 assign rom_D = allowing_arm_access == 1'b1 ? (
@@ -104,7 +124,13 @@ assign rom_D = allowing_arm_access == 1'b1 ? (
       {flash1_DQ, flash0_DQ} :
       32'bZ
   ) : (
-    32'bZ  // tristate rom_D when allowing_arm_access == 0
+    // allowing_arm_access == 1'b0; we can't handle a flash access now
+    32'bZ
+
+    // The intention below was to make all ROM reads return "mov pc, #0x3400000"
+    // during programming, so the system might jump to the start of the ROM
+    // afterward.  It didn't seem to do anything though, so I've removed it.
+    // rom_nCS == 1'b0 ? 32'he3a0f50d : 32'bZ
   );
 
 // Flash chip address lines
@@ -158,40 +184,62 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
     if (spi_bit_count == 0) begin
       allowing_arm_access <= cpld_MOSI;
       // $display("SPI: Set allowing_arm_access to %d", cpld_MOSI);
-    end else if (spi_bit_count == 1) begin
-      spi_rnw <= cpld_MOSI;
-    end else if (spi_bit_count < 24) begin  // 22 bit address in spi bits 2-23
-      spi_A <= {spi_A[20:0], cpld_MOSI};
-    end else if (spi_rnw == 1'b1) begin
-      // FLASH READ
-      // 24-31=0 32-63=data (setting up A from 2-23, /CE+/OE low at 24,reading at 31)
-      if (spi_bit_count == 24) begin
-        // start read
-        accessing_flash <= 1'b1;
-      end else if (spi_bit_count == 31) begin
-        // end read
-        spi_D <= {flash1_DQ, flash0_DQ};
-        accessing_flash <= 1'b0;
-      end else if (spi_bit_count >= 32) begin
-        spi_D <= {spi_D[30:0], 1'b0};
+    end else if (allowing_arm_access == 1) begin
+      // allowing ARM access: rest of SPI transaction is a control message
+      if (spi_bit_count < 8) begin
+        flash_bank <= {flash_bank[1:0], cpld_MOSI};
+      end else if (spi_bit_count == 8) begin
+        use_la21 <= cpld_MOSI;
+      end else if (spi_bit_count == 9) begin
+        reset_arm <= cpld_MOSI;
+      end else if (spi_bit_count == 12) begin
+        // mcu has data for me
+      end else if (spi_bit_count == 13) begin
+        // mcu has buffer space for me to transmit
+      end else if (spi_bit_count == 14) begin
+        // send: i have data for mcu
+      end else if (spi_bit_count == 15) begin
+        // send: i have buffer space for mcu
+      end else if (spi_bit_count < 24) begin
+        mcu_to_arm_buffer <= {mcu_to_arm_buffer[comms_buffer_width-2:0], cpld_MOSI};
       end
-    end else if (spi_rnw == 1'b0) begin
-      // FLASH WRITE
-      // 24-55=data 56-63=0 (setting up A and D from 2-55, /CE low from 56-59, /WR low from 57-58)
-      if (spi_bit_count < 56) begin
-        spi_D <= {spi_D[30:0], cpld_MOSI};
-      end
-      if (spi_bit_count == 56) begin
-        accessing_flash <= 1'b1;
-      end
-      if (spi_bit_count == 57) begin
-        writing_flash <= 1'b1;
-      end
-      if (spi_bit_count == 58) begin
-        writing_flash <= 1'b0;
-      end
-      if (spi_bit_count == 59) begin
-        accessing_flash <= 1'b0;
+    end else begin
+      // not allowing ARM access: rest of SPI transaction is a flash access request
+      if (spi_bit_count == 1) begin
+        spi_rnw <= cpld_MOSI;
+      end else if (spi_bit_count < 24) begin  // 22 bit address in spi bits 2-23
+        spi_A <= {spi_A[20:0], cpld_MOSI};
+      end else if (spi_rnw == 1'b1) begin
+        // FLASH READ
+        // 24-31=0 32-63=data (setting up A from 2-23, /CE+/OE low at 24,reading at 31)
+        if (spi_bit_count == 24) begin
+          // start read
+          accessing_flash <= 1'b1;
+        end else if (spi_bit_count == 31) begin
+          // end read
+          spi_D <= {flash1_DQ, flash0_DQ};
+          accessing_flash <= 1'b0;
+        end else if (spi_bit_count >= 32) begin
+          spi_D <= {spi_D[30:0], 1'b0};
+        end
+      end else if (spi_rnw == 1'b0) begin
+        // FLASH WRITE
+        // 24-55=data 56-63=0 (setting up A and D from 2-55, /CE low from 56-59, /WR low from 57-58)
+        if (spi_bit_count < 56) begin
+          spi_D <= {spi_D[30:0], cpld_MOSI};
+        end
+        if (spi_bit_count == 56) begin
+          accessing_flash <= 1'b1;
+        end
+        if (spi_bit_count == 57) begin
+          writing_flash <= 1'b1;
+        end
+        if (spi_bit_count == 58) begin
+          writing_flash <= 1'b0;
+        end
+        if (spi_bit_count == 59) begin
+          accessing_flash <= 1'b0;
+        end
       end
     end
     spi_bit_count <= spi_bit_count + 1;

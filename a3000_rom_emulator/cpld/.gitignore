@@ -1,0 +1,5 @@
+*.vcd
+*.vvp
+*_html
+*.xsvf
+build.log

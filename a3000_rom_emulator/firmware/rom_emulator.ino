@@ -165,9 +165,10 @@ uint32_t flash_read(uint32_t A) {
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
+  uint8_t flash_bank = 2;
   // Reset allowing_arm_access to 1 in the CPLD
   CPLD_SS_CLEAR();
-  spi_transfer(0xff);
+  spi_transfer(0x80 | flash_bank);
   CPLD_SS_SET();
 }
 
@@ -181,6 +182,18 @@ void flash_reset() {
 
 // System startup
 void setup() {
+  // Set up fast SPI comms on SERCOM2 with CPLD
+  pinMode(CPLD_SS_PIN, OUTPUT);
+  CPLD_SS_SET();
+  cpld_spi.begin();
+  pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
+  pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
+  pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
+  cpld_spi.beginTransaction(SPISettings(24000000L, MSBFIRST, SPI_MODE0));
+
+  // Select configured flash_bank
+  flash_unlock();
+
   // Set pin directions for CPLD JTAG.
   pinMode(TDO_PIN, INPUT);
   pinMode(TDI_PIN, OUTPUT);
@@ -193,15 +206,6 @@ void setup() {
   // Set up pullups for flash pins
   flash_reset();
   pinMode(FLASH_NREADY_PIN, INPUT_PULLUP);
-
-  // Set up fast SPI comms on SERCOM2 with CPLD
-  pinMode(CPLD_SS_PIN, OUTPUT);
-  CPLD_SS_SET();
-  cpld_spi.begin();
-  pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
-  pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
-  pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
-  cpld_spi.beginTransaction(SPISettings(24000000L, MSBFIRST, SPI_MODE0));
 
   // Set up USB serial port
   Serial.begin(9600);
@@ -646,7 +650,6 @@ void loop() {
         Serial.print("Program whole chip.  Size = ");
         Serial.println(chip_end);
         program_range(0, chip_end / 4);  // Program chip_end/4 words
-        flash_unlock();
         reset();
         break;
       }
