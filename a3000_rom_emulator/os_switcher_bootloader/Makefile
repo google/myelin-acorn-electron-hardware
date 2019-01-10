@@ -13,21 +13,43 @@
 # limitations under the License.
 
 AS = arm-none-eabi-as
-LD = arm-none-eabi-ld
+CC = arm-none-eabi-g++
+LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
+CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions
+LDFLAGS = -nostdlib -lgcc
 
-.PHONY: default all
+.PHONY: default all clean
 
 default: all
 
-all: jump_to_rom.bin
+clean:
+	rm -vf *.bin *.elf *.o *.rom
+
+all: switcher.bin jump_to_rom.bin
 
 %.o: %.s
 	$(AS) -o $@ $<
 
+%.o: %.cc
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+%.o: %.c
+	$(CCC) $(CFLAGS) -c -o $@ $<
+
 %.elf: %.o
-	$(LD) --section-start .text=0 -o $@ $<
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--section-start=.text=0 -o $@ $<
+
+%.rom: %.bin
+	python pad_to_rom.py $< $@
+
+SWITCHER_OBJS=start.o cstartup.o main.o
+
+switcher.elf: $(SWITCHER_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--section-start=.text=0 -o $@ $(SWITCHER_OBJS)
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
+show: switcher.rom
+	arm-none-eabi-objdump -S --disassemble switcher.elf

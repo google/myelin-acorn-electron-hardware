@@ -12,6 +12,11 @@
 @ See the License for the specific language governing permissions and
 @ limitations under the License.
 
-start:
-	@ jump to the start of the 'low rom' area
-	mov pc, #0x3400000
+
+.global _start
+
+_start:
+	@ jump to the start of the 'high rom' area
+	@ (where the RISC OS ROMs are mapped)
+	@ mov pc, #0x3800000
+	mov pc, #0
