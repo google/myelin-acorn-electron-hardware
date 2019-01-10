@@ -19,9 +19,9 @@ extern "C" {
 
   extern void main_program();
 
-  void cstart() __attribute__((naked));
+  void cstartup() __attribute__((naked));
 
-  void cstart() {
+  void cstartup() {
     // jump into c++ code
     main_program();
 

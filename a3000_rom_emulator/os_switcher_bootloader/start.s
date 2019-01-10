@@ -45,4 +45,4 @@ in_rom_now:
 	@ TODO zero out bss
 
 	@ done with all the pre-memory stuff -- jump into C for the rest
-	b cstart
+	b cstartup
