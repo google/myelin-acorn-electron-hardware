@@ -23,11 +23,9 @@
 
 _start:
 	@ On reset, pc==0, but we want to be at 0x3800000.
-	@ Jump to 0x3800008, which should hopefully be in_rom_now, below.
-	@ TODO figure out a safer way of doing this.  Is there a non
-	@ PC-relative way to put an address in a register?
-	mov r0, #0x3800000
-	add pc, r0, #8
+	@ Jump to in_rom_now by loading its proper address into pc.
+	ldr pc, in_rom_now_addr
+in_rom_now_addr: .word in_rom_now
 
 in_rom_now:
 	@ TODO set screen border color
@@ -40,9 +38,24 @@ in_rom_now:
 	@ not really using the frame pointer, but init it to stack pointer
 	mov fp, sp
 
-	@ TODO copy data
+	@ clear bss section
+	mov r0, #0
+	ldr r1, =__bss_start__
+	ldr r2, =__bss_end__
+still_clearing_bss:
+	cmp r1, r2
+	strlo r0, [r1], #4
+	blo still_clearing_bss
 
-	@ TODO zero out bss
+	@ copy initial values from rom (_etext) into .data (_data)
+	ldr r1, =_etext
+	ldr r2, =_data
+	ldr r3, =_edata
+still_copying_data:
+	cmp r2, r3
+	ldrlo r0, [r1], #4
+	strlo r0, [r2], #4
+	blo still_copying_data
 
 	@ done with all the pre-memory stuff -- jump into C for the rest
 	b cstartup

@@ -26,7 +26,7 @@ default: all
 clean:
 	rm -vf *.bin *.elf *.o *.rom
 
-all: switcher.bin jump_to_rom.bin
+all: switcher.rom jump_to_rom.bin
 
 %.o: %.s
 	$(AS) -o $@ $<
@@ -46,10 +46,8 @@ all: switcher.bin jump_to_rom.bin
 SWITCHER_OBJS=start.o cstartup.o main.o
 
 switcher.elf: $(SWITCHER_OBJS)
-	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--section-start=.text=0 -o $@ $(SWITCHER_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -o $@ $(SWITCHER_OBJS)
+	arm-none-eabi-objdump -S --disassemble switcher.elf > switcher.list
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
-
-show: switcher.rom
-	arm-none-eabi-objdump -S --disassemble switcher.elf

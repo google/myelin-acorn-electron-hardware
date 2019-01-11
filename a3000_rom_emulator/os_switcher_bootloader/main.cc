@@ -22,12 +22,27 @@
 // volatile uint32_t* VIDCR = (uint32_t *)0x3400000L;
 #define VIDCR (*((volatile uint32_t *)0x3400000L))
 
+const char* foo = "this is a test";
+
+#define BUF_SIZE 512
+uint32_t buf[BUF_SIZE];
+
 extern "C" void main_program() {
   // set border color to white: 40:8 X:11 supreme:1 blue:4 green:4 red:4
   // white = 0001 1111 1111 1111
   VIDCR = 0x40001FFFL;
 
   // TODO set up screen mode; presumably this involves allocating memory and setting up MEMC DMA
+
+  // DEBUG some loops, to validate that text/rodata/data/bss have been linked properly:
+  buf[0] = 0;
+  uint32_t i = 1;
+  for (; i < 15; ++i) {
+    buf[i] = foo[i];
+  }
+  for (; i < BUF_SIZE; ++i) {
+    buf[i] = buf[i-1] + 42;
+  }
 
   // TODO draw something...
 
