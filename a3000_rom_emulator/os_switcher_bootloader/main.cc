@@ -18,9 +18,7 @@
 
 #include <stdint.h>
 
-// Writes to anywhere in 0x3400000-0x35FFFFF activate the ~VIDW output from MEMC
-// volatile uint32_t* VIDCR = (uint32_t *)0x3400000L;
-#define VIDCR (*((volatile uint32_t *)0x3400000L))
+#include "arcregs.h"
 
 const char* foo = "this is a test";
 

@@ -28,7 +28,58 @@ _start:
 in_rom_now_addr: .word in_rom_now
 
 in_rom_now:
-	@ TODO set screen border color
+	@ Init MEMC
+	ldr r0, =0x036E170C  @ os mode, sound off, video on, refresh on, rom slow, 32k pages
+	ldr r1, =0
+	str r1, [r0]
+
+	@ Set up initial video display, with a white border in
+	@ MODE 13: 640x256, 256 colors (8bpp), 163840 bytes
+
+	@ VIDC registers
+	ldr r1, =0x03400000  @ VIDCR
+
+	ldr r2, =vidc_reg_table
+	ldr r3, =vidc_setup_done
+write_to_one_vidc_reg:
+	cmp r2, r3
+	ldrlo r0, [r2], #4
+	strlo r0, [r1]
+	blo write_to_one_vidc_reg
+	b vidc_setup_done
+vidc_reg_table:
+	.word 0x807FC000  @ reg 80 = 0x7FC000 - horizontal cycle
+	.word 0x8408C000  @ reg 84 = 0x08C000 - horizontal sync width
+	.word 0x8810C000  @ reg 88 = 0x10C000 - horizontal border start
+	.word 0x8C1B4000  @ reg 8C = 0x1B4000 - horizontal display start
+	.word 0x906B4000  @ reg 90 = 0x6B4000 - horizontal display end
+	.word 0x9476C000  @ reg 94 = 0x76C000 - horizontal border end
+	.word 0x9C400000  @ reg 9C = 0x400000 - horizontal interlace
+	.word 0xA04DC000  @ reg A0 = 0x4DC000 - vertical cycle
+	.word 0xA4008000  @ reg A4 = 0x008000 - vertical sync width
+	.word 0xA8048000  @ reg A8 = 0x048000 - vertical border start
+	.word 0xAC08C000  @ reg AC = 0x08C000 - vertical display start
+	.word 0xB048C000  @ reg B0 = 0x48C000 - vertical display end
+	.word 0xB44D0000  @ reg B4 = 0x4D0000 - vertical border end
+	.word 0xE00000AE  @ reg E0 = 0x0000AE - control
+	.word 0xB8000000  @ reg B8 = 0x000000 - vertical cursor start
+	.word 0xBC000000  @ reg BC = 0x000000 - vertical cursor end
+	@ Plus this, to set the border color to white:
+	.word 0x40001FFF  @ screen border color
+vidc_setup_done:
+
+	@ Set up video DMA registers in MEMC.  These refer to physical memory and
+	@ are limited to the bottom 512kB of memory.  RISC OS sets vstart=0 and
+	@ maps these to the top of the 32MB logical memory space.
+	@ Set vstart=0
+	ldr r0, =0x03600000
+	str r1, [r0]
+	@ Set vinit=0
+	ldr r0, =0x03620000
+	str r1, [r0]
+	@ Set vend=163840/16 = 10240
+	ldr r0, =0x0364a000
+	str r1, [r0]
 
 	@ TODO test system memory
 

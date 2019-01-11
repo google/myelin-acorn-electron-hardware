@@ -4,7 +4,7 @@ ENTRY(_start)
 
 MEMORY {
 	ROM (rx)  : ORIGIN = 0x3800000, LENGTH = 2M
-	RAM (rwx) : ORIGIN = 0x2000000, LENGTH = 512k
+	RAM (rwx) : ORIGIN = 0x2028000, LENGTH = 512k  /* first 160k is screen mem */
 }
 
 C_STACK_SIZE = 16384;
