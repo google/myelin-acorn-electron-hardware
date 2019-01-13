@@ -14,6 +14,7 @@
 
 import glob
 import gzip
+import os
 import random
 import serial
 from serial.serialutil import SerialTimeoutException
@@ -23,7 +24,9 @@ import time
 import zipfile
 
 def guess_port():
-    port = None
+    port = os.environ.get('UPURS_PORT')
+    if port:
+        return port
     for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
         matches = glob.glob(pattern)
         if matches:

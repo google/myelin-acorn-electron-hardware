@@ -13,8 +13,10 @@
 # limitations under the License.
 
 import glob
+import os
 import pygame
 import serial
+import time
 
 # Keyboard mappings
 
@@ -73,7 +75,9 @@ for col in range(len(bbc_master_keycodes)):
             scancodes_to_beebcodes[scancode] = beebcode
 
 def guess_port():
-    port = None
+    port = os.environ.get('KB_PORT')
+    if port:
+        return port
     for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
         matches = glob.glob(pattern)
         if matches:
@@ -141,6 +145,7 @@ class Main:
                             while v in self.keys_down:
                                 self.keys_down.remove(v)
                             self.send_keys()
+            time.sleep(1.0/60)
 
 if __name__ == '__main__':
     Main().main()

@@ -24,25 +24,25 @@ def main():
     svf = open(svf_fn).read() + "\n\x04"
 
     with simple_cpld_programmer.Port() as ser:
-        # print "Serial port opened:", ser
+        # print("Serial port opened:", ser)
 
         while 1:
             r = ser.read(1024)
             if not r: break
-            print `r`
+            print(repr(r))
             time.sleep(0.1)
 
         ser.write("C\n")
 
         resp = ''
-        print "Waiting for SEND SVF"
+        print("Waiting for SEND SVF")
         while 1:
             r = ser.read(1024)
             if r:
                 resp += r
-                print `r`
+                print(repr(r))
                 if resp.find("SEND SVF") != -1:
-                    print "got SEND SVF - continuing"
+                    print("got SEND SVF - continuing")
                     break
             time.sleep(0.1)
 
@@ -58,7 +58,7 @@ def main():
             if stars < -3:
                 time.sleep(0.001)
             else:
-                print "\r  (write @ line %d, %d/%d)" % (line_no, svf_pos, len(svf)),
+                print("\r  (write @ line %d, %d/%d)" % (line_no, svf_pos, len(svf)),)
                 sys.stdout.flush()
 
                 # always send 63 chars if we can
@@ -67,8 +67,8 @@ def main():
                 n = ser.write(svf[svf_pos:p])
                 if n:
                     stars -= 1
-                    #print "  (%d bytes written)" % n
-                    #print "  (sent: %s)" % `svf[svf_pos:p]`
+                    #print("  (%d bytes written)" % n)
+                    #print("  (sent: %s)" % repr(svf[svf_pos:p]))
                     line_no += svf[svf_pos:p].count("\n")
                     svf_pos += n
 
@@ -76,7 +76,7 @@ def main():
                 r = ser.read(1024)
                 if not r:
                     break
-                #print r
+                #print(r)
                 resp += r
                 while 1:
                     p = resp.find("\n")
@@ -85,20 +85,20 @@ def main():
                     if line == "*#":
                         stars += 1
                     else:
-                        print "\r%s" % line
+                        print("\r%s" % line)
                     resp = resp[p+1:]
                     if line.find("SVF DONE") != -1:
                         all_done = True
-                        print "all done"
+                        print("all done")
             if not n:
                 time.sleep(SLEEP_TIME)
                 sleep_count += 1
         svf_delivery_time = time.time() - svf_start_time
 
-        print "SVF entirely sent, in %.2f s" % svf_delivery_time
+        print("SVF entirely sent, in %.2f s" % svf_delivery_time)
         total_sleep_time = SLEEP_TIME * sleep_count
         if total_sleep_time > 0.3:
-            print "Slept for %.2f s total" % total_sleep_time
+            print("Slept for %.2f s total" % total_sleep_time)
 
 if __name__ == '__main__':
     main()
