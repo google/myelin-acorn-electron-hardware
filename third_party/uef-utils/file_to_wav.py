@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,10 +21,10 @@
 import os, stat, sys, tempfile
 
 HERE = os.path.abspath(os.path.split(sys.argv[0])[0])
-print HERE
+print(HERE)
 
 def cmd(s):
-	print s
+	print(s)
 	return os.system(s)
 
 class UEF(object):
@@ -39,8 +40,8 @@ class UEF(object):
 		temp = tempfile.mkdtemp("_uef_append")
 		try:
 			cmd("cp -v %s %s/file" % (fn, temp))
-			print>>open("%s/file.inf" % temp, "w"), "$.%s\t%X\t%X\t%X" % (
-				leaf, load, start, size)
+			print("$.%s\t%X\t%X\t%X" % (
+				leaf, load, start, size), file=open("%s/file.inf" % temp, "w"))
 			cmd("python %s/UEFtrans.py %s append %s/file" % (HERE, self.uef_fn, temp))
 		finally:
 			os.unlink("%s/file" % temp)
@@ -61,4 +62,4 @@ if __name__ == '__main__':
 	leaf, load_addr = sys.argv[1:]
 	wav_fn = make_wav(leaf, load_addr)
 	cmd("open '%s'" % wav_fn)
-	print "On the Electron, run: *LOAD %s %x" % (leaf, int(load_addr, 16))
+	print("On the Electron, run: *LOAD %s %x" % (leaf, int(load_addr, 16)))

@@ -62,6 +62,7 @@
 		commands.
 		Fixed the new command so that the keyboard layout is set correctly.
 """
+from __future__ import print_function
 
 import sys, string, os, gzip
 
@@ -249,7 +250,7 @@ def read_block(chunk):
 	# Read the block
 	name = ''
 	a = 1
-	while 1:
+	while True:
 		c = block[a]
 		if ord(c) != 0:		# was > 32:
 			name = name + c
@@ -506,13 +507,13 @@ def write_machine_info(file, machine, keyboard):
 	machines = {'BBC Model A': 0, 'Electron': 1, 'BBC Model B': 2, 'BBC Master':3}
 	keyboards = {'any': 0, 'physical': 1, 'logical': 2}
 
-	if machines.has_key(machine):
+	if machine in machines:
 
 		machine = machines[target_machine]
 	else:
 		machine = 0
 
-	if keyboards.has_key(keyboard):
+	if keyboard in keyboards:
 
 		keyboard = keyboards[keyboard_layout]
 	else:
@@ -545,7 +546,7 @@ def create_chunks(file_names):
 			try:
 				details = open(name + suffix + 'INF', 'r').readline()
 			except IOError:
-				print "Couldn't open information file, %s" % name+suffix+'inf'
+				print("Couldn't open information file, %s" % name+suffix+'inf')
 				sys.exit()
 
 		# Parse the details
@@ -571,7 +572,7 @@ def create_chunks(file_names):
 		try:
 			in_file = open(name, 'rb')
 		except IOError:
-			print "Couldn't open file, %s" % name
+			print("Couldn't open file, %s" % name)
 			sys.exit()
 
 		# Find the length of the file (don't rely on the .inf file)
@@ -592,7 +593,7 @@ def create_chunks(file_names):
 		exe = hex2num(exe)
 
 		if load == None or exe == None:
-			print 'Problem with %s: information is possibly incorrect.' % name+suffix+'inf'
+			print('Problem with %s: information is possibly incorrect.' % name+suffix+'inf')
 			sys.exit()
 
 		# Reset the block number to zero
@@ -602,7 +603,7 @@ def create_chunks(file_names):
 		gap = 1
 	
 		# Write block details
-		while 1:
+		while True:
 			block, last = write_block(in_file, real_name, load, exe, length, block_number)
 
 			if gap == 1:
@@ -669,7 +670,7 @@ def encode_chunks(file_names):
 			try:
 				new_chunks.append( (hex2num(leafname[hexsuffix+3:]), open(name, 'rb').read()) )
 			except IOError:
-				print "Couldn't insert file %s as chunk." % name
+				print("Couldn't insert file %s as chunk." % name)
 				sys.exit()
 		else:
 			# Attempt to convert filename into a chunk number
@@ -679,11 +680,11 @@ def encode_chunks(file_names):
 				new_chunks.append( (number, open(name, 'rb').read()) )
 
 			except KeyError:
-				print "Couldn't find suitable chunk number for file %s" % name
+				print("Couldn't find suitable chunk number for file %s" % name)
 				sys.exit()
 
 			except IOError:
-				print "Couldn't insert file %s as chunk." % name
+				print("Couldn't insert file %s as chunk." % name)
 				sys.exit()
 
 	# Return the list of new chunks
@@ -697,13 +698,13 @@ def export_file(out_path, chunks, name, write_name, load, exe, length):
 	try:
 		out_file = open(out_path + os.sep + write_name, 'wb')
 	except IOError:
-		print "Couldn't open file %s" % out_path+os.sep+name
+		print("Couldn't open file %s" % out_path+os.sep+name)
 
 	if out_file == None:
 
 		# Try to open the file with a generic stem and put the
 		# real name in the .inf file
-		print 'Trying to create %s' % out_path+os.sep+stem+str(new_file)
+		print('Trying to create %s' % out_path+os.sep+stem+str(new_file))
 		try:
 			out_file = open(out_path + os.sep + stem + str(new_file), 'wb')
 
@@ -711,7 +712,7 @@ def export_file(out_path, chunks, name, write_name, load, exe, length):
 			write_name = stem + str(new_file)
 			new_file = new_file + 1
 		except IOError:
-			print "Couldn't open file %s" % out_path+os.sep+stem+str(new_file)
+			print("Couldn't open file %s" % out_path+os.sep+stem+str(new_file))
 
 	if out_file != None:
 
@@ -719,7 +720,7 @@ def export_file(out_path, chunks, name, write_name, load, exe, length):
 		try:
 			inf_file = open(out_path + os.sep + write_name + suffix + 'inf', 'w')
 		except IOError:
-			print "Couldn't open file %s" % out_path+os.sep+name+suffix+'inf'
+			print("Couldn't open file %s" % out_path+os.sep+name+suffix+'inf')
 
 	if inf_file != None:
 
@@ -770,7 +771,7 @@ def decode_chunk(out_path, chunk_info, position):
 
 	# If the chunk number is not in the dictionary then write a file with name constructed
 	# from the hexadecimal form of the chunk number beginning with 0x.
-	if decode_as.has_key(chunk_info[0]):
+	if chunk_info[0] in decode_as:
 
 		name = decode_as[chunk_info[0]]
 
@@ -785,7 +786,7 @@ def decode_chunk(out_path, chunk_info, position):
 		open(out_path+os.sep+name, 'wb').write(chunk_info[1])
 
 	except IOError:
-		print "Couldn't write file %s for chunk number %s." % (name, hex(chunk_info[0]))
+		print("Couldn't write file %s for chunk number %s." % (name, hex(chunk_info[0])))
 
 
 def printable(s):
@@ -828,200 +829,200 @@ def print_help(command):
 
 	if command == 'general':
 
-		print syntax
-		print
-		print 'UEFtrans version '+version
-		print
-		print 'This program allows the user to perform operations on UEF archives.'
-		print 'The operations supported may take arguments and are as follows:'
-		print
-		print '        info'
-		print '        wwwinfo <directory>'
-		print '        new <machine> <keyboard>'
-		print '        cat'
-		print '        append <files>'
-		print '        insert <position> <files/chunks>'
-		print '        remove <positions>'
-		print '        extract <positions> <directory>'
-		print '        chunks'
-		print
-		print 'In addition, the help command provides information on any command'
-		print 'and uses the special syntax:'
-		print
-		print '        UEFtrans'+suffix+'py help <command>'
-		print
+		print(syntax)
+		print()
+		print('UEFtrans version '+version)
+		print()
+		print('This program allows the user to perform operations on UEF archives.')
+		print('The operations supported may take arguments and are as follows:')
+		print()
+		print('        info')
+		print('        wwwinfo <directory>')
+		print('        new <machine> <keyboard>')
+		print('        cat')
+		print('        append <files>')
+		print('        insert <position> <files/chunks>')
+		print('        remove <positions>')
+		print('        extract <positions> <directory>')
+		print('        chunks')
+		print()
+		print('In addition, the help command provides information on any command')
+		print('and uses the special syntax:')
+		print()
+		print('        UEFtrans'+suffix+'py help <command>')
+		print()
 
 	elif command == 'info':
 
-		print info_syntax
-		print
-		print '        Provides general information on the target machine,'
-		print '        keyboard layout, file creator and target emulator.'
-		print
+		print(info_syntax)
+		print()
+		print('        Provides general information on the target machine,')
+		print('        keyboard layout, file creator and target emulator.')
+		print()
 
 	elif command == 'new':
 
-		print new_syntax
-		print
-		print '        Creates a new UEF file of the name given specified as'
-		print '        being for a particular machine which is one of the'
-		print '        following:'
-		print
-		print '        BBC Model A, Electron, BBC Model B, BBC Master'
-		print
-		print '        The keyboard layout is  "any", "physical" or "logical".'
-		print
-		print '        UEF version is a number of the form x.y corresponding to'
-		print '        the relevant version of the UEF file format specification.'
-		print
+		print(new_syntax)
+		print()
+		print('        Creates a new UEF file of the name given specified as')
+		print('        being for a particular machine which is one of the')
+		print('        following:')
+		print()
+		print('        BBC Model A, Electron, BBC Model B, BBC Master')
+		print()
+		print('        The keyboard layout is  "any", "physical" or "logical".')
+		print()
+		print('        UEF version is a number of the form x.y corresponding to')
+		print('        the relevant version of the UEF file format specification.')
+		print()
 
 	elif command == 'cat':
 
-		print cat_syntax
-		print
-		print '        Lists the names of the files in the archive.'
-		print
+		print(cat_syntax)
+		print()
+		print('        Lists the names of the files in the archive.')
+		print()
 
 	elif command == 'append':
 
-		print append_syntax
-		print
-		print '        Add the files in the order given to the end of the'
-		print '        archive. Each file requires an associated .inf file.'
-		print
+		print(append_syntax)
+		print()
+		print('        Add the files in the order given to the end of the')
+		print('        archive. Each file requires an associated .inf file.')
+		print()
 
 	elif command == 'insert':
 
-		print insert_syntax
-		print
-		print '        Insert files/chunks in the order given into the archive'
-		print '        at the position specified.'
-		print
-		print '        To insert files, the position given is the number of a file'
-		print '        in the archive catalogue before which you wish the files to'
-		print '        be placed. Note that 0 is the number of the first file in'
-		print '        the archive.'
-		print
-		print '        To insert chunks, the position given is that of the chunk'
-		print '        before which the inserted chunks will appear. This number'
-		print '        must be prefixed by "c" to indicate that the files to be'
-		print '        inserted contain chunk data. Since there is no version of'
-		print '        the append command for chunks, you should append them by'
-		print '        specifying a position which is one greater than the last'
-		print '        chunk in the file.'
-		print
-		print 'Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.'
-		print
+		print(insert_syntax)
+		print()
+		print('        Insert files/chunks in the order given into the archive')
+		print('        at the position specified.')
+		print()
+		print('        To insert files, the position given is the number of a file')
+		print('        in the archive catalogue before which you wish the files to')
+		print('        be placed. Note that 0 is the number of the first file in')
+		print('        the archive.')
+		print()
+		print('        To insert chunks, the position given is that of the chunk')
+		print('        before which the inserted chunks will appear. This number')
+		print('        must be prefixed by "c" to indicate that the files to be')
+		print('        inserted contain chunk data. Since there is no version of')
+		print('        the append command for chunks, you should append them by')
+		print('        specifying a position which is one greater than the last')
+		print('        chunk in the file.')
+		print()
+		print('Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.')
+		print()
 
 	elif command == 'numbers':
 
-		print
-		print '        Files containing chunk data are given the correct chunk'
-		print '        number if they have a filename which is one of the'
-		print '        following:'
-		print
-		print '        creator (0x0)     manual (0x1)      credits (0x2)'
-		print '        inlay (0x3)       machine (0x5)     multiplexing (0x6)'
-		print '        palette (0x7)     tone (0x110)      dummy (0x111)'
-		print '        gap (0x112)       baud (0x113)      position (0x120)'
-		print '        discinfo (0x200)  discside (0x201)  rom (0x300)'
-		print '        6502 (0x400)      ula (0x401)       wd1770 (0x402)'
-		print '        memory (0x403)    emulator (0xff00)'
-		print
-		print '        To insert chunks with numbers other than those recognized,'
-		print '        add a suffix to the filenames in the form of hexadecimal'
-		print '        numbers corresponding to the chunk numbers required,'
-		print
-		print '        e.g. a_data_block'+suffix+'0x100'
-		print
+		print()
+		print('        Files containing chunk data are given the correct chunk')
+		print('        number if they have a filename which is one of the')
+		print('        following:')
+		print()
+		print('        creator (0x0)     manual (0x1)      credits (0x2)')
+		print('        inlay (0x3)       machine (0x5)     multiplexing (0x6)')
+		print('        palette (0x7)     tone (0x110)      dummy (0x111)')
+		print('        gap (0x112)       baud (0x113)      position (0x120)')
+		print('        discinfo (0x200)  discside (0x201)  rom (0x300)')
+		print('        6502 (0x400)      ula (0x401)       wd1770 (0x402)')
+		print('        memory (0x403)    emulator (0xff00)')
+		print()
+		print('        To insert chunks with numbers other than those recognized,')
+		print('        add a suffix to the filenames in the form of hexadecimal')
+		print('        numbers corresponding to the chunk numbers required,')
+		print()
+		print('        e.g. a_data_block'+suffix+'0x100')
+		print()
 
 	elif command == 'remove':
 
-		print remove_syntax
-		print
-		print '        Remove files/chunks at the positions specified,'
-		print '        separating the numbers by commas.'
-		print
-		print '        To remove files, use the numbers of the file in the archive'
-		print '        catalogue. To remove chunks, supply the positions of the'
-		print '        chunks which you wish to remove prefixed by "c".'
-		print
-		print 'Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.'
-		print
+		print(remove_syntax)
+		print()
+		print('        Remove files/chunks at the positions specified,')
+		print('        separating the numbers by commas.')
+		print()
+		print('        To remove files, use the numbers of the file in the archive')
+		print('        catalogue. To remove chunks, supply the positions of the')
+		print('        chunks which you wish to remove prefixed by "c".')
+		print()
+		print('Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.')
+		print()
 
 	elif command == 'extract':
 
-		print extract_syntax
-		print
-		print '        Extract files/chunks at the comma separated positions'
-		print '        specified and either save them in the directory given with'
-		print '        .inf files or add them to the end of the UEF file given.'
-		print
-		print '        To extract files, use the numbers of the file in the'
-		print '        archive catalogue. To extract chunks, supply the positions'
-		print '        of the chunks which you wish to extract prefixed by "c".'
-		print
-		print 'Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.'
-		print
+		print(extract_syntax)
+		print()
+		print('        Extract files/chunks at the comma separated positions')
+		print('        specified and either save them in the directory given with')
+		print('        .inf files or add them to the end of the UEF file given.')
+		print()
+		print('        To extract files, use the numbers of the file in the')
+		print('        archive catalogue. To extract chunks, supply the positions')
+		print('        of the chunks which you wish to extract prefixed by "c".')
+		print()
+		print('Type "'+help_syntax[8:-9]+'numbers" for information on chunk numbers.')
+		print()
 
 	elif command == 'chunks':
 
-		print chunks_syntax
-		print
-		print '        Display the chunks in the UEF file in a table format'
-		print '        with the following symbols denoting each type of'
-		print '        chunk:'
-		print '                O        Originator information            (0x0)'
-		print '                I        Instructions/manual               (0x1)'
-		print '                C        Author credits                    (0x2)'
-		print '                S        Inlay scan                        (0x3)'
-		print '                M        Target machine information        (0x5)'
-		print '                X        Multiplexing information          (0x6)'
-		print '                P        Extra palette                     (0x7)'
-		print
-		print '                #, *     File data block             (0x100,0x102)'
-		print '                #x, *x   Multiplexed block           (0x101,0x103)'
-		print '                -        High tone (inter-block gap)       (0x110)'
-		print '                +        High tone with dummy byte         (0x111)'
-		print '                _        Gap (silence)                     (0x112)'
-		print '                B        Change of baud rate               (0x113)'
-		print '                !        Position marker                   (0x120)'
-		print '                D        Disc information                  (0x200)'
-		print '                d        Standard disc side                (0x201)'
-		print '                dx       Multiplexed disc side             (0x202)'
-		print '                R        Standard machine ROM              (0x300)'
-		print '                Rx       Multiplexed machine ROM           (0x301)'
-		print '                6        6502 standard state               (0x400)'
-		print '                U        Electron ULA state                (0x401)'
-		print '                W        WD1770 state                      (0x402)'
-		print '                m        Standard memory data              (0x410)'
-		print '                mx       Multiplexed memory data           (0x410)'
-		print
-		print '                E        Emulator identification string    (0xff00)'
-		print '                ?        Unknown (unsupported chunk)'
-		print
+		print(chunks_syntax)
+		print()
+		print('        Display the chunks in the UEF file in a table format')
+		print('        with the following symbols denoting each type of')
+		print('        chunk:')
+		print('                O        Originator information            (0x0)')
+		print('                I        Instructions/manual               (0x1)')
+		print('                C        Author credits                    (0x2)')
+		print('                S        Inlay scan                        (0x3)')
+		print('                M        Target machine information        (0x5)')
+		print('                X        Multiplexing information          (0x6)')
+		print('                P        Extra palette                     (0x7)')
+		print()
+		print('                #, *     File data block             (0x100,0x102)')
+		print('                #x, *x   Multiplexed block           (0x101,0x103)')
+		print('                -        High tone (inter-block gap)       (0x110)')
+		print('                +        High tone with dummy byte         (0x111)')
+		print('                _        Gap (silence)                     (0x112)')
+		print('                B        Change of baud rate               (0x113)')
+		print('                !        Position marker                   (0x120)')
+		print('                D        Disc information                  (0x200)')
+		print('                d        Standard disc side                (0x201)')
+		print('                dx       Multiplexed disc side             (0x202)')
+		print('                R        Standard machine ROM              (0x300)')
+		print('                Rx       Multiplexed machine ROM           (0x301)')
+		print('                6        6502 standard state               (0x400)')
+		print('                U        Electron ULA state                (0x401)')
+		print('                W        WD1770 state                      (0x402)')
+		print('                m        Standard memory data              (0x410)')
+		print('                mx       Multiplexed memory data           (0x410)')
+		print()
+		print('                E        Emulator identification string    (0xff00)')
+		print('                ?        Unknown (unsupported chunk)')
+		print()
 
 	elif command == 'wwwinfo':
 
-		print wwwinfo_syntax
-		print
-		print '        Extracts information about the contents of the UEF file and'
-		print '        writes an HTML document with relevant images to the'
-		print '        directory specified.'
-		print
+		print(wwwinfo_syntax)
+		print()
+		print('        Extracts information about the contents of the UEF file and')
+		print('        writes an HTML document with relevant images to the')
+		print('        directory specified.')
+		print()
 
 	elif command == 'help':
 
-		print help_syntax
-		print
-		print '        Provides help on the command specified using the special'
-		print '        syntax as shown. In addition asking for help on "general"'
-		print '        will show the list of commands available.'
-		print
+		print(help_syntax)
+		print()
+		print('        Provides help on the command specified using the special')
+		print('        syntax as shown. In addition asking for help on "general"')
+		print('        will show the list of commands available.')
+		print()
 
 	else:
-		print 'No help is available on that command.'
-		print
+		print('No help is available on that command.')
+		print()
 
 
 # Main program
@@ -1067,7 +1068,7 @@ if __name__ == '__main__':
 		
 			if args[0] == 'help':
 		
-				print help_syntax
+				print(help_syntax)
 	
 			else:
 				print_help('general')
@@ -1129,7 +1130,7 @@ if __name__ == '__main__':
 			write_version = args[2]
 
 		else:
-			print new_syntax
+			print(new_syntax)
 			sys.exit()
 	
 		# Determine the major and minor version numbers to write
@@ -1138,7 +1139,7 @@ if __name__ == '__main__':
 			major = int(numbers[0])
 			minor = int(numbers[1])
 		except ValueError:
-			print 'Invalid version number.'
+			print('Invalid version number.')
 			sys.exit()
 
 		# Open file for writing
@@ -1160,7 +1161,7 @@ if __name__ == '__main__':
 	try:
 		in_f = open(uef_file, 'rb')
 	except IOError:
-		print 'The input file, '+uef_file+' could not be found.'
+		print('The input file, '+uef_file+' could not be found.')
 		sys.exit()
 	
 	# Is it gzipped?
@@ -1171,11 +1172,11 @@ if __name__ == '__main__':
 	
 		try:
 			if in_f.read(10) != 'UEF File!\000':
-				print 'The input file, '+uef_file+' is not a UEF file.'
+				print('The input file, '+uef_file+' is not a UEF file.')
 				in_f.close()
 				sys.exit()
 		except:
-			print 'The input file, '+uef_file+' could not be read.'
+			print('The input file, '+uef_file+' could not be read.')
 			in_f.close()
 			sys.exit()
 	
@@ -1189,7 +1190,7 @@ if __name__ == '__main__':
 	
 		if len(args) < 2:
 	
-			print extract_syntax
+			print(extract_syntax)
 			sys.exit()
 	
 		# Check whether the output path is a directory or a UEF file
@@ -1204,7 +1205,7 @@ if __name__ == '__main__':
 				try:
 					dest_uef = gzip.open(args[1], 'wb')
 				except IOError:
-					print "Couldn't open file %s for writing." % args[1]
+					print("Couldn't open file %s for writing." % args[1])
 					sys.exit()
 	
 				# Write the header for the file and the creator
@@ -1222,9 +1223,9 @@ if __name__ == '__main__':
 			except:
 				try:
 					os.mkdir(args[1])
-					print 'Created directory '+args[1]
+					print('Created directory '+args[1])
 				except:
-					print "Couldn't create directory %s" % leafname
+					print("Couldn't create directory %s" % leafname)
 					sys.exit()
 	
 	# Detailed information
@@ -1233,7 +1234,7 @@ if __name__ == '__main__':
 	
 		if len(args) < 1:
 	
-			print wwwinfo_syntax
+			print(wwwinfo_syntax)
 			sys.exit()
 	
 		# Get the leafname of the output path
@@ -1245,9 +1246,9 @@ if __name__ == '__main__':
 		except:
 			try:
 				os.mkdir(args[0])
-				print 'Created directory '+args[0]
+				print('Created directory '+args[0])
 			except:
-				print "Couldn't create directory %s" % leafname
+				print("Couldn't create directory %s" % leafname)
 				sys.exit()
 	
 	
@@ -1290,7 +1291,7 @@ if __name__ == '__main__':
 	
 	if command == 'chunks':
 	
-		print 'Chunks in %s' % uef_file
+		print('Chunks in %s' % uef_file)
 	
 		n = 0
 	
@@ -1443,7 +1444,7 @@ if __name__ == '__main__':
 	
 			n = n + 1
 	
-		print
+		print()
 	
 		# Exit
 	        sys.exit()
@@ -1459,21 +1460,21 @@ if __name__ == '__main__':
 		# Split paragraphs
 		originator = string.split(originator, '\012')
 	
-		print 'File originator:'
+		print('File originator:')
 		for line in originator:
-			print line
-		print
-		print 'File format version: %i.%i' % (UEF_major, UEF_minor)
-		print
-		print 'Target machine : '+target_machine
-		print 'Keyboard layout: '+keyboard_layout
-		print 'Emulator       : '+emulator
-		print
+			print(line)
+		print()
+		print('File format version: %i.%i' % (UEF_major, UEF_minor))
+		print()
+		print('Target machine : '+target_machine)
+		print('Keyboard layout: '+keyboard_layout)
+		print('Emulator       : '+emulator)
+		print()
 		if features != '':
 
-			print 'Contains:'
-			print features
-			print
+			print('Contains:')
+			print(features)
+			print()
 
 		# Exit
 		sys.exit()
@@ -1488,7 +1489,7 @@ if __name__ == '__main__':
 	
 	position = 0
 	
-	while 1:
+	while True:
 	
 		position = find_next_block(chunks, position)
 	
@@ -1567,11 +1568,11 @@ if __name__ == '__main__':
 	
 		if contents == []:
 	
-			print 'No files in '+uef_file
+			print('No files in '+uef_file)
 	
 		else:
 	
-			print 'Contents of %s:' % uef_file
+			print('Contents of %s:' % uef_file)
 	
 			file_number = 0
 	
@@ -1581,14 +1582,14 @@ if __name__ == '__main__':
 				# to ? symbols
 				new_name = printable(file['name'])
 	
-				print string.expandtabs(string.ljust(str(file_number), 3)+': '+
+				print(string.expandtabs(string.ljust(str(file_number), 3)+': '+
 							string.ljust(new_name, 16)+
 							string.upper(
 								string.ljust(hex(file['load'])[2:], 10) +'\t'+
 								string.ljust(hex(file['exec'])[2:], 10) +'\t'+
 								string.ljust(hex(len(file['data']))[2:], 6)
 							) +'\t'+
-							'chunks %i to %i' % (file['position'], file['last position']) )
+							'chunks %i to %i' % (file['position'], file['last position']) ))
 	
 				file_number = file_number + 1
 	
@@ -1606,7 +1607,7 @@ if __name__ == '__main__':
 			index = open(index_file, 'w')
 	
 		except IOError:
-			print "Couldn't open the index file %s" % index_file
+			print("Couldn't open the index file %s" % index_file)
 			sys.exit()
 	
 		# The leafname variable is the leafname of the input file
@@ -1747,7 +1748,7 @@ if __name__ == '__main__':
 			try:
 				open(inlay_path, 'wb').write(inlay[1])
 			except IOError:
-				print "Couldn't write the inlay to the file %s" % inlay_path
+				print("Couldn't write the inlay to the file %s" % inlay_path)
 	
 			index.write('\n')
 	
@@ -1766,7 +1767,7 @@ if __name__ == '__main__':
 		if len(args) < 2:
 	
 			# Must have two arguments to this command
-			print insert_syntax
+			print(insert_syntax)
 			sys.exit()
 	
 		# There are two versions of this command: one inserts files, the other inserts chunks.
@@ -1785,12 +1786,12 @@ if __name__ == '__main__':
 			try:
 				position = int(args[0][1:])
 			except ValueError:
-				print insert_syntax
+				print(insert_syntax)
 				sys.exit()
 	
 			if position < 0:
 		
-				print 'Position must be zero or greater.'
+				print('Position must be zero or greater.')
 				sys.exit()
 	
 			# Names of files to insert as chunks (comma-separated list)
@@ -1807,12 +1808,12 @@ if __name__ == '__main__':
 			try:
 				file_position = int(args[0])
 			except ValueError:
-				print insert_syntax
+				print(insert_syntax)
 				sys.exit()
 	
 			if file_position < 0:
 		
-				print 'Position must be zero or greater.'
+				print('Position must be zero or greater.')
 				sys.exit()
 		
 			# Find the chunk position which corresponds to the file_position
@@ -1844,7 +1845,7 @@ if __name__ == '__main__':
 		try:
 			uef = gzip.open(uef_file, 'wb')
 		except IOError:
-			print "Couldn't open %s for writing." % uef_file
+			print("Couldn't open %s for writing." % uef_file)
 			sys.exit()
 	
 		# Write the UEF file header
@@ -1867,7 +1868,7 @@ if __name__ == '__main__':
 		if len(args) < 1:
 	
 			# Must have one arguments to this command
-			print append_syntax
+			print(append_syntax)
 			sys.exit()
 	
 		# Names of files to insert (comma-separated list)
@@ -1880,7 +1881,7 @@ if __name__ == '__main__':
 		try:
 			uef = gzip.open(uef_file, 'wb')
 		except IOError:
-			print "Couldn't open %s for writing." % uef_file
+			print("Couldn't open %s for writing." % uef_file)
 			sys.exit()
 	
 		# Write the UEF file header
@@ -1937,14 +1938,14 @@ if __name__ == '__main__':
 						write_chunks(dest_uef, chunks[position:position+1])
 	
 					except IOError:
-						print "Couldn't write to file %s for chunk %i." % (out_path, position)
+						print("Couldn't write to file %s for chunk %i." % (out_path, position))
 				else:
 					try:
 						# Send chunk to a decoding function
 						decode_chunk(out_path, chunks[position], position)
 	
 					except ValueError:
-						print extract_syntax
+						print(extract_syntax)
 						sys.exit()
 	
 			else:
@@ -1953,13 +1954,13 @@ if __name__ == '__main__':
 				try:
 					file_position = int(position)
 				except ValueError:
-					print extract_syntax
+					print(extract_syntax)
 					sys.exit()
 	
 				# Find the chunk position which corresponds to the file position
 				if file_position < 0 or file_position >= len(contents):
 		
-					print 'File position %i does not correspond to an actual file.' % file_position
+					print('File position %i does not correspond to an actual file.' % file_position)
 				else:
 					# Find the start and end positions
 					start_pos = contents[file_position]['position']
@@ -1972,7 +1973,7 @@ if __name__ == '__main__':
 #							write_chunks(gzip.open(out_path, 'ab'), chunks[start_pos:end_pos+1])
 							write_chunks(dest_uef, chunks[start_pos:end_pos+1])
 						except IOError:
-							print "Couldn't write file %i to archive %s" % (file_position, out_path)
+							print("Couldn't write file %i to archive %s" % (file_position, out_path))
 					else:
 						# Writing a file in the archive to a file in a directory
 	
@@ -2000,7 +2001,7 @@ if __name__ == '__main__':
 		if len(args) < 1:
 	
 			# One argument required
-			print remove_syntax
+			print(remove_syntax)
 			sys.exit()
 	
 		# As with the insert command, there are two versions of this command. The first will remove
@@ -2027,7 +2028,7 @@ if __name__ == '__main__':
 					positions.append(int(file_position[1:]))
 	
 				except ValueError:
-					print extract_syntax
+					print(extract_syntax)
 					sys.exit()
 	
 			else:
@@ -2035,13 +2036,13 @@ if __name__ == '__main__':
 					file_position = int(file_position)
 	
 				except ValueError:
-					print extract_syntax
+					print(extract_syntax)
 					sys.exit()
 	
 				# Find the chunk position which corresponds to the file position
 				if file_position < 0 or file_position >= len(contents):
 			
-					print 'File position %i does not correspond to an actual file.' % file_position
+					print('File position %i does not correspond to an actual file.' % file_position)
 		
 				else:
 					# Add the chunk positions within each file to the list of positions
@@ -2059,7 +2060,7 @@ if __name__ == '__main__':
 		try:
 			uef = gzip.open(uef_file, 'wb')
 		except IOError:
-			print "Couldn't open %s for writing." % uef_file
+			print("Couldn't open %s for writing." % uef_file)
 			sys.exit()
 	
 		# Write the UEF file header

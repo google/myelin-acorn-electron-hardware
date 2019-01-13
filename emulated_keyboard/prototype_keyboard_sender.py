@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,10 @@
 # limitations under the License.
 
 import glob
+import os
 import pygame
 import serial
+import time
 
 # Keyboard mappings
 
@@ -64,16 +67,18 @@ for col in range(len(bbc_master_keycodes)):
     for row in range(len(coldata)):
         scancodes = coldata[row]
         if scancodes is None: continue
-        if type(scancodes) != type(()): scancodes = (scancodes,)
+        if not isinstance(scancodes, type(())): scancodes = (scancodes,)
         for scancode in scancodes:
             beebcode = (col << 4) | row
-            if scancodes_to_beebcodes.has_key(scancode):
-                print "WARNING: overriding scancode %s dest %s with %s" % (
-                    scancode, scancodes_to_beebcodes[scancode], beebcode)
+            if scancode in scancodes_to_beebcodes:
+                print("WARNING: overriding scancode %s dest %s with %s" % (
+                    scancode, scancodes_to_beebcodes[scancode], beebcode))
             scancodes_to_beebcodes[scancode] = beebcode
 
 def guess_port():
-    port = None
+    port = os.environ.get('KB_PORT')
+    if port:
+        return port
     for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
         matches = glob.glob(pattern)
         if matches:
@@ -87,7 +92,7 @@ class Main:
             (0x80 if shift_down else 0) | (0x40 if ctrl_down else 0) | (0x20 if break_down else 0),
         )
         self.ser.write(msg)
-        print `self.ser.read(1)`
+        print(repr(self.ser.read(1)))
 
     def send_keys(self):
         s = c = b = 0
@@ -105,16 +110,16 @@ class Main:
         # this probably breaks games, but gives nice rollover when typing :)
         others, leftovers = others[-2:], others[:-2]
         while len(others) < 2: others.append(KEY_NONE)
-        print s, c, b, others, leftovers
+        print(s, c, b, others, leftovers)
         self.set_keys(others[0], others[1], s, c, b)
 
     def main(self):
         self.keys_down = []
 
-        print "Opening port"
+        print("Opening port")
         self.ser = serial.Serial(guess_port(), timeout=2)
 
-        print "Forwarding key input through to the connected MCU"
+        print("Forwarding key input through to the connected MCU")
         pygame.init()
         pygame.display.set_mode((100, 100))
         while True:
@@ -125,7 +130,7 @@ class Main:
                 elif event.type == pygame.KEYDOWN:
                     v = scancodes_to_beebcodes.get(event.key, None)
                     if v is not None:
-                        print "beebcode %02x" % v
+                        print("beebcode %02x" % v)
                         if v not in self.keys_down:
                             self.keys_down.append(v)
                             self.send_keys()
@@ -136,11 +141,12 @@ class Main:
                     print("KEYUP %s" % event.key)
                     v = scancodes_to_beebcodes.get(event.key, None)
                     if v is not None:
-                        print "beebcode %02x" % v
+                        print("beebcode %02x" % v)
                         if v in self.keys_down:
                             while v in self.keys_down:
                                 self.keys_down.remove(v)
                             self.send_keys()
+            time.sleep(1.0/60)
 
 if __name__ == '__main__':
     Main().main()

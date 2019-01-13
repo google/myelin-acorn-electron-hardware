@@ -1,13 +1,14 @@
 #!env/bin/python
 
+from __future__ import print_function
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-print "load image"
+print("load image")
 img = cv2.imread("ElectronULA_32mm_1.5X_GX7_DxO.tif")
 
-print "size:", img.shape
+print("size:", img.shape)
 
 #thresholded = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 101, 2)
 #cv2.imwrite("thresholded.tif", thresholded)
@@ -22,17 +23,17 @@ bottom = 6522.0
 trace_width = 1323.0/8/30
 trace_height = 1650.0/10/30
 
-print "drawing a bunch of lines"
+print("drawing a bunch of lines")
 y = top
 while y < bottom:
-    print y
+    print(y)
     cv2.line(img, (int(left), int(y)), (int(right), int(y)), (0, 0, 255))  # BGR
     y += trace_height
 x = left
 while x < right:
-    print x
+    print(x)
     cv2.line(img, (int(x), int(top)), (int(x), int(bottom)), (0, 0, 255))
     x += trace_width
 
-print "saving"
+print("saving")
 cv2.imwrite("processed.png", img)

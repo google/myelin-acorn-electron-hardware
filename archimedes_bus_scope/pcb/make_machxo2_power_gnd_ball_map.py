@@ -1,3 +1,4 @@
+from __future__ import print_function
 lines = """B2
 GND
 GND
@@ -298,9 +299,9 @@ for i in range(len(lines) / 6):
 	label = lines[i*6+1]
 	for x in range(i*6+1, i*6+6):
 		assert lines[x] == label
-	print 'Pin("%s", "%s", "%s"),' % (
+	print('Pin("%s", "%s", "%s"),' % (
 		ball,
 		label,
 		'' if label == 'NC' else 'GND' if label == 'GND' else '3V3'
-	)
+	))
 	

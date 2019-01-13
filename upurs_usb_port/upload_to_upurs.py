@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,7 @@
 
 import glob
 import gzip
+import os
 import random
 import serial
 from serial.serialutil import SerialTimeoutException
@@ -23,13 +25,15 @@ import time
 import zipfile
 
 def guess_port():
-    port = None
+    port = os.environ.get('UPURS_PORT')
+    if port:
+        return port
     for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
         matches = glob.glob(pattern)
         if matches:
             return matches[0]
 
-print "Opening port"
+print("Opening port")
 USE_TIMEOUT=0
 ser = serial.Serial(guess_port(), timeout=0, write_timeout=0.5 if USE_TIMEOUT else None)
 
@@ -50,53 +54,53 @@ else:
         zf = zipfile.ZipFile(fn)
         for f in zf.namelist():
             if f.endswith(".uef"):
-                print "found %s in zip" % f
+                print("found %s in zip" % f)
                 data = zf.read(f)
-                print "read %d bytes from %s inside %s" % (len(data), f, fn)
+                print("read %d bytes from %s inside %s" % (len(data), f, fn))
                 break
     except zipfile.BadZipfile:
-        print "not a zip file"
+        print("not a zip file")
     if data is None:
         # not a zip or can't find a .uef in there
         data = open(fn).read()
-        print "read %d bytes from %s" % (len(data), fn)
+        print("read %d bytes from %s" % (len(data), fn))
 
     # try un-gzipping it
     try:
         data = gzip.GzipFile(fileobj=StringIO(data)).read()
-        print "after gunzipping: %d bytes" % len(data)
+        print("after gunzipping: %d bytes" % len(data))
     except IOError:
-        print "not gzipped"
+        print("not gzipped")
 
-print "Sending %s to port and verifying that it comes back" % fn
+print("Sending %s to port and verifying that it comes back" % fn)
 
 n_out = n_in = 0
 received = []
 n_retries = 0
-print "Writing %d (%x) bytes" % (len(data), len(data))
+print("Writing %d (%x) bytes" % (len(data), len(data)))
 for c in data:
-    while 1:
+    while True:
         v = ord(c)
-        print "%02x %c" % (v, c if 32 < v < 127 else '.')
+        print("%02x %c" % (v, c if 32 < v < 127 else '.'))
         try:
             n = ser.write(c)
         except SerialTimeoutException:
             n = 0
-        print n
+        print(n)
         if not USE_TIMEOUT: break
 
         # try receiving
         r = ser.read(1000)
         if r:
-            print "RECEIVED", `r`
+            print("RECEIVED", repr(r))
             received.append(r)
 
         if n: break # next char
         time.sleep(0.01)
-        print "RETRY",
+        print("RETRY", end=' ')
         n_retries += 1
 
-print "Waiting for final serial loopback"
+print("Waiting for final serial loopback")
 start = time.time()
 while (time.time() - start) < 0.5:
     r = ser.read()
@@ -105,12 +109,12 @@ while (time.time() - start) < 0.5:
         continue
     # we got something, so reset the timeout
     start = time.time()
-    print `r`
+    print(repr(r))
     received.append(r)
 
-print "ALL SENT"
+print("ALL SENT")
 received = ''.join(received)
-print "This is what we received:"
-print `received`
+print("This is what we received:")
+print(repr(received))
 n = len(received)
-print "%d (%x) bytes (%d missing).  %d retries." % (n, n, len(data) - n, n_retries)
+print("%d (%x) bytes (%d missing).  %d retries." % (n, n, len(data) - n, n_retries))

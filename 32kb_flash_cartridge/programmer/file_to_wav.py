@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,10 +21,10 @@
 import os, stat, sys
 
 HERE = os.path.abspath(os.path.split(sys.argv[0])[0])
-print HERE
+print(HERE)
 
 def cmd(s):
-	print s
+	print(s)
 	return os.system(s)
 
 fn, leaf, load_addr = sys.argv[1:]
@@ -31,8 +32,8 @@ fn, leaf, load_addr = sys.argv[1:]
 cmd("cp -v %s out/file" % fn)
 size = os.stat("out/file")[stat.ST_SIZE]
 load = start = int(load_addr, 16)
-print>>open("out/file.inf", "w"), "$.%s\t%X\t%X\t%X" % (
-    leaf, load, start, size)
+print("$.%s\t%X\t%X\t%X" % (
+    leaf, load, start, size), file=open("out/file.inf", "w"))
 cmd("rm -f out/file.uef")
 cmd("python UEFtrans.py out/file.uef new Electron any")
 cmd("python UEFtrans.py out/file.uef append out/file")
@@ -41,4 +42,4 @@ cmd("rm -f out/file.wav")
 cmd("python uef2wave.py out/file.uef out/file.wav")
 cmd("open out/file.wav")
 
-print "On the Electron, run: *LOAD %s %x" % (leaf, load)
+print("On the Electron, run: *LOAD %s %x" % (leaf, load))

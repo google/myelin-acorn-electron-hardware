@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +22,10 @@ import time
 
 def read_until(ser, match):
 	resp = ''
-	while 1:
+	while True:
 		r = ser.read(1024)
 		if r:
-			print `r`
+			print(repr(r))
 			resp += r
 			if resp.find(match) != -1:
 				break
@@ -39,27 +40,27 @@ def main():
 	with standalone_programmer.Port() as ser:
 		ser.write("I")  # identify chip
 		resp = read_until(ser, "ID DONE")
-		print "DONE"
-		print
-		print resp.strip()
+		print("DONE")
+		print()
+		print(resp.strip())
 
 		pos = 0
 		if resp.find("SST39SF010") != -1:
-			print "it's a SST39SF010; we can program that"
+			print("it's a SST39SF010; we can program that")
 			ser.write("W")  # write 32k
-			print read_until(ser, "Programming")
+			print(read_until(ser, "Programming"))
 			while pos < len(rom):
 				n = ser.write(rom[pos:pos+63])
 				if n:
 					pos += n
-					print "wrote %d bytes" % n
+					print("wrote %d bytes" % n)
 				else:
 					time.sleep(0.01)
 
 				r = ser.read(1024)
 				if r:
-					print `r`
-			print read_until(ser, "WRITE DONE")
+					print(repr(r))
+			print(read_until(ser, "WRITE DONE"))
 
 
 if __name__ == '__main__':

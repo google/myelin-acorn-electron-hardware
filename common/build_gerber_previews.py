@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,19 +24,19 @@ def generate_previews(fab_output_path, preview_output_path):
     def read(pattern):
         files = glob(os.path.join(fab_output_path, pattern))
         if not files:
-            print "WARNING: Nothing found matching %s" % pattern
+            print("WARNING: Nothing found matching %s" % pattern)
             return None
         return load_layer(files[0])
 
     def save(name):
         path = os.path.join(preview_output_path, "%s.png" % name)
-        print "Saving preview to %s" % path
+        print("Saving preview to %s" % path)
         ctx.dump(path)
 
     def render(pattern, **kw):
         layer = read(pattern)
         if layer is None:
-            print "Not rendering %s" % pattern
+            print("Not rendering %s" % pattern)
             return
         ctx.render_layer(layer, **kw)
 
