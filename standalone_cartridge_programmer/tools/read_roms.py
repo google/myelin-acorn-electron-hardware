@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,20 +23,20 @@ def main():
 	with standalone_programmer.Port() as ser:
 		ser.write("S")  # fast read
 		resp = ''
-		while 1:
+		while True:
 			r = ser.read(1024)
 			if r:
-				print `r`
+				print(repr(r))
 				resp += r
 				if resp.rstrip().endswith("ROM DONE"):
 					break
 			else:
 				time.sleep(0.1)
-		print "DONE"
+		print("DONE")
 
 
 	rom_data = re.search("ROM\[(.{32768})\]", resp, re.DOTALL).group(1)
-	print len(rom_data)
+	print(len(rom_data))
 	open("rom1.bin", "w").write(rom_data[:16384])
 	open("rom2.bin", "w").write(rom_data[16384:])
 

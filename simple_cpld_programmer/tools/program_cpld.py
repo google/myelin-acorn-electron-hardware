@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +27,7 @@ def main():
     with simple_cpld_programmer.Port() as ser:
         # print("Serial port opened:", ser)
 
-        while 1:
+        while True:
             r = ser.read(1024)
             if not r: break
             print(repr(r))
@@ -36,7 +37,7 @@ def main():
 
         resp = ''
         print("Waiting for SEND SVF")
-        while 1:
+        while True:
             r = ser.read(1024)
             if r:
                 resp += r
@@ -58,7 +59,7 @@ def main():
             if stars < -3:
                 time.sleep(0.001)
             else:
-                print("\r  (write @ line %d, %d/%d)" % (line_no, svf_pos, len(svf)),)
+                print("\r  (write @ line %d, %d/%d)" % (line_no, svf_pos, len(svf)), end=' ')
                 sys.stdout.flush()
 
                 # always send 63 chars if we can
@@ -72,13 +73,13 @@ def main():
                     line_no += svf[svf_pos:p].count("\n")
                     svf_pos += n
 
-            while 1:
+            while True:
                 r = ser.read(1024)
                 if not r:
                     break
                 #print(r)
                 resp += r
-                while 1:
+                while True:
                     p = resp.find("\n")
                     if p == -1: break
                     line = resp[:p].strip()

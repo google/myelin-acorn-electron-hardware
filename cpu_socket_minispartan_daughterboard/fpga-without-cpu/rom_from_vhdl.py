@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +32,7 @@ def rom_from_vhdl(data):
 
 if __name__ == '__main__':
     infile, outfile = sys.argv[1:]
-    print "extracting bytes from %s and saving to %s" % (infile, outfile)
+    print("extracting bytes from %s and saving to %s" % (infile, outfile))
     bytes = rom_from_vhdl(open(infile).read())
-    print "writing %d bytes" % len(bytes)
+    print("writing %d bytes" % len(bytes))
     open(outfile, 'w').write(bytes)

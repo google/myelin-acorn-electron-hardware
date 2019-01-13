@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,18 +25,18 @@ def main():
 	with standalone_programmer.Port() as ser:
 
 		cart_read_start = time.time()
-		print "setting flags: RPM=0 RBS=0 RWE=0"
+		print("setting flags: RPM=0 RBS=0 RWE=0")
 		ser.write("w" + BANK_SEL + "\x00")
 
 		for bank in range(128):
-			print "READ BANK %d" % bank
+			print("READ BANK %d" % bank)
 			bank_read_start = time.time()
 			write_cmd = "w" + BANK_SEL + chr(bank)
-			print `write_cmd`
+			print(repr(write_cmd))
 			ser.write(write_cmd)
 			ser.write("S")  # fast read
 			resp = ''
-			while 1:
+			while True:
 				r = ser.read(1024)
 				if r:
 					#print `r`
@@ -44,14 +45,14 @@ def main():
 						break
 				else:
 					time.sleep(0.1)
-			print "Bank read in %.2f s" % (time.time() - bank_read_start)
+			print("Bank read in %.2f s" % (time.time() - bank_read_start))
 
 			rom_data = re.search("ROM\[(.{32768})\]", resp, re.DOTALL).group(1)
-			print len(rom_data)
+			print(len(rom_data))
 			open("mgc_rom_%d.bin" % (bank * 2), "w").write(rom_data[:16384])
 			open("mgc_rom_%d.bin" % (bank * 2 + 1), "w").write(rom_data[16384:])
 
-		print "Whole cartridge read in %.2f s" % (time.time() - cart_read_start)
+		print("Whole cartridge read in %.2f s" % (time.time() - cart_read_start))
 
 if __name__ == '__main__':
 	main()

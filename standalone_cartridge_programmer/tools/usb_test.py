@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,15 +25,15 @@ def main():
 		while written < to_write:
 			n = ser.write(data_to_write[written:written+63])
 			if n:
-				print "written %d: %d/%d (read %d)" % (n, written, to_write, read)
+				print("written %d: %d/%d (read %d)" % (n, written, to_write, read))
 				written += n
 			else:
 				time.sleep(0.01)
 			r = ser.read(1024)
 			if r:
 				read += len(r)
-				print "READ %d: %d total" % (len(r), read)
-				print `r`
+				print("READ %d: %d total" % (len(r), read))
+				print(repr(r))
 
 if __name__ == '__main__':
 	main()

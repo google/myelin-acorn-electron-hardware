@@ -345,7 +345,7 @@ convertor.SetVolumeRange(0x30, 0xC0)
 try:
 	convertor.Convert()
 	print "All done."
-except IOError, msg:
+except IOError as msg:
 	print "An error occured:", msg
 	sys.exit(1)
 

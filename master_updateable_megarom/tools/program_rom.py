@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +23,10 @@ import time
 
 def read_until(ser, match):
     resp = ''
-    while 1:
+    while True:
         r = ser.read(1024)
         if r:
-            print `r`
+            print(repr(r))
             resp += r
             if resp.find(match) != -1:
                 break
@@ -38,24 +39,24 @@ def main():
     rom = open(rom_fn).read()
 
     with megarom.Port() as ser:
-        print "\n* Port open.  Giving it a kick, and waiting for OK."
+        print("\n* Port open.  Giving it a kick, and waiting for OK.")
         ser.write("\n")
         r = read_until(ser, "OK")
 
-        print "\n* Requesting chip ID and locking chip"
+        print("\n* Requesting chip ID and locking chip")
         ser.write("I\n")  # identify chip
         r = read_until(ser, "OK")
         m = re.search("Size = (\d+)", r)
         if not m:
             raise Exception("Chip identification failed")
         chip_size = int(m.group(1))
-        print "\n* Chip size = %d bytes" % chip_size
+        print("\n* Chip size = %d bytes" % chip_size)
         usb_block_size = 63 if (chip_size < 1048576) else 1024  # atmega32u4 can't handle big usb chunks, but atsamd21 can
 
         if len(rom) != chip_size:
             raise Exception("%s is %d bytes long, which does not match the flash capacity of %d bytes" % (rom_fn, len(rom), chip_size))
 
-        print "\n* Start programming process"
+        print("\n* Start programming process")
         ser.write("P\n")  # program chip
 
         input_buf = ''
@@ -66,23 +67,23 @@ def main():
                 p = input_buf.find("\n") + 1
                 line, input_buf = input_buf[:p], input_buf[p:]
                 line = line.strip()
-                print "parse",`line`
+                print("parse",repr(line))
                 if line == "OK":
-                    print "All done!"
+                    print("All done!")
                     done = 1
                     break
                 m = re.search(r"^(\d+)\+(\d+)$", line)
                 if not m: continue
 
                 start, size = int(m.group(1)), int(m.group(2))
-                print "* Sending data from %d-%d" % (start, start+size)
+                print("* Sending data from %d-%d" % (start, start+size))
                 blk = rom[start:start+size]
                 #print `blk[:64]`
                 while len(blk):
                     n = ser.write(blk[:usb_block_size])
                     if n:
                         blk = blk[n:]
-                        #print "wrote %d bytes" % n
+                        #print("wrote %d bytes" % n)
                     else:
                         time.sleep(0.01)
 
