@@ -85,7 +85,7 @@ def main():
                         print(len(input_buf), chip_size)
                         last_reported = len(input_buf)
         except KeyboardInterrupt:
-            print "Interrupted -- saving what we have"
+            print("Interrupted -- saving what we have")
         time_taken = time.time() - start_time
         print("Saving")
         contents, input_buf = input_buf[:chip_size], input_buf[chip_size:]

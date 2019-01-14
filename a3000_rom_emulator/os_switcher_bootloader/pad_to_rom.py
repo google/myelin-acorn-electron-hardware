@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +20,12 @@ ROM_SIZE = 2 * 1024 * 1024
 
 src, dest = sys.argv[1:]
 
-print "Padding %s with 0xFF to create a ROM file %s" % (src, dest)
+print("Padding %s with 0xFF to create a ROM file %s" % (src, dest))
 
 data = open(src, "rb").read()
 
-print len(data), ROM_SIZE - len(data)
+print(len(data), ROM_SIZE - len(data))
 data += "\xFF" * (ROM_SIZE - len(data))
-print len(data)
+print(len(data))
 
 open(dest, "wb").write(data)
