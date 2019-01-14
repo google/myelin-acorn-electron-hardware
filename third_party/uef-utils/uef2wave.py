@@ -10,6 +10,7 @@
 	WWW		: http://www.fmf.nl/~xaviar/acorn/
 	Email		: xaviar@fmf.nl
 """
+from __future__ import print_function
 
 
 import sys, math, gzip
@@ -282,7 +283,7 @@ class Convertor:
 		try:
 			fpIn = open(self.inFile, "rb")
 		except IOError:
-			raise IOError, "Couldn't open file: " + self.inFile
+			raise IOError("Couldn't open file: " + self.inFile)
 		
 		if fpIn.read(10) != "UEF File!\000":
 			fpIn.close()
@@ -291,10 +292,10 @@ class Convertor:
 				fpIn = gzip.open(self.inFile, "rb")
 				if fpIn.read(10) != "UEF File!\000":
 					fpIn.close()
-					raise IOError, "Not a UEF file: " + self.inFile
+					raise IOError("Not a UEF file: " + self.inFile)
 
 			except IOError:
-				raise IOError, "Not a UEF file: " + self.inFile
+				raise IOError("Not a UEF file: " + self.inFile)
 
 		fpIn.read(2)
 		buffer = fpIn.read()
@@ -303,7 +304,7 @@ class Convertor:
 		try:
 			fpOut = open(self.outFile, "wb")
 		except IOError:
-			raise IOError, "Couldn't open file: " + self.outFile
+			raise IOError("Couldn't open file: " + self.outFile)
 		
 		parser    = UEFParser(buffer)
 		bitStream = parser.ReadAllTapeBlocks()
@@ -335,7 +336,7 @@ else:
 	# a command-line is assumed here
 	
 	if len(sys.argv) != 3:
-		print "Syntax:", sys.argv[0], "<inputfile.uef> <outputfile.wav>"
+		print("Syntax:", sys.argv[0], "<inputfile.uef> <outputfile.wav>")
 		sys.exit(1)
 	
 	convertor = Convertor(sys.argv[1], sys.argv[2])
@@ -344,9 +345,9 @@ convertor.SetVolumeRange(0x30, 0xC0)
 
 try:
 	convertor.Convert()
-	print "All done."
+	print("All done.")
 except IOError as msg:
-	print "An error occured:", msg
+	print("An error occured:", msg)
 	sys.exit(1)
 
 sys.exit()
