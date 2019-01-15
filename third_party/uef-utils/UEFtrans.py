@@ -172,7 +172,7 @@ def chunk(f, n, data):
 
 def read_block(chunk):
 	"""Read a data block from a tape chunk and return the program name, load and execution addresses,
-        block data, block number and whether the block is supposedly the last in the file."""
+	   block data, block number and whether the block is supposedly the last in the file."""
 
 	# Chunk number and data
 	chunk_id = chunk[0]
@@ -648,13 +648,13 @@ def encode_chunks(file_names):
 	# encode_as dictionary.
 
 	encode_as = {'creator': 0x0, 'originator': 0x0, 'instructions': 0x1, 'manual': 0x1,
-		     'credits': 0x2, 'inlay': 0x3, 'target': 0x5, 'machine': 0x5,
-		     'multi': 0x6, 'multiplexing': 0x6, 'palette': 0x7,
-		     'tone': 0x110, 'dummy': 0x111, 'gap': 0x112, 'baud': 0x113,
-		     'position': 0x120,
-		     'discinfo': 0x200, 'discside': 0x201, 'rom': 0x300,
-		     '6502': 0x400, 'ula': 0x401, 'wd1770': 0x402, 'memory': 0x410,
-		     'emulator': 0xff00}
+	             'credits': 0x2, 'inlay': 0x3, 'target': 0x5, 'machine': 0x5,
+	             'multi': 0x6, 'multiplexing': 0x6, 'palette': 0x7,
+	             'tone': 0x110, 'dummy': 0x111, 'gap': 0x112, 'baud': 0x113,
+	             'position': 0x120,
+	             'discinfo': 0x200, 'discside': 0x201, 'rom': 0x300,
+	             '6502': 0x400, 'ula': 0x401, 'wd1770': 0x402, 'memory': 0x410,
+	             'emulator': 0xff00}
 
 	new_chunks = []
 
@@ -762,12 +762,12 @@ def decode_chunk(out_path, chunk_info, position):
 	# Write a file depending on the chunk number using a convention similar to that used for encoding
 	# chunks.
 	decode_as = {0x0: 'creator', 0x1: 'manual', 0x2: 'credits', 0x3: 'inlay',
-		     0x5: 'machine', 0x6: 'multiplexing', 0x7: 'palette',
-		     0x110: 'tone', 0x111: 'dummy', 0x112: 'gap', 0x113: 'baud',
-		     0x120: 'position',
-		     0x200: 'discinfo', 0x201: 'discside', 0x300: 'rom',
-		     0x400: '6502', 0x401: 'ula', 0x402: 'wd1770', 0x410: 'memory',
-		     0xff00: 'emulator'}
+	             0x5: 'machine', 0x6: 'multiplexing', 0x7: 'palette',
+	             0x110: 'tone', 0x111: 'dummy', 0x112: 'gap', 0x113: 'baud',
+	             0x120: 'position',
+	             0x200: 'discinfo', 0x201: 'discside', 0x300: 'rom',
+	             0x400: '6502', 0x401: 'ula', 0x402: 'wd1770', 0x410: 'memory',
+	             0xff00: 'emulator'}
 
 	# If the chunk number is not in the dictionary then write a file with name constructed
 	# from the hexadecimal form of the chunk number beginning with 0x.
@@ -1447,7 +1447,7 @@ if __name__ == '__main__':
 		print()
 	
 		# Exit
-	        sys.exit()
+		sys.exit()
 	
 	
 	# UEF file information
@@ -1550,8 +1550,8 @@ if __name__ == '__main__':
 					# Update the last position information to mark the end of the file
 					current_file['last position'] = position
 	
-	        # Increase the position
-	        position = position + 1
+		# Increase the position
+		position = position + 1
 	
 	
 	
@@ -1797,7 +1797,7 @@ if __name__ == '__main__':
 			# Names of files to insert as chunks (comma-separated list)
 			file_names = string.split(args[1], ',')
 	
-		        # Insert the chunks in the list at the specified position
+			# Insert the chunks in the list at the specified position
 			chunks = chunks[:position] + encode_chunks(file_names) + chunks[position:]
 	
 		else:
@@ -1838,7 +1838,7 @@ if __name__ == '__main__':
 			# Names of files to insert (comma-separated list)
 			file_names = string.split(args[1], ',')
 	
-		        # Insert the chunks in the list at the specified position
+			# Insert the chunks in the list at the specified position
 			chunks = chunks[:position] + create_chunks(file_names) + chunks[position:]
 	
 		# Open the UEF file for writing
@@ -2047,7 +2047,7 @@ if __name__ == '__main__':
 				else:
 					# Add the chunk positions within each file to the list of positions
 					positions = positions + range(contents[file_position]['position'],
-								      contents[file_position]['last position'] + 1)
+					                              contents[file_position]['last position'] + 1)
 	
 		# Create a new list of chunks without those in the positions list
 		new_chunks = []
