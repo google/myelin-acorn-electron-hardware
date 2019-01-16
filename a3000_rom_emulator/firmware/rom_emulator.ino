@@ -67,7 +67,8 @@
 // PA15 - D7 - flash_nREADY (pull up)
 #define FLASH_NREADY_PIN 7
 
-// PA28 - cpld_clock_from_mcu
+// PA28 - D4 - cpld_clock_from_mcu (clock output)
+#define CPLD_CLOCK_FROM_MCU_PIN 4
 
 
 // Uncomment this to show every byte sent and received over SPI
@@ -165,7 +166,7 @@ uint32_t flash_read(uint32_t A) {
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
-  uint8_t flash_bank = 2;
+  uint8_t flash_bank = 6;
   // Reset allowing_arm_access to 1 in the CPLD
   CPLD_SS_CLEAR();
   spi_transfer(0x80 | flash_bank);
@@ -191,8 +192,36 @@ void setup() {
   pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
   cpld_spi.beginTransaction(SPISettings(24000000L, MSBFIRST, SPI_MODE0));
 
+  // lock flash for a couple of seconds, to see if we can hold the boot for a while
+  // flash_read(0);
+  // delay(2000);
+
   // Select configured flash_bank
   flash_unlock();
+
+  // I made a poor pin choice in the v1 board, putting cpld_clock_from_mcu on
+  // PA28, which is GCLK_IO[0].  It looks like only GCLK0 can drive GCLK_MAIN,
+  // so to change the clock frequency output on PA28, we need to slow down the
+  // CPU.
+
+  // DIV=2 gives 24MHz, but breaks USB
+  // DIV=0 gives 48MHz
+  GCLK->GENDIV.reg = GCLK_GENDIV_ID(0) | GCLK_GENDIV_DIV(0);
+  while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+
+  // Update with same settings as in Arduino SAMD startup.c, but also
+  // GCLK_GENCTRL_OE, to output the clock on GCLK_IO[0].  (Also, is there a
+  // way to read the current settings for a GCLK, so I can just set the OE bit
+  // without having to repeat the config?)
+  GCLK->GENCTRL.reg = GCLK_GENCTRL_ID(0) |
+                      GCLK_GENCTRL_SRC_DFLL48M |
+                      GCLK_GENCTRL_OE |
+                      GCLK_GENCTRL_IDC |
+                      GCLK_GENCTRL_GENEN;
+  while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+
+  // enable GCLK_IO[0] on PA28 (cpld_clock_from_mcu)
+  pinPeripheral(CPLD_CLOCK_FROM_MCU_PIN, PIO_AC_CLK);
 
   // Set pin directions for CPLD JTAG.
   pinMode(TDO_PIN, INPUT);

@@ -109,29 +109,42 @@ reg accessing_flash = 1'b0;
 // 1 when an SPI transaction wants flash_nWE low
 reg writing_flash = 1'b0;
 
-
 // set to 1 to reset the ARM, 0 to let it run
 reg reset_arm = 1'b0;
 
+
+// synchronizer for romcs*
+reg [1:0] romcs_sync = 2'b0;
+
+always @(posedge cpld_clock_from_mcu) begin
+  romcs_sync <= {romcs_sync[0], rom_nCS};
+end
+
+
 // ARM reset line; open collector
 assign arc_RESET = reset_arm == 1'b1 ? 1'b0 : 1'bZ;
+//assign arc_RESET = romcs_sync[1]; // DEBUG: synchronized romcs
+//assign arc_RESET = clock_divider[0]; // DEBUG
+//assign arc_RESET = cpld_clock_from_mcu; // DEBUG
+//assign arc_RESET = cpld_SCK; // DEBUG
 
 
 // ARM data bus
-assign rom_D = allowing_arm_access == 1'b1 ? (
-    // Pass flash output through to rom_D only when rom_nCS == 0
-    rom_nCS == 1'b0 ?
-      {flash1_DQ, flash0_DQ} :
-      32'bZ
+assign rom_D = rom_nCS == 1'b1 ? 32'bZ : (
+  allowing_arm_access == 1'b1 ? (
+    // Pass flash output through to rom_D
+    {flash1_DQ, flash0_DQ}
   ) : (
     // allowing_arm_access == 1'b0; we can't handle a flash access now
-    32'bZ
 
-    // The intention below was to make all ROM reads return "mov pc, #0x3400000"
+    // The intention below was to make all ROM reads return "mov pc, #0x3400000" (32'he3a0f50d)
     // during programming, so the system might jump to the start of the ROM
     // afterward.  It didn't seem to do anything though, so I've removed it.
-    // rom_nCS == 1'b0 ? 32'he3a0f50d : 32'bZ
-  );
+    // 32'hE3A0F50E  // mov pc, #0x3800000
+    32'hE3A0F000  // mov pc, #0
+    // 32'bZ
+  )
+);
 
 // Flash chip address lines
 assign flash_A = allowing_arm_access == 1'b1 ? (

@@ -14,6 +14,10 @@
 
 MODULE=a3000_rom_emulator
 PART=xc95144xl-10-cs144
+# Use low power mode.  Ideally would use "auto" (timing-driven), but that only
+# puts a few macrocells in low power mode.  Setting POWER=low still seems to
+# work fine timing wise.
+POWER=low
 
 SHARED_PATH ?= ../../common
 include ${SHARED_PATH}/Makefile.xilinx
