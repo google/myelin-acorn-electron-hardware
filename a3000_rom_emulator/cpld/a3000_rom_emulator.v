@@ -113,11 +113,43 @@ reg writing_flash = 1'b0;
 reg reset_arm = 1'b0;
 
 
+// 1 when rom_A is pointing at the top 2048 bytes (512 words) of ROM
+wire accessing_signal_ROM;
+assign accessing_signal_ROM = (rom_A[18:11] == 8'b11111111) ? 1'b1 : 1'b0;
+
+
 // synchronizer for romcs*
 reg [1:0] romcs_sync = 2'b0;
+// pulse length measurement for romcs*
+reg [2:0] romcs_pulse_length = 3'b0;
 
 always @(posedge cpld_clock_from_mcu) begin
   romcs_sync <= {romcs_sync[0], rom_nCS};
+  if (romcs_sync[1] == 1'b1) begin
+    romcs_pulse_length <= 3'b0;
+  end else begin
+    if (romcs_pulse_length != 3'b111) begin
+      // don't allow the counter to wrap
+      romcs_pulse_length <= romcs_pulse_length + 1;
+    end
+    if (romcs_pulse_length == 3'b110) begin
+      // pulse length of synchronized romcs = 6, which means
+      // we're about 180 ns into the pulse, and safely past
+      // the point where MEMC might change its mind and
+      // bring romcs* high again.
+
+      // see if rom_A is pointing at the last 2kB of ROM, i.e.
+      // the last 512 words.  rom_A[9:2] contain a data byte
+      // for us, and rom_A[10] is RnW.
+      if (accessing_signal_ROM == 1'b1) begin
+        if (rom_A[10] == 1'b0) begin
+          // ARM is writing data for the MCU
+        end else begin
+          // ARM is reading data from the MCU
+        end
+      end
+    end
+  end
 end
 
 
