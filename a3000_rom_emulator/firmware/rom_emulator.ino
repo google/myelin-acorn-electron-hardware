@@ -190,11 +190,7 @@ void setup() {
   pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
   pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
   pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
-  cpld_spi.beginTransaction(SPISettings(24000000L, MSBFIRST, SPI_MODE0));
-
-  // lock flash for a couple of seconds, to see if we can hold the boot for a while
-  // flash_read(0);
-  // delay(2000);
+  cpld_spi.beginTransaction(SPISettings(12000000L, MSBFIRST, SPI_MODE0));
 
   // Select configured flash_bank
   flash_unlock();
