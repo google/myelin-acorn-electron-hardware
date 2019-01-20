@@ -159,7 +159,7 @@ module a3000_rom_emulator_tb;
     @(posedge clk);
     `assert(dut.allowing_arm_access == 1'b1, "FAIL: 32 1's didn't reenable ARM access");
 
-    $display("\nTEST that we can write to the flash (51234)");
+    $display("\nTEST that we can write to the flash (A 51234 D 12345678)");
     // message format for a WRITE: acc, rnw, a[22], d[32], 8'b0
     // with the write happening during the six zeros
     spi_d <= {1'b0, 1'b0, 22'b1010001001000110100, 32'h12345678, 8'b0};
@@ -180,37 +180,43 @@ module a3000_rom_emulator_tb;
     `assert(dut.allowing_arm_access == 1'b0, "FAIL: write operation unlocked ARM access");
 
     $display("\nTEST that the unlock process appears correct");
-    spi_d <= {19'h5555, 1'b0, 8'hAA, 4'b0};
+    $display("unlock: write AA to 5555");
+    spi_d <= {1'b0, 1'b0, 22'h5555, 32'hAA, 8'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
     @(posedge spi_ss);
 
-    spi_d <= {19'h2AAA, 1'b0, 8'h55, 4'b0};
+    $display("unlock: write 55 to 2AAA");
+    spi_d <= {1'b0, 1'b0, 22'h2AAA, 32'h55, 8'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
     @(posedge spi_ss);
 
-    spi_d <= {19'h5555, 1'b0, 8'h90, 4'b0};
+    $display("unlock: write 90 to 5555");
+    spi_d <= {1'b0, 1'b0, 22'h5555, 32'h90, 8'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
     @(posedge spi_ss);
 
-    spi_d <= {19'h0, 1'b1, 12'b0};
+    $display("unlock: read 0");
+    spi_d <= {1'b0, 1'b1, 32'h0000, 40'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
     @(posedge spi_ss);
 
-    spi_d <= {19'h1, 1'b1, 12'b0};
+    $display("unlock: read 1");
+    spi_d <= {1'b0, 1'b1, 32'h0001, 40'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
     @(posedge spi_ss);
 
-    spi_d <= {19'h5555, 1'b0, 8'hF0, 4'b0};
+    $display("unlock: write F0 to 5555");
+    spi_d <= {1'b0, 1'b0, 22'h5555, 32'hF0, 8'b0};
     spi_start <= 1;
     @(posedge clk);
     #1 spi_start <= 0;
