@@ -56,22 +56,33 @@ module a3000_rom_emulator(
 
   // possible clocks (unused)
   input wire cpld_clock_from_mcu,
-  input wire cpld_clock_osc,  // PHI1 from a flying lead
+  input wire cpld_clock_osc,  // TODO rename: 5V power signal from rom pin 32
   
   // SPI connection to MCU
-  input wire cpld_MOSI,
+  input wire cpld_MOSI,  // doubles as serial RXD when cpld_SS=1
   input wire cpld_SS,
   input wire cpld_SCK,
-  output reg cpld_MISO = 1'b1
+  output wire cpld_MISO  // doubles as serial TXD when cpld_SS=1
 );
 
 
-// width of the buffer used to communicate between the ARM and MCU; requires 2x this in registers
-parameter comms_buffer_width = 8;
+// set to 1 once the power signal has been wired to cpld_clock_osc
+parameter use_power_signal_from_host = 1;
+wire host_power_on;
+assign host_power_on = use_power_signal_from_host ? cpld_clock_osc : 1'b1;
+
+
+// ----- ARM-MCU comms with handshaking -- better than bit-banged serial, but won't fit in XC95144) -----
+
+// enable/disable arm-mcu comms
+parameter enable_comms = 0;
+
+// width of the buffer used to communicate between the ARM and MCU; requires 2x this in registers.
+parameter comms_buffer_width = 1;
 
 reg [comms_buffer_width-1:0] mcu_to_arm_buffer;
 reg mcu_to_arm_write_state = 1'b0;  // toggles when cpld receives byte from MCU
-reg mcu_to_arm_write_state_sync = 1'b0;  // synchronized to cpld_clock_osc (ARM phi1)
+reg mcu_to_arm_write_state_sync = 1'b0;  // synchronized to cpld_clock_from_mcu (48MHz)
 reg mcu_to_arm_read_state = 1'b0;  // toggles when ARM reads byte from buffer
 reg mcu_to_arm_read_state_sync = 1'b0;  // synchronized to cpld_SCK
 
@@ -79,17 +90,23 @@ reg [comms_buffer_width-1:0] arm_to_mcu_buffer;
 reg arm_to_mcu_write_state = 1'b0;  // toggles when cpld receives byte from ARM
 reg arm_to_mcu_write_state_sync = 1'b0;  // synchronized to cpld_SCK
 reg arm_to_mcu_read_state = 1'b0;  // toggles when MCU reads byte from buffer
-reg arm_to_mcu_read_state_sync = 1'b0;  // synchronized to cpld_clock_osc (ARM phi1)
+reg arm_to_mcu_read_state_sync = 1'b0;  // synchronized to cpld_clock_from_mcu (48MHz)
 
 
-// 1 to pass host accesses through to the flash, 0 to control flash from SPI
-reg allowing_arm_access = 1'b1;
+// ----- Hacky bit-banged serial comms; actually works but requires more work on ARM side -----
 
-// 1 to use rom_A[19] (LA21) and provide 4MB of flash, 0 to ignore it and provide 2MB
-reg use_la21 = 1'b0;
+// enable/disable hacky bit banged serial comms
+parameter enable_bitbang_serial = 1;
 
-// Flash bank selected; bit 0 is ignored if use_la21==1
-reg [2:0] flash_bank = 3'b0;
+// for bit-banged serial comms
+reg cpld_MOSI_sync = 1'b1;  // synchronized to rom_nCS falling edge
+reg cpld_MISO_TXD = 1'b1;  // value to assign to cpld_MISO when cpld_SS==1
+
+
+// ---- SPI registers -----
+
+// SPI MISO output
+reg cpld_MISO_int = 1'b1;  // MISO when cpld_SS==0
 
 // counts up to 63
 reg [5:0] spi_bit_count = 6'b0;
@@ -109,14 +126,36 @@ reg accessing_flash = 1'b0;
 // 1 when an SPI transaction wants flash_nWE low
 reg writing_flash = 1'b0;
 
+
+// ----- Config registers -----
+// 1 to pass host accesses through to the flash, 0 to control flash from SPI
+reg allowing_arm_access = 1'b1;
+
+// 1 to use rom_A[19] (LA21) and provide 4MB of flash, 0 to ignore it and provide 2MB
+reg use_la21 = 1'b0;
+
+// Flash bank selected; bit 0 is ignored if use_la21==1
+reg [2:0] flash_bank = 3'b0;
+
 // set to 1 to reset the ARM, 0 to let it run
 reg reset_arm = 1'b0;
 
 
-// 1 when rom_A is pointing at the top 2048 bytes (512 words) of ROM
-wire accessing_signal_ROM;
-assign accessing_signal_ROM = (rom_A[18:11] == 8'b11111111) ? 1'b1 : 1'b0;
+// ----- Read-sensitive ROM locations -----
 
+// 1 when rom_A is pointing at the top 16 bytes (4 words) of ROM
+wire accessing_signal_ROM;
+assign accessing_signal_ROM = (rom_A[18:3] == 16'b1111111111111111) ? 1'b1 : 1'b0;
+
+// synchronize mcu-to-arm signals when romcs goes active.
+// any metastability should settle by the time these values are read.
+always @(negedge rom_nCS) begin
+  mcu_to_arm_write_state_sync <= mcu_to_arm_write_state;
+  arm_to_mcu_read_state_sync <= arm_to_mcu_read_state;
+  if (enable_bitbang_serial) begin
+    cpld_MOSI_sync <= cpld_MOSI;
+  end
+end
 
 // synchronizer for romcs*
 reg [1:0] romcs_sync = 2'b0;
@@ -142,10 +181,20 @@ always @(posedge cpld_clock_from_mcu) begin
       // the last 512 words.  rom_A[9:2] contain a data byte
       // for us, and rom_A[10] is RnW.
       if (accessing_signal_ROM == 1'b1) begin
-        if (rom_A[10] == 1'b0) begin
-          // ARM is writing data for the MCU
+        if (rom_A[1] == 1'b0) begin
+          if (enable_comms) begin
+            // ARM is writing data for the MCU
+            arm_to_mcu_buffer <= rom_A[comms_buffer_width+1:2];
+            arm_to_mcu_write_state <= !arm_to_mcu_write_state;
+          end
+          if (enable_bitbang_serial) begin
+            cpld_MISO_TXD <= rom_A[0];
+          end
         end else begin
-          // ARM is reading data from the MCU
+          if (enable_comms) begin
+            // ARM is reading data from the MCU
+            mcu_to_arm_read_state <= !mcu_to_arm_read_state;
+          end
         end
       end
     end
@@ -161,10 +210,19 @@ assign arc_RESET = reset_arm == 1'b1 ? 1'b0 : 1'bZ;
 //assign arc_RESET = cpld_SCK; // DEBUG
 
 
+wire selected;  // Romcs* low and power high
+assign selected = (rom_nCS == 1'b0 && host_power_on == 1'b1) ? 1'b0 : 1'b1;
+
 // ARM data bus
-assign rom_D = rom_nCS == 1'b1 ? 32'bZ : (
+assign rom_D = selected == 1'b1 ? 32'bZ : (
   allowing_arm_access == 1'b1 ? (
     // Pass flash output through to rom_D
+    // DEBUG actually should be mcu_to_arm_buffer, but this lets us loopback
+    (accessing_signal_ROM == 1'b1) ? {
+      enable_bitbang_serial ? {flash1_DQ, flash0_DQ[15:1], cpld_MOSI_sync}
+      : (enable_comms ? {flash1_DQ, flash0_DQ[15:3], mcu_to_arm_write_state_sync, arm_to_mcu_read_state_sync, mcu_to_arm_buffer}
+                      : {flash1_DQ, flash0_DQ})
+    } :
     {flash1_DQ, flash0_DQ}
   ) : (
     // allowing_arm_access == 1'b0; we can't handle a flash access now
@@ -173,8 +231,8 @@ assign rom_D = rom_nCS == 1'b1 ? 32'bZ : (
     // during programming, so the system might jump to the start of the ROM
     // afterward.  It didn't seem to do anything though, so I've removed it.
     // 32'hE3A0F50E  // mov pc, #0x3800000
-    32'hE3A0F000  // mov pc, #0
-    // 32'bZ
+    // 32'hE3A0F000  // mov pc, #0
+    32'bZ
   )
 );
 
@@ -192,8 +250,8 @@ assign flash0_DQ = allowing_arm_access == 1'b1 ? 16'bZ : (accessing_flash == 1'b
 assign flash1_DQ = allowing_arm_access == 1'b1 ? 16'bZ : (accessing_flash == 1'b1 && spi_rnw == 1'b0 ? spi_D[31:16] : 16'bZ);
 
 // Flash chip control lines
-assign flash_nCE = allowing_arm_access == 1'b1 ? rom_nCS : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
-assign flash_nOE = allowing_arm_access == 1'b1 ? rom_nCS : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
+assign flash_nCE = allowing_arm_access == 1'b1 ? selected : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
+assign flash_nOE = allowing_arm_access == 1'b1 ? selected : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
 assign flash_nWE = allowing_arm_access == 1'b1 ? 1'b1 : (writing_flash == 1'b1 ? 1'b0 : 1'b1);
 
 
@@ -228,6 +286,8 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
 
     if (spi_bit_count == 0) begin
       allowing_arm_access <= cpld_MOSI;
+      arm_to_mcu_write_state_sync <= arm_to_mcu_write_state;
+      mcu_to_arm_read_state_sync <= mcu_to_arm_read_state;
       // $display("SPI: Set allowing_arm_access to %d", cpld_MOSI);
     end else if (allowing_arm_access == 1) begin
       // allowing ARM access: rest of SPI transaction is a control message
@@ -238,15 +298,27 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
       end else if (spi_bit_count == 9) begin
         reset_arm <= cpld_MOSI;
       end else if (spi_bit_count == 12) begin
-        // mcu has data for me
+        if (enable_comms) begin
+          // mcu has data for me
+          mcu_to_arm_write_state <= cpld_MOSI;
+          spi_D[31] <= arm_to_mcu_write_state;  // HACK: 41.6ns to resolve metastability
+          // TODO toggle write state rather than copy
+        end
       end else if (spi_bit_count == 13) begin
-        // mcu has buffer space for me to transmit
+        if (enable_comms) begin
+          // mcu has buffer space for me to transmit
+          arm_to_mcu_read_state <= cpld_MOSI;
+          // TODO toggle read state rather than copy
+          spi_D[31] <= mcu_to_arm_read_state;  // HACK: 41.6ns to resolve metastability
+        end
       end else if (spi_bit_count == 14) begin
-        // send: i have data for mcu
-      end else if (spi_bit_count == 15) begin
-        // send: i have buffer space for mcu
-      end else if (spi_bit_count < 24) begin
-        mcu_to_arm_buffer <= {mcu_to_arm_buffer[comms_buffer_width-2:0], cpld_MOSI};
+        if (enable_comms) begin
+          // data bit from mcu
+          // TODO only replace if there's room
+          // (can dispense with this if we really need the space)
+          mcu_to_arm_buffer <= {cpld_MOSI};
+          spi_D[31] <= arm_to_mcu_buffer[0];  // HACK: 41.6ns to resolve metastability
+        end
       end
     end else begin
       // not allowing ARM access: rest of SPI transaction is a flash access request
@@ -292,12 +364,27 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
 end
 
 always @(negedge cpld_SCK) begin
-  if (spi_bit_count < 32) begin
-    cpld_MISO <= spi_bit_count[0];  // should toggle and result in data & ffffe00 == 55554000
-  end else begin
-    cpld_MISO <= spi_D[31];
+  cpld_MISO_int <= spi_D[31];
+  if (enable_comms) begin
+    if (spi_bit_count == 12) begin
+      // we have data for mcu
+      // cpld_MISO <= arm_to_mcu_write_state_sync;
+      // TODO toggle write state rather than copy
+    end else if (spi_bit_count == 13) begin
+      // we have buffer space for mcu to transmit
+      // cpld_MISO <= mcu_to_arm_read_state_sync;
+      // TODO toggle read state rather than copy
+    end else if (spi_bit_count == 14) begin
+      // data bit from arm
+      // TODO only replace if there's room
+      // (can dispense with this if we really need the space)
+      // cpld_MISO <= arm_to_mcu_buffer[0];
+    end
   end
 end
+
+// output cpld_MISO_TXD when cpld_SS==1 and the bit-banged serial port is enabled
+assign cpld_MISO = (enable_bitbang_serial && cpld_SS == 1'b1) ? cpld_MISO_TXD : cpld_MISO_int;
 
 
 endmodule
