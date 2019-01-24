@@ -29,6 +29,7 @@ SECTIONS {
 	.data : {
 		_data = .;
 		*(.data)
+		*(.ramfunc)
 		. = ALIGN(0x4);
 		_edata = .;
 	} >RAM AT>ROM

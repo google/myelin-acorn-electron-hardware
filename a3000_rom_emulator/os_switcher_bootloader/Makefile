@@ -16,7 +16,7 @@ AS = arm-none-eabi-as
 CC = arm-none-eabi-g++
 LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
-CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions
+CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2
 LDFLAGS = -nostdlib -lgcc
 
 .PHONY: default all clean
@@ -46,7 +46,7 @@ all: switcher.rom jump_to_rom.bin
 SWITCHER_OBJS=start.o cstartup.o main.o
 
 switcher.elf: $(SWITCHER_OBJS)
-	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -o $@ $(SWITCHER_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)
 	arm-none-eabi-objdump -S --disassemble switcher.elf > switcher.list
 
 %.bin: %.elf

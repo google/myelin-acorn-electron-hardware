@@ -29,12 +29,11 @@ in_rom_now_addr: .word in_rom_now
 
 in_rom_now:
 	@ Init MEMC
-	ldr r0, =0x036E170C  @ os mode, sound off, video on, refresh on, rom slow, 32k pages
+	ldr r0, =0x036E170C  @ os mode, sound off, video on, refresh on, rom slow, 32k pages TODO should be 140c bc we dont want refresh (video dma will do it)
 	ldr r1, =0
 	str r1, [r0]
 
-	@ Set up initial video display, with a white border in
-	@ MODE 13: 640x256, 256 colors (8bpp), 163840 bytes
+	@ Set up initial video display
 
 	@ VIDC registers
 	ldr r1, =0x03400000  @ VIDCR
@@ -48,6 +47,8 @@ write_to_one_vidc_reg:
 	blo write_to_one_vidc_reg
 	b vidc_setup_done
 vidc_reg_table:
+	@ TODO init SFR reg to turn off test mode
+	@ MODE 13: 640x256, 256 colors (8bpp), 163840 bytes
 	.word 0x807FC000  @ reg 80 = 0x7FC000 - horizontal cycle
 	.word 0x8408C000  @ reg 84 = 0x08C000 - horizontal sync width
 	.word 0x8810C000  @ reg 88 = 0x10C000 - horizontal border start
@@ -64,8 +65,25 @@ vidc_reg_table:
 	.word 0xE00000AE  @ reg E0 = 0x0000AE - control
 	.word 0xB8000000  @ reg B8 = 0x000000 - vertical cursor start
 	.word 0xBC000000  @ reg BC = 0x000000 - vertical cursor end
-	@ Plus this, to set the border color to white:
-	.word 0x40001FFF  @ screen border color
+	@ Palette
+	.word 0x00000000
+	.word 0x04000111
+	.word 0x08000222
+	.word 0x0C000333
+	.word 0x10000004
+	.word 0x14000115
+	.word 0x18000226
+	.word 0x1C000337
+	.word 0x20000400
+	.word 0x24000511
+	.word 0x28000622
+	.word 0x2C000733
+	.word 0x30000404
+	.word 0x34000515
+	.word 0x38000626
+	.word 0x3C000737
+	@ White screen border
+	.word 0x40000FFF
 vidc_setup_done:
 
 	@ Set up video DMA registers in MEMC.  These refer to physical memory and
@@ -83,8 +101,11 @@ vidc_setup_done:
 
 	@ TODO test system memory
 
+	@ memory tested!
+	@ now we can run ordinary C code :)
+
 	@ create stack, at memory+512kB-4
-	mov sp, #0x2080000
+	mov sp, #0x2080000 @ todo can prob get this from a linker var
 	sub sp, sp, #4
 	@ not really using the frame pointer, but init it to stack pointer
 	mov fp, sp

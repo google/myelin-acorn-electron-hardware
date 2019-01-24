@@ -42,3 +42,6 @@ static void write_memc(
 // volatile uint32_t* VIDCR = (uint32_t *)0x3400000L;
 #define VIDCR (*((volatile uint32_t *)0x3400000L))
 
+// Screen memory pointer
+#define SCREEN ((volatile uint8_t *)0x2000000)
+
