@@ -29,7 +29,16 @@ in_rom_now_addr: .word in_rom_now
 
 in_rom_now:
 	@ Init MEMC
-	ldr r0, =0x036E170C  @ os mode, sound off, video on, refresh on, rom slow, 32k pages TODO should be 140c bc we dont want refresh (video dma will do it)
+	@ RISC OS 3 writes the following for a 4MB machine:
+	@ 036E000C: os mode off, sound off, video off, no refresh, slow roms, 32kB
+	@ 036E010C: refresh during flyback, otherwise as above
+	@ 036E0D0C: sound on, video on, refresh during flyback
+	@ On a 1024K machine:
+	@ 036E000C
+	@ 036E0104
+	@ ... etc
+	@ On a 512K machine, RO3 gives an error on boot
+	ldr r0, =0x036E050C  @ os mode off, sound off, video on, refresh during flyback, rom slow, 32k pages
 	ldr r1, =0
 	str r1, [r0]
 
@@ -47,7 +56,8 @@ write_to_one_vidc_reg:
 	blo write_to_one_vidc_reg
 	b vidc_setup_done
 vidc_reg_table:
-	@ TODO init SFR reg to turn off test mode
+	@ Init SFR reg to turn off test mode
+	.word 0xC0000100
 	@ MODE 13: 640x256, 256 colors (8bpp), 163840 bytes
 	.word 0x807FC000  @ reg 80 = 0x7FC000 - horizontal cycle
 	.word 0x8408C000  @ reg 84 = 0x08C000 - horizontal sync width
