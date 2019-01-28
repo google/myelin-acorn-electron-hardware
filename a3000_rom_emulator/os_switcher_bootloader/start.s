@@ -14,10 +14,19 @@
 
 
 @ Initial startup code, designed to run on a possibly flaky system with bad
-@ RAM or malfunctioning chips.  Assume as little as possible.
+@ RAM or malfunctioning chips.  Assume as little as possible, i.e.:
 
-@ Run from 0x3800000
-@ Expect at least 512kB RAM, physically mapped at 0x2000000-0x207ffff
+@ - Only use registers for variables (no stack, RAM, etc)
+@ - Write debug info to as many places as possible:
+@   - Screen memory (which might be bad, so only write to it)
+@   - KART serial port
+@   - I2C output
+@   - Any more?
+
+
+@ This code will be located at 0x3800000.  Expect at least 512kB RAM,
+@ physically mapped at 0x2000000-0x207ffff, although MEMC page configuration
+@ needs to be correct before RAM will be stable.
 
 .global _start
 
@@ -38,6 +47,7 @@ in_rom_now:
 	@ 036E0104
 	@ ... etc
 	@ On a 512K machine, RO3 gives an error on boot
+    @ TODO detect memory size and set page size appropriately.  Can we just use 512K setting for now?
 	ldr r0, =0x036E050C  @ os mode off, sound off, video on, refresh during flyback, rom slow, 32k pages
 	ldr r1, =0
 	str r1, [r0]
@@ -55,6 +65,7 @@ write_to_one_vidc_reg:
 	strlo r0, [r1]
 	blo write_to_one_vidc_reg
 	b vidc_setup_done
+
 vidc_reg_table:
 	@ Init SFR reg to turn off test mode
 	.word 0xC0000100
@@ -109,6 +120,27 @@ vidc_setup_done:
 	ldr r0, =0x0364a000
 	str r1, [r0]
 
+	@ register aliases for global vars until we init memory
+display_x .req r12  @ x position for plotting text
+display_y .req r13  @ y position for plotting text
+
+	@ start at top left of screen (with 8x8 border)
+	ldr display_x, =8
+	ldr display_y, =8
+
+	@ TEST - plot an asterisk
+	@mov r0, #42
+	@bl plot_character
+	@add display_y, display_y, #8
+
+	ldr r0, =banner
+	bl print_string
+	b print_banner_done
+banner: .asciz "Arcflash - http://myelin.nz/arcflash"
+	.align
+print_banner_done:
+
+memory_test:
 	@ TODO test system memory
 
 	@ memory tested!
@@ -141,3 +173,84 @@ still_copying_data:
 
 	@ done with all the pre-memory stuff -- jump into C for the rest
 	b cstartup
+
+@@@@@@@@@@ Functions @@@@@@@@@@
+
+plot_character:
+	@ input: r0 = ascii code
+	@ clobbers r0-r6
+
+	plot_tmp .req r1
+	plot_tmp2 .req r0
+	plot_ptr .req r2
+	plot_py .req r3  @ current y pos within char
+	plot_px .req r4  @ current x pos within char
+	plot_pattern_ptr .req r5  @ current pattern ptr
+	plot_pattern .req r6  @ current pattern row
+
+	@ find display ptr
+	@ ptr = y * 640 + x + base
+	mov plot_ptr, display_y
+	ldr plot_tmp, =640
+	mul plot_ptr, plot_tmp, plot_ptr
+	add plot_ptr, plot_ptr, display_x
+	add plot_ptr, plot_ptr, #0x02000000
+
+	@  pattern = charno * 8 [charno<<3] + riscosfont
+	lsl plot_pattern_ptr, r0, #3
+	ldr plot_tmp, =riscos_font
+	add plot_pattern_ptr, plot_pattern_ptr, plot_tmp
+	@ for py = 0-7
+	mov plot_py, #0
+	plot_loop_y:
+		@  pattern = *pattern
+		ldrb plot_pattern, [plot_pattern_ptr]
+		@  for px = 0-7
+		mov plot_px, #0
+		plot_loop_x:
+			@.  *ptr=(pattern & 128)?white:black
+			mov plot_tmp, #0
+			ands plot_tmp2, plot_pattern, #128
+			movne plot_tmp, #255
+			strb plot_tmp, [plot_ptr]
+			@.  ptr++
+			add plot_ptr, plot_ptr, #1
+			@.  pattern <<= 1
+			lsl plot_pattern, plot_pattern, #1
+			@  next
+			add plot_px, plot_px, #1
+			cmp plot_px, #8
+			blo plot_loop_x
+		@ ptr += 640-8
+		add plot_ptr, plot_ptr, #632
+		@ ++ pattern_ptr
+		add plot_pattern_ptr, plot_pattern_ptr, #1
+		@ next
+		add plot_py, plot_py, #1
+		cmp plot_py, #8
+		blo plot_loop_y
+	@ x += 8
+	add display_x, display_x, #8
+	@ if x > 640: y+=8, x=0
+	cmp display_x, #640
+	addhs display_y, display_y, #8
+	movhs display_x, #0
+	@ TODO if y > 256: move screen up
+	mov pc, lr
+
+print_string:
+	@ input: r0 = ptr to asciz string
+	@ clobbers r0-8
+	mov r8, lr  @ save lr because we are not a leaf
+
+	print_string_ptr .req r7
+	mov print_string_ptr, r0
+print_string_next_char:
+	@ c = *ptr++
+	ldrb r0, [print_string_ptr]
+	@ done if !c
+	cmp r0, #0
+	moveq pc, r8
+	bl plot_character
+	add print_string_ptr, print_string_ptr, #1
+	b print_string_next_char

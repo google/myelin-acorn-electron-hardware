@@ -31,6 +31,9 @@ all: switcher.rom jump_to_rom.bin
 %.o: %.s
 	$(AS) -o $@ $<
 
+riscos_font.o: ../../third_party/riscos/riscos_font.s
+	$(AS) -o $@ $<
+
 %.o: %.cc
 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -43,7 +46,7 @@ all: switcher.rom jump_to_rom.bin
 %.rom: %.bin
 	python pad_to_rom.py $< $@
 
-SWITCHER_OBJS=start.o cstartup.o main.o
+SWITCHER_OBJS=start.o cstartup.o main.o riscos_font.o
 
 switcher.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)

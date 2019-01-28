@@ -53,6 +53,7 @@ for line in open("Interfonts.s"):
 
 f = open('riscos_font.s', 'w')
 print(copyright, file=f)
+print('  .global riscos_font', file=f)
 print('  .align\nriscos_font:', file=f)
 for charno in range(0, 256):
     if charno in patterns:

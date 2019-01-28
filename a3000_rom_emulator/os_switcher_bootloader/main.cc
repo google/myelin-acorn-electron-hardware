@@ -50,7 +50,7 @@ extern "C" void main_program() {
 
   // Draw something on screen
   uint8_t c = 0;
-  for (uint32_t y = 0; y < HEIGHT; ++y) {
+  for (uint32_t y = 24; y < HEIGHT; ++y) {
     for (uint32_t x = 0; x < WIDTH; ++x) {
       SCREEN[y * WIDTH + x] = c++;
     }
