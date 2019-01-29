@@ -159,6 +159,15 @@ vidc_setup_done:
     ldr r0, =0x0364a000
     str r1, [r0]
 
+    @ blank video memory
+    mov r0, #0
+    ldr r1, =0x02000000
+    ldr r2, =0x02004000
+still_clearing_video_memory:
+    cmp r1, r2
+    strlo r0, [r1], #4
+    blo still_clearing_video_memory
+
     @ register aliases for global vars until we init memory
 display_x .req r12  @ x position for plotting text
 display_y .req r13  @ y position for plotting text
