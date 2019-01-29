@@ -53,6 +53,44 @@ in_rom_now:
     ldr r1, =0
     str r1, [r0]
 
+    @ Detect memory size
+    ldr r0, =0x02000000  @ write 4096 to address 0
+    ldr r1, =4096
+    str r1, [r0]
+    ldr r0, =0x2200000  @ write 2048 at 2M, which will alias to zero if mem size <= 2M
+    ldr r1, =2048
+    str r1, [r0]
+    ldr r0, =0x2100000  @ write 1024 at 1M, which will alias to zero if mem size <= 1M
+    ldr r1, =1024
+    str r1, [r0]
+    ldr r0, =0x2080000  @ write 512 at 512kB, which will alias to zero if mem size <= 512k
+    ldr r1, =512
+    str r1, [r0]
+    ldr r0, =0x2040000  @ write 256 at 256kB, which will alias to zero if mem size <= 256k
+    ldr r1, =256
+    str r1, [r0]
+    ldr r0, =0x2000000
+    ldr r1, [r0]
+    @ Now r1 should contain the memory size for the first MEMC.
+
+    @ Figure out the block size
+    ldr r0, =0x036E0500
+    mov r3, #0x0c  @ 32k block
+    cmp r1, #4096
+    movlo r3, #0x08  @ 16k block
+    cmp r1, #2048
+    movlo r3, #0x04  @ 8k block
+    cmp r1, #1024
+    movlo r3, #0x00  @ 4k block
+    add r0, r0, r3
+    str r0, [r0]  @ Set block size -- only the address matters here
+
+    @ TODO handle 8M+ memory systems.  need to check RO code to figure that out.
+    @ =2400000 @ start of 5th meg
+    @ =2800000 @ 9th
+    @ =2c00000 @ 12th
+    @ these will maybe alias or maybe just fail to read
+
     @ Set up initial video display
 
     @ VIDC registers
