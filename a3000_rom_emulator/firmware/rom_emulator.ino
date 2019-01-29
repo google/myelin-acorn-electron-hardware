@@ -24,7 +24,7 @@
 // Functions provided:
 // - USB serial interface for all control
 // - USB SVF+JTAG interface to program the CPLD
-// - CPLD clock generation (24MHz)
+// - CPLD clock generation (48MHz)
 
 // Pinout:
 
@@ -101,6 +101,40 @@ extern void arduino_play_svf(int tms_pin, int tdi_pin, int tdo_pin, int tck_pin,
 // SPI on SERCOM2 to talk to the CPLD at 24MHz
 SPIClass cpld_spi(&sercom2, CPLD_MISO_PIN, CPLD_SCK_PIN, CPLD_MOSI_PIN, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
 
+// Alternate function: UART to talk to host
+Uart cpld_uart(&sercom2, CPLD_MISO_PIN, CPLD_MOSI_PIN, SERCOM_RX_PAD_3, UART_TX_PAD_0);
+// to enable: cpld_uart.begin(); then same pinPeripheral calls as for SPI (because we're using the same sercom pins/pads, just a different function.)
+
+enum { NOTHING_SELECTED, SPI_SELECTED, UART_SELECTED } spi_port_state = NOTHING_SELECTED;
+
+// Set MOSI/SCK/MISO/SS pins up for SPI comms with CPLD
+void select_spi() {
+  if (spi_port_state == SPI_SELECTED) return;
+  spi_port_state = SPI_SELECTED;
+  if (Serial.dtr()) Serial.println("select spi");
+  sercom2.disableSPI();  // disable SERCOM so we can write registers
+  cpld_spi.begin();
+  pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
+  pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
+  pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
+  cpld_spi.beginTransaction(SPISettings(12000000L, MSBFIRST, SPI_MODE0));
+}
+
+// Set MOSI/MISO pins up for UART comms with host machine (forwarded by CPLD)
+void select_uart() {
+  if (spi_port_state == UART_SELECTED) return;
+  spi_port_state = UART_SELECTED;
+  if (Serial.dtr()) Serial.println("select uart");
+  sercom2.disableSPI();  // disable SERCOM so we can write registers
+  cpld_uart.begin(9600);  // ideally quicker than this, but baby steps...
+  pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
+  pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
+  // disable all interrupts that begin() enables
+  SERCOM2->USART.INTENCLR.reg = SERCOM_USART_INTENSET_DRE |
+                                SERCOM_USART_INTENSET_RXC |
+                                SERCOM_USART_INTENSET_ERROR;
+
+}
 
 // Send/receive a byte over SPI, optionally dumping details to the serial port
 uint8_t spi_transfer(uint8_t b) {
@@ -166,7 +200,10 @@ uint32_t flash_read(uint32_t A) {
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
-  uint8_t flash_bank = 6;
+  uint8_t flash_bank = 0;
+
+  select_spi();
+
   // Reset allowing_arm_access to 1 in the CPLD
   CPLD_SS_CLEAR();
   spi_transfer(0x80 | flash_bank);
@@ -183,14 +220,11 @@ void flash_reset() {
 
 // System startup
 void setup() {
+
   // Set up fast SPI comms on SERCOM2 with CPLD
   pinMode(CPLD_SS_PIN, OUTPUT);
   CPLD_SS_SET();
-  cpld_spi.begin();
-  pinPeripheral(CPLD_MOSI_PIN, PIO_SERCOM_ALT);
-  pinPeripheral(CPLD_SCK_PIN, PIO_SERCOM_ALT);
-  pinPeripheral(CPLD_MISO_PIN, PIO_SERCOM_ALT);
-  cpld_spi.beginTransaction(SPISettings(12000000L, MSBFIRST, SPI_MODE0));
+  select_spi();
 
   // Select configured flash_bank
   flash_unlock();
@@ -234,6 +268,8 @@ void setup() {
 
   // Set up USB serial port
   Serial.begin(9600);
+
+  select_uart();
 }
 
 // Read a byte from the USB serial port
@@ -311,10 +347,12 @@ void reset() {
   // leave flash accessible by host machine
   flash_unlock();
   Serial.println("OK");
+  select_uart();
 }
 
 // Return the number of bytes of flash on this board, i.e. double the byte count of one chip
 uint32_t chip_size() {
+  select_spi();
   flash_write_both(0x55, 0x0098L);  // Enter CFI mode
   uint32_t size_log2 = flash_read(0x27) & 0xffff;
   flash_write_both(0x00, 0xf0);  // Exit CFI mode
@@ -383,6 +421,8 @@ bool get_range(uint32_t range_start, uint32_t range_end) {
 
 // kick off a range-program operation
 void program_range(uint32_t start_addr, uint32_t end_addr) {
+
+  select_spi();
 
   // verify addresses
   if (start_addr != (start_addr & SECTOR_MASK)) {
@@ -594,6 +634,16 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
 
 void loop() {
 
+  // DEBUG: output 0-255 on cpld_uart
+  static uint8_t uart_debug_char = 0;
+  static long last_char_written = 0;
+  long now = millis();
+  if ((now - last_char_written) > 1 && sercom2.isDataRegisterEmptyUART()) {
+    sercom2.writeDataUART(uart_debug_char++);
+    while (!sercom2.isDataRegisterEmptyUART());
+    last_char_written = now;
+  }
+
 #ifdef ENABLE_USB_SERIAL
   static uint8_t serial_active = 0;
   static unsigned long serial_active_when = 0;
@@ -641,6 +691,7 @@ void loop() {
       }
       case 'I': {
         Serial.println("IDENTIFY FLASH");
+        select_spi();
 
         flash_write_both(0x55, 0x0098L);  // Enter CFI mode
 
@@ -663,7 +714,7 @@ void loop() {
         Serial.println(chip_end);
 
         Serial.println("OK");
-
+        reset();
         break;
       }
       case 'P': {
@@ -700,6 +751,15 @@ void loop() {
         reset();
         break;
       }
+      case 'S': {
+        Serial.println("S");
+        select_uart();
+        Serial.println("send *");
+        sercom2.writeDataUART(42);
+        while (!sercom2.isDataRegisterEmptyUART());
+        Serial.println("done");
+        break;
+      }
       case 'Z': {
         // USB test
         Serial.println("USB TEST");
@@ -726,6 +786,7 @@ void loop() {
           }
         }
         Serial.println("TEST DONE");
+        reset();
         break;
       }
       default: {
