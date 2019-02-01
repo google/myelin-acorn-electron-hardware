@@ -644,6 +644,14 @@ void loop() {
     last_char_written = now;
   }
 
+  if (sercom2.availableDataUART()) {
+    uint8_t c = sercom2.readDataUART();
+    if (Serial.dtr()) {
+      Serial.print("received: ");
+      Serial.println((char)c);
+    }
+  }
+
 #ifdef ENABLE_USB_SERIAL
   static uint8_t serial_active = 0;
   static unsigned long serial_active_when = 0;

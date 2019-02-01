@@ -213,7 +213,7 @@ uint32_t read_serial_byte() {
 __attribute__((section(".ramfunc")))
 void reflect_serial_port() {
   volatile uint8_t *pixptr = SCREEN_END;
-  uint8_t debug_byte = 0;
+  uint8_t debug_byte = 32;
   uint8_t white = 128;
 
   setup_bitbang_uart(UART_FULL_BIT_TIME);
@@ -226,13 +226,14 @@ void reflect_serial_port() {
     if (pixptr >= SCREEN_ADDR(0, 200)) {
       pixptr = SCREEN_ADDR(0, 100);
       ++white;
-      write_serial_byte((debug_byte % 2) ? 0x55 : 0xaa);
+      write_serial_byte(debug_byte);
       ++debug_byte;
+      if (debug_byte > 126) debug_byte = 32;
     }
-    // *pixptr++ = b ? white : BLACK;  // serial input status
-    int tm1_active = IOC_TM1 ? 1 : 0;
-    if (tm1_active) IOC_CLEAR_TM1();
-    *pixptr++ = tm1_active ? white : BLACK;  // TM1 interrupt status
+    *pixptr++ = b ? white : BLACK;  // serial input status
+    // int tm1_active = IOC_TM1 ? 1 : 0;
+    // if (tm1_active) IOC_CLEAR_TM1();
+    // *pixptr++ = tm1_active ? white : BLACK;  // TM1 interrupt status
   }
 }
 
