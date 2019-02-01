@@ -53,4 +53,6 @@ switcher.elf: $(SWITCHER_OBJS)
 	arm-none-eabi-objdump -S --disassemble switcher.elf > switcher.list
 
 %.bin: %.elf
+	arm-none-eabi-size $<
 	$(OBJCOPY) -O binary $< $@
+	ls -al $@
