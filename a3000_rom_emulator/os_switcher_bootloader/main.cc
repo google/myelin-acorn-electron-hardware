@@ -17,7 +17,6 @@
 // working, and everything necessary to execute C++ code has been done.
 
 #include <stdint.h>
-
 #include "arcregs.h"
 
 #define BUF_SIZE 512
