@@ -1,0 +1,43 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+A21
+- Value: 
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
+
+A3KROM1
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip32_rom
+
+A3KROM2
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip32_rom_data_only
+
+A3KROM3
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip32_rom_data_only
+
+A3KROM4
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip32_rom_data_only
+
+OE
+- Value: 
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
+
+RPCROM1
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 42-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip42_rom
+
+RPCROM2
+- Value: ROM header
+- Description: Adapter to emulate a 600mil 42-pin DIP, e.g. Digikey ???
+- KiCad package: myelin-kicad:dip42_rom
+
