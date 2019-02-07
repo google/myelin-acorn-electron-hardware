@@ -237,6 +237,16 @@ a21_pin = myelin_kicad_pcb.Component(
     pins=[Pin(1, "nOE", "nOE")],
 )
 
+staples = [
+    myelin_kicad_pcb.Component(
+        footprint="myelin-kicad:via_single",
+        identifier="staple_single%d" % (n+1),
+        value="",
+        pins=[Pin(1, "GND", ["GND"])],
+    )
+    for n in range(70)
+]
+
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",

@@ -3,9 +3,9 @@
   (general
     (thickness 1.6)
     (drawings 20)
-    (tracks 599)
+    (tracks 600)
     (zones 0)
-    (modules 8)
+    (modules 78)
     (nets 57)
   )
 
@@ -448,7 +448,7 @@
     )
   )
 
-  (module myelin-kicad:dip42_rom (layer F.Cu) (tedit 5C583AC8) (tstamp 5C5B58FF)
+  (module myelin-kicad:dip42_rom (layer F.Cu) (tedit 5C583AC8) (tstamp 5C5CC7D6)
     (at 131.2926 137.23366 270)
     (fp_text reference RPCROM1 (at -23.02256 -3.32994 270) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
@@ -650,6 +650,916 @@
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
     )
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC326)
+    (at 178.8414 62.52972)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single1 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC5D8)
+    (at 149.29104 62.26302)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single2 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC330)
+    (at 175.58512 73.43902)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single3 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC335)
+    (at 144.17802 69.83222)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single4 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC33A)
+    (at 141.00556 71.32066)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single5 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC33F)
+    (at 138.25728 62.47638)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single6 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC344)
+    (at 152.50922 75.2348)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single7 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC349)
+    (at 177.93462 92.5322)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single8 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC34E)
+    (at 172.7454 95.90532)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single9 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC353)
+    (at 177.85588 134.10692)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single10 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC358)
+    (at 157.99054 68.03136)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single11 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC35D)
+    (at 175.47844 94.1324)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single12 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC362)
+    (at 175.44034 87.70874)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single13 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC367)
+    (at 166.23538 152.57018)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single14 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC36C)
+    (at 141.53134 139.70508)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single15 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC371)
+    (at 176.50968 82.6262)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single16 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC376)
+    (at 169.41292 88.39962)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single17 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC37B)
+    (at 165.9763 156.31414)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single18 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC380)
+    (at 178.50104 148.05152)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single19 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC385)
+    (at 127.06096 149.65426)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single20 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC38A)
+    (at 170.0403 97.52838)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single21 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC38F)
+    (at 175.01616 110.8075)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single22 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC394)
+    (at 168.81856 109.96676)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single23 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC399)
+    (at 141.58214 152.3873)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single24 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC39E)
+    (at 135.56742 149.65426)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single25 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3A3)
+    (at 172.92574 87.9602)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single26 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3A8)
+    (at 178.05146 115.26266)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single27 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3AD)
+    (at 141.478 160.06826)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single28 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3B2)
+    (at 141.53134 142.12824)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single29 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3B7)
+    (at 135.65124 142.0241)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single30 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3BC)
+    (at 167.4622 118.36146)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single31 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3C1)
+    (at 127.14224 154.91968)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single32 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3C6)
+    (at 141.58214 147.1295)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single33 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3CB)
+    (at 127.06096 147.2311)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single34 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3D0)
+    (at 126.94158 139.2936)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single35 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3D5)
+    (at 141.53134 157.49016)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single36 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3DA)
+    (at 141.4272 149.96414)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single37 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3DF)
+    (at 135.60298 139.49934)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single38 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3E4)
+    (at 135.65124 144.653)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single39 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3E9)
+    (at 126.94158 142.07744)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single40 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3EE)
+    (at 141.4272 155.067)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single41 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3F3)
+    (at 141.63294 144.80794)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single42 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3F8)
+    (at 127.06858 144.6022)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single43 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC3FD)
+    (at 135.67156 147.1803)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single44 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC402)
+    (at 130.71856 157.35046)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single45 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC407)
+    (at 135.77316 154.86126)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single46 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC40C)
+    (at 127.06096 152.28316)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single47 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC411)
+    (at 127.22098 159.98444)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single48 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC416)
+    (at 135.72236 152.23236)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single49 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CC41B)
+    (at 127.22352 110.47476)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single50 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCCEB)
+    (at 167.64 94.86)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single51 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCCF0)
+    (at 170.21 123.15)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single52 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCCF5)
+    (at 147.7 83.73)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single53 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCEBF)
+    (at 160.71 97.84)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single54 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCCFF)
+    (at 159.07 94.73)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single55 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD04)
+    (at 162.6235 76.09332)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single56 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD09)
+    (at 141.25 121.97)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single57 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD0E)
+    (at 141.28 125.09)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single58 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD13)
+    (at 163.27 158.29)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single59 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD18)
+    (at 147.193 68.08724)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single60 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD1D)
+    (at 160.17 103.52)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single61 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD22)
+    (at 159.2 90.17)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single62 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD27)
+    (at 146.81 114.57)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single63 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD2C)
+    (at 170.307 76.86802)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single64 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD31)
+    (at 144.98 92.78)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single65 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD36)
+    (at 152.53 95.55)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single66 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD3B)
+    (at 147.7 86.61)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single67 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD40)
+    (at 167.78986 69.37756)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single68 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD45)
+    (at 143.54 98.07)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single69 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
+  )
+
+  (module myelin-kicad:via_single (layer F.Cu) (tedit 0) (tstamp 5C5CCD4A)
+    (at 147.61 97.84)
+    (descr "Via array for stapling planes together")
+    (fp_text reference staple_single70 (at 0 -1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (fp_text value "" (at 0 1) (layer F.SilkS) hide
+      (effects (font (size 1 1) (thickness 0.15)))
+    )
+    (pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu)
+      (net 1 GND) (zone_connect 2))
   )
 
   (gr_arc (start 122.555 161.925) (end 121.92 161.925) (angle -90) (layer Edge.Cuts) (width 0.1))
@@ -930,12 +1840,13 @@
   (segment (start 141.15542 62.41542) (end 141.15542 65.45072) (width 0.1778) (layer F.Cu) (net 20))
   (segment (start 139.7 66.90614) (end 139.7 80.01) (width 0.1778) (layer F.Cu) (net 20))
   (segment (start 140.97 62.23) (end 141.15542 62.41542) (width 0.1778) (layer F.Cu) (net 20))
+  (segment (start 142.24 65.90137) (end 142.24 64.77) (width 0.1778) (layer B.Cu) (net 21))
   (segment (start 142.24 73.110848) (end 142.24 65.90137) (width 0.1778) (layer B.Cu) (net 21))
+  (segment (start 144.26 109.02626) (end 144.26 83.5272) (width 0.1778) (layer B.Cu) (net 21))
+  (segment (start 144.26 83.5272) (end 146.20748 81.57972) (width 0.1778) (layer B.Cu) (net 21))
   (segment (start 146.20748 81.57972) (end 146.20748 77.078328) (width 0.1778) (layer B.Cu) (net 21))
   (segment (start 146.20748 77.078328) (end 142.24 73.110848) (width 0.1778) (layer B.Cu) (net 21))
-  (segment (start 143.9926 83.7946) (end 146.20748 81.57972) (width 0.1778) (layer B.Cu) (net 21))
-  (segment (start 142.24 65.90137) (end 142.24 64.77) (width 0.1778) (layer B.Cu) (net 21))
-  (segment (start 143.9926 109.29366) (end 143.9926 83.7946) (width 0.1778) (layer B.Cu) (net 21))
+  (segment (start 143.9926 109.29366) (end 144.26 109.02626) (width 0.1778) (layer B.Cu) (net 21))
   (segment (start 146.06016 75.68184) (end 146.06016 66.05016) (width 0.1778) (layer B.Cu) (net 22))
   (segment (start 143.9926 111.83366) (end 145.70202 110.12424) (width 0.1778) (layer B.Cu) (net 22))
   (segment (start 148.7932 81.17332) (end 148.7932 78.41488) (width 0.1778) (layer B.Cu) (net 22))
@@ -1289,7 +2200,7 @@
   (segment (start 151.226619 92.27566) (end 161.163 82.339279) (width 0.1778) (layer B.Cu) (net 56))
   (segment (start 149.11578 134.65048) (end 149.11578 125.36678) (width 0.1778) (layer B.Cu) (net 56))
 
-  (zone (net 1) (net_name GND) (layer F.Cu) (tstamp 5C5CBFC1) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer F.Cu) (tstamp 5C5CCEF1) (hatch edge 0.508)
     (connect_pads (clearance 0.1778))
     (min_thickness 0.1778)
     (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
@@ -2196,8 +3107,21 @@
         (xy 158.918624 61.2767)
       )
     )
+    (filled_polygon
+      (pts
+        (xy 139.848076 61.38) (xy 139.848076 63.08) (xy 139.868775 63.184061) (xy 139.927721 63.272279) (xy 140.015939 63.331225)
+        (xy 140.12 63.351924) (xy 140.79982 63.351924) (xy 140.799821 65.303424) (xy 139.473315 66.629931) (xy 139.443627 66.649768)
+        (xy 139.423791 66.679455) (xy 139.42379 66.679456) (xy 139.365033 66.767393) (xy 139.337434 66.90614) (xy 139.3444 66.94116)
+        (xy 139.344401 79.002706) (xy 139.095763 79.105695) (xy 138.988899 79.212559) (xy 138.988899 66.756296) (xy 139.908496 65.8367)
+        (xy 139.91218 65.8367) (xy 140.304237 65.674305) (xy 140.604305 65.374237) (xy 140.7667 64.98218) (xy 140.7667 64.55782)
+        (xy 140.604305 64.165763) (xy 140.304237 63.865695) (xy 139.91218 63.7033) (xy 139.48782 63.7033) (xy 139.095763 63.865695)
+        (xy 138.795695 64.165763) (xy 138.6333 64.55782) (xy 138.6333 64.561504) (xy 137.512401 65.682404) (xy 137.4767 65.706259)
+        (xy 137.4767 61.626192) (xy 137.506661 61.475565) (xy 137.574315 61.374315) (xy 137.675565 61.306661) (xy 137.826193 61.2767)
+        (xy 139.868624 61.2767)
+      )
+    )
   )
-  (zone (net 1) (net_name GND) (layer B.Cu) (tstamp 5C5CBFBE) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer B.Cu) (tstamp 5C5CCEEE) (hatch edge 0.508)
     (connect_pads (clearance 0.1778))
     (min_thickness 0.1778)
     (fill yes (arc_segments 16) (thermal_gap 0.508) (thermal_bridge_width 0.508))
@@ -3048,20 +3972,20 @@
         (xy 139.9793 114.58584) (xy 139.9793 114.16148) (xy 139.876311 113.912843) (xy 143.000088 110.789067) (xy 143.029772 110.769233)
         (xy 143.049607 110.739548) (xy 143.04961 110.739545) (xy 143.108367 110.651608) (xy 143.135966 110.51286) (xy 143.129 110.47784)
         (xy 143.129 109.938602) (xy 143.388363 110.197965) (xy 143.78042 110.36036) (xy 144.20478 110.36036) (xy 144.596837 110.197965)
-        (xy 144.896905 109.897897) (xy 145.0593 109.50584) (xy 145.0593 109.08148) (xy 144.896905 108.689423) (xy 144.596837 108.389355)
-        (xy 144.3482 108.286366) (xy 144.3482 83.941894) (xy 146.434165 81.855929) (xy 146.463852 81.836093) (xy 146.542447 81.718468)
-        (xy 146.56308 81.61474) (xy 146.56308 81.614736) (xy 146.570045 81.579721) (xy 146.56308 81.544706) (xy 146.56308 80.761622)
-        (xy 146.715763 80.914305) (xy 147.10782 81.0767) (xy 147.53218 81.0767) (xy 147.924237 80.914305) (xy 148.224305 80.614237)
-        (xy 148.3867 80.22218) (xy 148.3867 79.79782) (xy 148.224305 79.405763) (xy 147.924237 79.105695) (xy 147.53218 78.9433)
-        (xy 147.10782 78.9433) (xy 146.715763 79.105695) (xy 146.56308 79.258378) (xy 146.56308 77.113347) (xy 146.570046 77.078327)
-        (xy 146.542447 76.93958) (xy 146.48369 76.851643) (xy 146.483689 76.851642) (xy 146.463853 76.821955) (xy 146.434166 76.802119)
-        (xy 142.5956 72.963554) (xy 142.5956 65.777294) (xy 142.844237 65.674305) (xy 143.144305 65.374237) (xy 143.3067 64.98218)
-        (xy 143.3067 64.55782) (xy 143.144305 64.165763) (xy 142.844237 63.865695) (xy 142.45218 63.7033) (xy 142.02782 63.7033)
-        (xy 141.635763 63.865695) (xy 141.335695 64.165763) (xy 141.1733 64.55782) (xy 141.1733 64.98218) (xy 141.335695 65.374237)
-        (xy 141.635763 65.674305) (xy 141.8844 65.777294) (xy 141.8844 65.936389) (xy 141.884401 65.936394) (xy 141.8844 73.075828)
-        (xy 141.877434 73.110848) (xy 141.8844 73.145867) (xy 141.905033 73.249595) (xy 141.983627 73.36722) (xy 142.013315 73.387057)
-        (xy 145.851881 77.225624) (xy 145.85188 81.432426) (xy 143.765915 83.518391) (xy 143.736228 83.538227) (xy 143.716392 83.567914)
-        (xy 143.71639 83.567916) (xy 143.657633 83.655853) (xy 143.630034 83.7946) (xy 143.637001 83.829625) (xy 143.637 108.286366)
+        (xy 144.896905 109.897897) (xy 145.0593 109.50584) (xy 145.0593 109.08148) (xy 144.896905 108.689423) (xy 144.6156 108.408118)
+        (xy 144.6156 83.674494) (xy 146.434168 81.855927) (xy 146.463852 81.836093) (xy 146.483687 81.806408) (xy 146.48369 81.806405)
+        (xy 146.542447 81.718468) (xy 146.570046 81.57972) (xy 146.56308 81.5447) (xy 146.56308 80.761622) (xy 146.715763 80.914305)
+        (xy 147.10782 81.0767) (xy 147.53218 81.0767) (xy 147.924237 80.914305) (xy 148.224305 80.614237) (xy 148.3867 80.22218)
+        (xy 148.3867 79.79782) (xy 148.224305 79.405763) (xy 147.924237 79.105695) (xy 147.53218 78.9433) (xy 147.10782 78.9433)
+        (xy 146.715763 79.105695) (xy 146.56308 79.258378) (xy 146.56308 77.113347) (xy 146.570046 77.078327) (xy 146.542447 76.93958)
+        (xy 146.48369 76.851643) (xy 146.483689 76.851642) (xy 146.463853 76.821955) (xy 146.434166 76.802119) (xy 142.5956 72.963554)
+        (xy 142.5956 65.777294) (xy 142.844237 65.674305) (xy 143.144305 65.374237) (xy 143.3067 64.98218) (xy 143.3067 64.55782)
+        (xy 143.144305 64.165763) (xy 142.844237 63.865695) (xy 142.45218 63.7033) (xy 142.02782 63.7033) (xy 141.635763 63.865695)
+        (xy 141.335695 64.165763) (xy 141.1733 64.55782) (xy 141.1733 64.98218) (xy 141.335695 65.374237) (xy 141.635763 65.674305)
+        (xy 141.8844 65.777294) (xy 141.8844 65.936389) (xy 141.884401 65.936394) (xy 141.8844 73.075828) (xy 141.877434 73.110848)
+        (xy 141.8844 73.145867) (xy 141.905033 73.249595) (xy 141.983627 73.36722) (xy 142.013315 73.387057) (xy 145.851881 77.225624)
+        (xy 145.85188 81.432425) (xy 144.033315 83.250991) (xy 144.003628 83.270827) (xy 143.983792 83.300514) (xy 143.98379 83.300516)
+        (xy 143.925033 83.388453) (xy 143.897434 83.5272) (xy 143.904401 83.562225) (xy 143.9044 108.22696) (xy 143.78042 108.22696)
         (xy 143.388363 108.389355) (xy 143.129 108.648718) (xy 143.129 82.080074) (xy 143.934806 81.274269) (xy 143.96449 81.254435)
         (xy 143.984325 81.22475) (xy 143.984328 81.224747) (xy 144.043085 81.13681) (xy 144.070684 80.998062) (xy 144.063718 80.963042)
         (xy 144.063718 80.80226) (xy 144.175763 80.914305) (xy 144.56782 81.0767) (xy 144.99218 81.0767) (xy 145.384237 80.914305)
