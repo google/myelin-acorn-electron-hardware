@@ -213,6 +213,8 @@ rpc_headers = [
                 (41, "A8"),
                 (42, "A19"),  # NC on 27C800
             ]
+            if (rom_id == 0 and (pinid == 12 or pinid > 13))
+            or (rom_id == 1 and pinid < 32)
         ],
     )
     for machine in ["RPC"]
