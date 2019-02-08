@@ -244,7 +244,7 @@ staples = [
         value="",
         pins=[Pin(1, "GND", ["GND"])],
     )
-    for n in range(70)
+    for n in range(100)
 ]
 
 
