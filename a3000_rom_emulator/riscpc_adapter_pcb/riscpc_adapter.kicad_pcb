@@ -2,7 +2,7 @@
 
   (general
     (thickness 1.6)
-    (drawings 20)
+    (drawings 22)
     (tracks 598)
     (zones 0)
     (modules 108)
@@ -256,7 +256,7 @@
 
   (module myelin-kicad:dip42_rom (layer F.Cu) (tedit 5C583AC8) (tstamp 5C58A2C3)
     (at 151.6126 137.23366 270)
-    (fp_text reference RPCROM2 (at -23.08606 -3.38074 270) (layer F.SilkS)
+    (fp_text reference RPCROM2 (at 22.87634 -1.7974) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value "ROM header" (at 0 -0.5 270) (layer F.Fab)
@@ -448,9 +448,9 @@
     )
   )
 
-  (module myelin-kicad:dip42_rom (layer F.Cu) (tedit 5C583AC8) (tstamp 5C5CC7D6)
+  (module myelin-kicad:dip42_rom (layer F.Cu) (tedit 5C583AC8) (tstamp 5C5CD566)
     (at 131.2926 137.23366 270)
-    (fp_text reference RPCROM1 (at -23.02256 -3.32994 270) (layer F.SilkS)
+    (fp_text reference RPCROM1 (at 22.76634 -1.6074 180) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value "ROM header" (at 0 -0.5 270) (layer F.Fab)
@@ -1952,6 +1952,12 @@
       (net 1 GND) (zone_connect 2))
   )
 
+  (gr_text "Plug in to\nRisc PC\nROM 1\nsocket" (at 151.64 113.6 270) (layer F.SilkS) (tstamp 5C5CD430)
+    (effects (font (size 1 1) (thickness 0.2)))
+  )
+  (gr_text "Plug in to\nRisc PC\nROM 2\nsocket" (at 131.17 113.6 270) (layer F.SilkS) (tstamp 5C5CD38C)
+    (effects (font (size 1 1) (thickness 0.2)))
+  )
   (gr_arc (start 122.555 161.925) (end 121.92 161.925) (angle -90) (layer Edge.Cuts) (width 0.1))
   (gr_arc (start 122.555 107.315) (end 122.555 106.68) (angle -90) (layer Edge.Cuts) (width 0.1) (tstamp 5C5B5E21))
   (gr_line (start 180.34 149.225) (end 167.005 162.56) (layer Edge.Cuts) (width 0.1))
@@ -1962,7 +1968,7 @@
   (gr_text http://myelin.nz/acorn/rpca3krom (at 160.02 93.345) (layer B.SilkS) (tstamp 5C332CBE)
     (effects (font (size 1 1) (thickness 0.2)) (justify mirror))
   )
-  (gr_text http://myelin.nz/acorn/rpca3krom (at 130.29184 139.21486 90) (layer F.SilkS)
+  (gr_text http://myelin.nz/acorn/rpca3krom (at 131.31 140.14 270) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.2)))
   )
   (gr_text "A3000 IC17 (ROM 4)\nplugs in here" (at 169.23004 133.5024) (layer F.SilkS) (tstamp 5C33191E)
