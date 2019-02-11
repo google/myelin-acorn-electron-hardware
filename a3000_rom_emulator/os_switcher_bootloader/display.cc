@@ -15,6 +15,17 @@ void display_goto(int x, int y) {
 void display_print(const char* s) {
 	for (const uint8_t *sptr = (const uint8_t *)s; *sptr; sptr++) {
 		int c = *sptr;
+
+		switch (c) {
+			case '\r':
+				display_x = 0;
+				continue;
+			case '\n':
+				display_x = 0;
+				display_y += 8;
+				continue;
+		}
+
 		const uint8_t *patternptr = &riscos_font[8 * c];
 		volatile uint8_t *displayptr = SCREEN + display_x + display_y * 640;
 		for (int y = 0; y < 8; ++y) {
@@ -41,4 +52,29 @@ void display_print(const char* s) {
 			}
 		}
 	}
+}
+
+char hex_digit(int v) {
+	if (v < 10)
+		return '0' + v;
+	if (v < 16)
+		return 'A' + v - 10;
+	return 'X';
+}
+
+void display_print_hex(uint32_t v) {
+	char s[9];
+	int digits = 1;
+	while (digits < 8 && v > (1 << (digits * 4))) {
+		++digits;
+	}
+	uint32_t shift = (digits - 1) * 4;
+	uint32_t mask = 15 << shift;
+	for (int i = 0; i < digits; ++i) {
+		s[i] = hex_digit((v & mask) >> shift);
+		mask >>= 4;
+		shift -= 4;
+	}
+	s[digits] = 0;
+	display_print(s);
 }

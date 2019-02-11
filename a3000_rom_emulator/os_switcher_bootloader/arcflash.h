@@ -10,3 +10,4 @@
 #define SCREEN_END SCREEN_ADDR(WIDTH, HEIGHT)
 extern void display_goto(int x, int y);
 extern void display_print(const char* s);
+extern void display_print_hex(uint32_t v);
