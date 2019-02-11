@@ -16,8 +16,7 @@
 // Main C++ entrypoint.  By the time this is called, we know the memory is
 // working, and everything necessary to execute C++ code has been done.
 
-#include <stdint.h>
-#include "arcregs.h"
+#include "arcflash.h"
 
 #define BUF_SIZE 512
 uint32_t buf[BUF_SIZE];
@@ -63,8 +62,7 @@ static void setup_bitbang_uart(bool half_time) {
   // half_time is used when reading the start bit
   if (half_time == UART_HALF_BIT_TIME) uart_timer >>= 1;
 
-  IOC_TIMER1_HIGH = (uart_timer & 0xFF00) << 8;
-  IOC_TIMER1_LOW = (uart_timer & 0xFF) << 16;
+  SETUP_IOC_TIMER1(uart_timer);
 }
 
 __attribute__((section(".ramfunc")))
@@ -202,13 +200,6 @@ uint32_t read_serial_byte() {
   return data & 0xFF;
 }
 
-#define WIDTH 640
-#define HEIGHT 256
-#define WHITE 255
-#define BLACK 0
-#define SCREEN_ADDR(x, y) (SCREEN + (y) * WIDTH + (x))
-#define SCREEN_END SCREEN_ADDR(WIDTH, HEIGHT)
-
 __attribute__((section(".ramfunc")))
 void reflect_serial_port() {
   volatile uint8_t *pixptr = SCREEN_END;
@@ -249,6 +240,9 @@ extern "C" void main_program() {
       SCREEN[y * WIDTH + x] = c++;
     }
   }
+
+  display_goto(50, 24);
+  display_print("let's get started!");
 
   // TODO init IOC and check keyboard
 

@@ -98,6 +98,10 @@ static void write_memc(
 
 // IRQ B
 #define IOC_IRQ_STATUS_B  IOC_REG(0x20)
+#define IOC_IRQ_STATUS_B_TX_EMPTY (1 << 6)
+#define IOC_TX_EMPTY (IOC_IRQ_STATUS_B & IOC_IRQ_STATUS_B_TX_EMPTY)
+#define IOC_IRQ_STATUS_B_RX_FULL (1 << 5)
+#define IOC_RX_FULL (IOC_IRQ_STATUS_B & IOC_IRQ_STATUS_B_RX_FULL)
 #define IOC_IRQ_REQUEST_B IOC_REG(0x24)
 #define IOC_IRQ_MASK_B    IOC_REG(0x28)
 
@@ -117,6 +121,10 @@ static void write_memc(
 #define IOC_TIMER1_HIGH   IOC_REG(0x54)
 #define IOC_TIMER1_GO     IOC_REG(0x58)
 #define IOC_TIMER1_LATCH  IOC_REG(0x5c)
+#define SETUP_IOC_TIMER1(ticks) do { \
+    IOC_TIMER1_HIGH = ((ticks) & 0xFF00) << 8; \
+    IOC_TIMER1_LOW = ((ticks) & 0xFF) << 16; \
+  } while (0)
 
 // Timer 2: external BAUD pin
 #define IOC_TIMER2_LOW    IOC_REG(0x60)

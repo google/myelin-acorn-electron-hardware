@@ -46,7 +46,7 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 %.rom: %.bin
 	python pad_to_rom.py $< $@
 
-SWITCHER_OBJS=start.o cstartup.o main.o riscos_font.o cmos.o
+SWITCHER_OBJS=start.o cstartup.o main.o riscos_font.o cmos.o display.o
 
 switcher.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)

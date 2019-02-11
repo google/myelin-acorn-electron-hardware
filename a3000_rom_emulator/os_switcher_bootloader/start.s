@@ -244,7 +244,7 @@ plot_character:
     add plot_ptr, plot_ptr, display_x
     add plot_ptr, plot_ptr, #0x02000000
 
-    @  pattern = charno * 8 [charno<<3] + riscosfont
+    @  pattern = charno * 8 [charno<<3] + riscos_font
     lsl plot_pattern_ptr, r0, #3
     ldr plot_tmp, =riscos_font
     add plot_pattern_ptr, plot_pattern_ptr, plot_tmp
