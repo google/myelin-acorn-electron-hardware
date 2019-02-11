@@ -13,7 +13,8 @@
 # limitations under the License.
 
 AS = arm-none-eabi-as
-CC = arm-none-eabi-g++
+CCC = arm-none-eabi-g++
+CC = arm-none-eabi-gcc
 LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
 CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2
@@ -35,10 +36,10 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 	$(AS) -o $@ $<
 
 %.o: %.cc
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CCC) $(CFLAGS) -c -o $@ $<
 
 %.o: %.c
-	$(CCC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.elf: %.o
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--section-start=.text=0 -o $@ $<
@@ -46,7 +47,7 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 %.rom: %.bin
 	python pad_to_rom.py $< $@
 
-SWITCHER_OBJS=start.o cstartup.o main.o riscos_font.o cmos.o display.o
+SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o
 
 switcher.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)

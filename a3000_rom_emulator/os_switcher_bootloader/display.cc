@@ -1,6 +1,6 @@
 #include "arcflash.h"
 
-static int display_x = 0, display_y = 0;
+int display_x = 0, display_y = 0;
 
 // riscosfont is defined in third_party/riscos/riscos_font.s
 extern "C" {

@@ -71,12 +71,14 @@ static void write_memc(
 #define IOC_CTRL          IOC_REG(0x00)
 // KART serial TX/RX
 #define IOC_SERIAL        IOC_REG(0x04)
+#define IOC_SERIAL_TX(v) do { IOC_SERIAL = (v) << 16; } while (0)
 
 // IRQ A
 #define IOC_IRQ_STATUS_A  IOC_REG(0x10)
 #define IOC_IRQ_STATUS_A_TM1 (1 << 6)
 #define IOC_TM1 (IOC_IRQ_STATUS_A & IOC_IRQ_STATUS_A_TM1)
 #define IOC_IRQ_STATUS_A_TM0 (1 << 5)
+#define IOC_TM0 (IOC_IRQ_STATUS_A & IOC_IRQ_STATUS_A_TM0)
 #define IOC_IRQ_STATUS_A_POR (1 << 4)
 #define IOC_IRQ_STATUS_A_IR  (1 << 3)
 #define IOC_IRQ_STATUS_A_TF  (1 << 2)
@@ -92,6 +94,7 @@ static void write_memc(
 #define IOC_IRQ_CLEAR_TM1 ((1 << 6) << 16)
 #define IOC_CLEAR_TM1()   do { IOC_IRQ_CLEAR = IOC_IRQ_CLEAR_TM1; } while (0)
 #define IOC_IRQ_CLEAR_TM0 ((1 << 5) << 16)
+#define IOC_CLEAR_TM0()   do { IOC_IRQ_CLEAR = IOC_IRQ_CLEAR_TM0; } while (0)
 #define IOC_IRQ_CLEAR_POR ((1 << 4) << 16)
 #define IOC_IRQ_CLEAR_IR  ((1 << 3) << 16)
 #define IOC_IRQ_CLEAR_TF  ((1 << 2) << 16)
@@ -100,7 +103,7 @@ static void write_memc(
 #define IOC_IRQ_STATUS_B  IOC_REG(0x20)
 #define IOC_IRQ_STATUS_B_TX_EMPTY (1 << 6)
 #define IOC_TX_EMPTY (IOC_IRQ_STATUS_B & IOC_IRQ_STATUS_B_TX_EMPTY)
-#define IOC_IRQ_STATUS_B_RX_FULL (1 << 5)
+#define IOC_IRQ_STATUS_B_RX_FULL (1 << 7)
 #define IOC_RX_FULL (IOC_IRQ_STATUS_B & IOC_IRQ_STATUS_B_RX_FULL)
 #define IOC_IRQ_REQUEST_B IOC_REG(0x24)
 #define IOC_IRQ_MASK_B    IOC_REG(0x28)
@@ -115,15 +118,26 @@ static void write_memc(
 #define IOC_TIMER0_HIGH   IOC_REG(0x44)
 #define IOC_TIMER0_GO     IOC_REG(0x48)
 #define IOC_TIMER0_LATCH  IOC_REG(0x4c)
+#define SETUP_IOC_TIMER0(ticks) do { \
+    IOC_TIMER0_HIGH = ((ticks) & 0xFF00) << 8; \
+    IOC_TIMER0_LOW = ((ticks) & 0xFF) << 16; \
+  } while (0)
 
 // Timer 1: general purpose interval timer
 #define IOC_TIMER1_LOW    IOC_REG(0x50)
 #define IOC_TIMER1_HIGH   IOC_REG(0x54)
 #define IOC_TIMER1_GO     IOC_REG(0x58)
 #define IOC_TIMER1_LATCH  IOC_REG(0x5c)
+#define IOC_TICKS_PER_US 2
 #define SETUP_IOC_TIMER1(ticks) do { \
     IOC_TIMER1_HIGH = ((ticks) & 0xFF00) << 8; \
     IOC_TIMER1_LOW = ((ticks) & 0xFF) << 16; \
+  } while (0)
+#define IOC_DELAY_US(us) do { \
+    SETUP_IOC_TIMER1((us) * IOC_TICKS_PER_US); \
+    IOC_TIMER1_GO = 0; \
+    IOC_CLEAR_TM1(); \
+    while (!IOC_TM1); \
   } while (0)
 
 // Timer 2: external BAUD pin

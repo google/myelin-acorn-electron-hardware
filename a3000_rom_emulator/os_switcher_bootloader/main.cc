@@ -21,6 +21,9 @@
 #define BUF_SIZE 512
 uint32_t buf[BUF_SIZE];
 
+// Timer
+uint32_t _millis = 0;
+
 // disable interrupts by setting bits 26 (F) and 27 (I) in the PSR
 void disable_interrupts() {
   asm volatile (
@@ -201,7 +204,7 @@ uint32_t read_serial_byte() {
 }
 
 __attribute__((section(".ramfunc")))
-void reflect_serial_port() {
+void loop() {
   volatile uint8_t *pixptr = SCREEN_END;
   uint8_t debug_byte = 32;
   uint8_t white = 128;
@@ -210,6 +213,17 @@ void reflect_serial_port() {
   IOC_TIMER1_GO = 0;
 
   while (1) {
+    if (IOC_TM0) {
+      IOC_CLEAR_TM0();
+      _millis++;
+      // if (!(_millis % 1000)) {
+      //   display_goto(50, 32);
+      //   display_print_hex(_millis / 1000);
+      //   display_print("        ");
+      // }
+    }
+    keyboard_poll();
+
     int b = read_serial_rx();
     // write_serial_tx(b);  // DEBUG disabled this so i can see the write_serial_byte output (and tweak the NOPs to work at 8MHz)
     // output to screen
@@ -233,6 +247,10 @@ extern "C" void main_program() {
   // VIDCR = 0x40000F00L;  // blue
   VIDCR = 0x40000777L;  // grey
 
+  // Set up IOC timer0 to tick at 1 kHz (1 ms)
+  SETUP_IOC_TIMER0(IOC_TICKS_PER_US * 1000);
+  IOC_TIMER0_GO = 0;
+
   // Draw something on screen
   uint8_t c = 0;
   for (uint32_t y = 24; y < HEIGHT; ++y) {
@@ -242,7 +260,7 @@ extern "C" void main_program() {
   }
 
   display_goto(50, 24);
-  display_print("let's get started!");
+  display_print("let's get started! ");
 
   // TODO init IOC and check keyboard
 
@@ -278,5 +296,5 @@ extern "C" void main_program() {
   //       [white] "r" (white)
   //     : "r0", "r1");
   // }
-  reflect_serial_port();
+  loop();
 }
