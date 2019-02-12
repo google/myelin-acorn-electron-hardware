@@ -82,14 +82,19 @@ void keyboard_init() {
     // From the VL86C410 databook: baud rate 31250 Hz is set with latch=1
     IOC_TIMER3_HIGH = 0;
     IOC_TIMER3_LOW = 1;
-    IOC_TIMER3_GO = 0;
 
-    // Read receive line to clear any outstanding interrupt
-    (void)IOC_SERIAL;
+    // Read receive line to clear any outstanding interrupt. This doesn't seem
+    // to be necessary on my A3000, and for some reason prevents the keyboard
+    // from working in Arculator, so it's commented out for now.  (And the
+    // interrupt will be handled later by keyboard_poll() anyway).
+
+    // (void)IOC_SERIAL;
 
     // Send hardware reset
-    IOC_SERIAL_TX(HRST);
-    keyboard_state = KEYBOARD_RESET;
+    IOC_SERIAL = 0;
+
+    // Set state to undetermined / initialization
+    keyboard_state = KEYBOARD_INIT;
 }
 
 __attribute__((section(".ramfunc")))
@@ -108,9 +113,9 @@ __attribute__((section(".ramfunc")))  // so this can run while ROM is inaccessib
 void keyboard_poll() {
     if (!IOC_RX_FULL) {
         // Are we stalled in the reset process?
-        if (keyboard_state < KEYBOARD_IDLE && ((millis() - keyboard_last_comms) > 1000)) {
-            IOC_SERIAL_TX(HRST);
-            keyboard_set_state(KEYBOARD_RESET);
+        if (keyboard_state < KEYBOARD_IDLE && ((millis() - keyboard_last_comms) > 500)) {
+            IOC_SERIAL_TX(0);
+            keyboard_set_state(KEYBOARD_INIT);
             keyboard_last_comms = millis();
         }
         // Otherwise we're good

@@ -68,8 +68,6 @@ static void write_memc(
 // La6:2 = IOC A
 
 // IOC internal registers.
-// Note that when writing to IOC, D23:16 are connected to Bd7:0, so everything needs
-// to be left-shifted 16 bits.
 #define IOC_REG(addr) REG_ADDRB(IOC_BASE | IOC_CS | IOC_T_FAST | IOC_B_INTERNAL | ((addr) & 0x7C))
 
 // Control register

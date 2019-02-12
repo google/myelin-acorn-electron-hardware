@@ -292,6 +292,9 @@ extern "C" void main_program() {
   SETUP_IOC_TIMER0(IOC_TICKS_PER_US * 1000);
   IOC_TIMER0_GO = 0;
 
+  // Initialize keyboard (IOC timer3 etc)
+  keyboard_init();
+
   // Draw something on screen
   uint8_t c = 0;
   for (uint32_t y = 24; y < HEIGHT; ++y) {

@@ -22,6 +22,7 @@ extern void display_print_hex(uint32_t v);
 
 // keyboard.cc
 extern int mouse_x, mouse_y;
+extern void keyboard_init();
 extern void keyboard_poll();
 
 // Top row - esc, function keys, print/scroll/break
