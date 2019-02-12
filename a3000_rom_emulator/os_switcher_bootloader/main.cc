@@ -16,6 +16,10 @@
 // Main C++ entrypoint.  By the time this is called, we know the memory is
 // working, and everything necessary to execute C++ code has been done.
 
+// Most of the functions here are placed in .ramfunc so they can run while the
+// flash is inaccessible (i.e. when it's being updated, or when we're
+// switching banks).
+
 #include "arcflash.h"
 
 #define BUF_SIZE 512
@@ -53,6 +57,7 @@ void setup_keyboard() {
 
 #define UART_HALF_BIT_TIME true
 #define UART_FULL_BIT_TIME false
+__attribute__((section(".ramfunc")))
 static void setup_bitbang_uart(bool half_time) {
   // Set IOC timer period to support bit-banged UART operation.
 
@@ -204,6 +209,22 @@ uint32_t read_serial_byte() {
 }
 
 __attribute__((section(".ramfunc")))
+void timer_poll() {
+    if (IOC_TM0) {
+      IOC_CLEAR_TM0();
+      _millis++;
+    }
+}
+
+__attribute__((section(".ramfunc")))
+void delay(int ms) {
+  uint32_t start = millis();
+  while ((millis() - start) < ms) {
+    timer_poll();
+  }
+}
+
+__attribute__((section(".ramfunc")))
 void loop() {
   volatile uint8_t *pixptr = SCREEN_END;
   uint8_t debug_byte = 32;
@@ -213,15 +234,7 @@ void loop() {
   IOC_TIMER1_GO = 0;
 
   while (1) {
-    if (IOC_TM0) {
-      IOC_CLEAR_TM0();
-      _millis++;
-      // if (!(_millis % 1000)) {
-      //   display_goto(50, 32);
-      //   display_print_hex(_millis / 1000);
-      //   display_print("        ");
-      // }
-    }
+    timer_poll();
     keyboard_poll();
 
     int b = read_serial_rx();
@@ -239,6 +252,41 @@ void loop() {
     // if (tm1_active) IOC_CLEAR_TM1();
     // *pixptr++ = tm1_active ? white : BLACK;  // TM1 interrupt status
   }
+}
+
+__attribute__((section(".ramfunc")))
+void keyboard_keydown(uint8_t keycode) {
+  char c = 0;
+  switch (keycode) {
+    case KEY_1: c = '1'; break;
+    case KEY_2: c = '2'; break;
+    case KEY_3: c = '3'; break;
+    case KEY_4: c = '4'; break;
+    case KEY_5: c = '5'; break;
+    case KEY_6: c = '6'; break;
+    case KEY_7: c = '7'; break;
+    case KEY_8: c = '8'; break;
+    case KEY_9: c = '9'; break;
+    case KEY_0: c = '0'; break;
+  }
+
+  if (c) {
+    // TODO turn this into a proper keyboard handler, but for now assume a
+    // keydown on 0-9 is to select an OS to boot
+    display_goto(48, 64);
+    display_print("Selected OS ");
+    display_print_char(c);
+    while (1) {
+      write_serial_byte('*');
+      write_serial_byte(c);
+      delay(500);
+    }
+  }
+}
+
+__attribute__((section(".ramfunc")))
+void keyboard_keyup(uint8_t keycode) {
+  // ignore
 }
 
 extern "C" void main_program() {
@@ -259,8 +307,9 @@ extern "C" void main_program() {
     }
   }
 
-  display_goto(50, 24);
-  display_print("let's get started! ");
+  display_goto(0, 32);
+  display_print("Hit 0-9 to select OS to switch to, then hit RESET to boot into it.  "
+                "(Currently we have no serial RX so there's no way to confirm that the flash bank has been selected.)");
 
   // TODO init IOC and check keyboard
 

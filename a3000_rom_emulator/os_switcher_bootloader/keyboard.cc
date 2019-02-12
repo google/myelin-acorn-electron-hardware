@@ -62,7 +62,7 @@ int mouse_x = WIDTH / 2, mouse_y = HEIGHT / 2;
 // ARM->KB NOP
 #define PRST 0x21
 
-static enum {
+static enum keyboard_state_t {
     KEYBOARD_INIT = 0,
     KEYBOARD_RESET,
     KEYBOARD_RESET_1,
@@ -87,12 +87,26 @@ void keyboard_init() {
     keyboard_state = KEYBOARD_RESET;
 }
 
+__attribute__((section(".ramfunc")))
+void keyboard_set_state(keyboard_state_t state) {
+    if (keyboard_state < KEYBOARD_IDLE && state >= KEYBOARD_IDLE) {
+        display_goto(50, HEIGHT-8);
+        display_print("KB OK");
+    } else if (state < KEYBOARD_IDLE) {
+        display_goto(50, HEIGHT-8);
+        display_print("KB ??");
+    }
+    keyboard_state = state;
+}
+
+__attribute__((section(".ramfunc")))  // so this can run while ROM is inaccessible
 void keyboard_poll() {
     if (!IOC_RX_FULL) {
         // Are we stalled in the reset process?
         if (keyboard_state < KEYBOARD_IDLE && ((millis() - keyboard_last_comms) > 1000)) {
             IOC_SERIAL_TX(HRST);
-            keyboard_state = KEYBOARD_RESET;
+            keyboard_set_state(KEYBOARD_RESET);
+            keyboard_last_comms = millis();
         }
         // Otherwise we're good
         return;
@@ -115,33 +129,40 @@ void keyboard_poll() {
     // Expect RAK2
     // Send SMAK (enable keyboard and mouse)
 
+    // debug
+    display_print_hex(keyboard_state);
+    display_print(" ");
+    display_print_hex(data);
+    display_print(" ");
+
+
     // Handle reset commands at all times
     switch (data) {
         case HRST:
             if (keyboard_state == KEYBOARD_RESET) {
                 IOC_SERIAL_TX(RAK1);
-                keyboard_state = KEYBOARD_RESET_1;
+                keyboard_set_state(KEYBOARD_RESET_1);
             } else {
                 IOC_SERIAL_TX(HRST);
-                keyboard_state = KEYBOARD_RESET;
+                keyboard_set_state(KEYBOARD_RESET);
             }
             return;
         case RAK1:
             if (keyboard_state == KEYBOARD_RESET_1) {
                 IOC_SERIAL_TX(RAK2);
-                keyboard_state = KEYBOARD_RESET_2;
+                keyboard_set_state(KEYBOARD_RESET_2);
             } else {
                 IOC_SERIAL_TX(HRST);
-                keyboard_state = KEYBOARD_RESET;
+                keyboard_set_state(KEYBOARD_RESET);
             }
             return;
         case RAK2:
             if (keyboard_state == KEYBOARD_RESET_2) {
                 IOC_SERIAL_TX(SMAK);
-                keyboard_state = KEYBOARD_IDLE;
+                keyboard_set_state(KEYBOARD_IDLE);
             } else {
                 IOC_SERIAL_TX(HRST);
-                keyboard_state = KEYBOARD_RESET;
+                keyboard_set_state(KEYBOARD_RESET);
             }
             return;
         default:
@@ -167,7 +188,7 @@ void keyboard_poll() {
                 // KDDA, KUDA, or MDAT byte 1
                 keyboard_data[0] = data;
                 IOC_SERIAL_TX(BACK);
-                keyboard_state = KEYBOARD_READING_DAT2;
+                keyboard_set_state(KEYBOARD_READING_DAT2);
                 return;
             }
             // Fall through to reset at end of function
@@ -178,10 +199,10 @@ void keyboard_poll() {
                 // KDDA, KUDA, or MDAT byte 2
                 keyboard_data[1] = data;
                 IOC_SERIAL_TX(SMAK);
-                keyboard_state = KEYBOARD_IDLE;
-                // TODO handle keyboard_data
+                keyboard_set_state(KEYBOARD_IDLE);
+
                 if ((keyboard_data[0] & 0x80) == 0 && (keyboard_data[1] & 0x80) == 0) {
-                    // 7-bit mouse data.  Sign extend and add to our mouse position
+                    // MDAT: 2x7-bit mouse data.  Sign extend and add to our mouse position
                     mouse_x += ((int)keyboard_data[0] ^ 0x40) - 0x40;
                     mouse_y -= ((int)keyboard_data[1] ^ 0x40) - 0x40;
                     if (mouse_x < 0) mouse_x = 0;
@@ -192,13 +213,25 @@ void keyboard_poll() {
                     return;
                 }
 
-                // TODO handle other states, then change the return below to a break, to send HRST when
-                // we get mismatched data
+                if ((keyboard_data[0] & 0xf0) == 0xc0 && (keyboard_data[1] & 0xf0) == 0xc0) {
+                    // KDDA: 2x4-bit key down code
+                    uint8_t keycode = ((keyboard_data[0] & 0x0f) << 4) | (keyboard_data[1] & 0x0f);
+                    keyboard_keydown(keycode);
+                    return;
+                }
+
+                if ((keyboard_data[0] & 0xf0) == 0xd0 && (keyboard_data[1] & 0xf0) == 0xd0) {
+                    // KUDA: 2x4-bit key up code
+                    uint8_t keycode = ((keyboard_data[0] & 0x0f) << 4) | (keyboard_data[1] & 0x0f);
+                    keyboard_keyup(keycode);
+                    return;
+                }
+
+                // Unknown or mismatched 2-byte code - fall through to reset
                 display_print_hex(keyboard_state);
                 display_print(" ");
                 display_print_hex(data);
                 display_print(" ");
-                return;
             }
             // Fall through to reset at end of function
             break;
@@ -209,5 +242,5 @@ void keyboard_poll() {
 
     // Unknown case happened somewhere above: reset
     IOC_SERIAL_TX(HRST);
-    keyboard_state = KEYBOARD_RESET;
+    keyboard_set_state(KEYBOARD_RESET);
 }
