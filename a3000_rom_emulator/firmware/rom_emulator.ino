@@ -198,16 +198,27 @@ uint32_t flash_read(uint32_t A) {
   return D;
 }
 
+static uint8_t flash_bank = 0;
+
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
-  uint8_t flash_bank = 0;
-
   select_spi();
 
   // Reset allowing_arm_access to 1 in the CPLD
   CPLD_SS_CLEAR();
   spi_transfer(0x80 | flash_bank);
   CPLD_SS_SET();
+}
+
+// Select a particular flash bank
+void select_flash_bank(uint8_t bank) {
+  if (bank > 7) bank = 0;
+  flash_bank = bank;
+  if (Serial.dtr()) {
+    Serial.print("Selecting flash bank ");
+    Serial.println(flash_bank);
+  }
+  flash_unlock();
 }
 
 // Pulse NRESET on the flash chips
@@ -649,6 +660,16 @@ void loop() {
     if (Serial.dtr()) {
       Serial.print("received: ");
       Serial.println((char)c);
+    }
+
+    static int bitbang_serial_have_star = 0;
+    if (c == '*') {
+      bitbang_serial_have_star = 1;
+    } else {
+      if (c >= '0' && c <= '7' && bitbang_serial_have_star) {
+        select_flash_bank(c - '0');
+      }
+      bitbang_serial_have_star = 0;
     }
   }
 
