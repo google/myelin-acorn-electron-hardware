@@ -76,11 +76,16 @@ static uint32_t keyboard_last_comms = 0;
 static uint8_t keyboard_data[2];
 
 void keyboard_init() {
+    // TODO something is missing in here -- the keyboard only works after an OS has booted
+
     // Set up IOC TIMER3 to drive KART serial clock
     // From the VL86C410 databook: baud rate 31250 Hz is set with latch=1
     IOC_TIMER3_HIGH = 0;
     IOC_TIMER3_LOW = 1;
     IOC_TIMER3_GO = 0;
+
+    // Read receive line to clear any outstanding interrupt
+    (void)IOC_SERIAL;
 
     // Send hardware reset
     IOC_SERIAL_TX(HRST);

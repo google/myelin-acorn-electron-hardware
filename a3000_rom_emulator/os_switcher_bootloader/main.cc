@@ -48,13 +48,6 @@ void enable_interrupts() {
   );
 }
 
-void setup_keyboard() {
-  // Set timer3 (KART BAUD rate) at 31250 Hz
-  IOC_TIMER3_HIGH = 0 << 16;
-  IOC_TIMER3_LOW = 1 << 16;
-  IOC_TIMER3_GO = 0;
-}
-
 #define UART_HALF_BIT_TIME true
 #define UART_FULL_BIT_TIME false
 __attribute__((section(".ramfunc")))

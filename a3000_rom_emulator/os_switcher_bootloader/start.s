@@ -37,6 +37,16 @@ _start:
 in_rom_now_addr: .word in_rom_now
 
 in_rom_now:
+    @ Disable interrupts
+    teqp pc, #0x0c000003
+
+    @ Zero all IOC registers
+    ldr r1, =0
+    ldr r0, =0x3300000  @ IOC base, IOC CS, fast, IOC internal
+    str r1, [r0, #0x18]  @ IOC mask A
+    str r1, [r0, #0x28]  @ IOC mask B
+    str r1, [r0, #0x38]  @ IOC FIRQ mask
+
     @ Init MEMC
     @ RISC OS 3 writes the following for a 4MB machine:
     @ 036E000C: os mode off, sound off, video off, no refresh, slow roms, 32kB

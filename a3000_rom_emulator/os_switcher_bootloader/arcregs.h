@@ -15,7 +15,12 @@
 
 // Acorn A3000 era system registers
 
+// Word register; something to be accessed with LDR and STR
 #define REG_ADDR(addr) (*((volatile uint32_t *)(addr)))
+
+// Byte register, i.e. something accessed through the IOC, which connects to
+// D16-23 and is a pain to access wordwise, but easy with LDRB and STRB.
+#define REG_ADDRB(addr) (*((volatile uint8_t *)(addr)))
 
 ////////// MEMC REGISTERS //////////
 
@@ -65,13 +70,13 @@ static void write_memc(
 // IOC internal registers.
 // Note that when writing to IOC, D23:16 are connected to Bd7:0, so everything needs
 // to be left-shifted 16 bits.
-#define IOC_REG(addr) REG_ADDR(IOC_BASE | IOC_CS | IOC_T_FAST | IOC_B_INTERNAL | ((addr) & 0x7C))
+#define IOC_REG(addr) REG_ADDRB(IOC_BASE | IOC_CS | IOC_T_FAST | IOC_B_INTERNAL | ((addr) & 0x7C))
 
 // Control register
 #define IOC_CTRL          IOC_REG(0x00)
 // KART serial TX/RX
 #define IOC_SERIAL        IOC_REG(0x04)
-#define IOC_SERIAL_TX(v) do { IOC_SERIAL = (v) << 16; } while (0)
+#define IOC_SERIAL_TX(v) do { IOC_SERIAL = (v); } while (0)
 
 // IRQ A
 #define IOC_IRQ_STATUS_A  IOC_REG(0x10)
@@ -89,15 +94,14 @@ static void write_memc(
 
 #define IOC_IRQ_MASK_A    IOC_REG(0x18)
 
-// Bits are << 16 because this is a write-only register
 #define IOC_IRQ_CLEAR     IOC_REG(0x14)
-#define IOC_IRQ_CLEAR_TM1 ((1 << 6) << 16)
+#define IOC_IRQ_CLEAR_TM1 (1 << 6)
 #define IOC_CLEAR_TM1()   do { IOC_IRQ_CLEAR = IOC_IRQ_CLEAR_TM1; } while (0)
-#define IOC_IRQ_CLEAR_TM0 ((1 << 5) << 16)
+#define IOC_IRQ_CLEAR_TM0 (1 << 5)
 #define IOC_CLEAR_TM0()   do { IOC_IRQ_CLEAR = IOC_IRQ_CLEAR_TM0; } while (0)
-#define IOC_IRQ_CLEAR_POR ((1 << 4) << 16)
-#define IOC_IRQ_CLEAR_IR  ((1 << 3) << 16)
-#define IOC_IRQ_CLEAR_TF  ((1 << 2) << 16)
+#define IOC_IRQ_CLEAR_POR (1 << 4)
+#define IOC_IRQ_CLEAR_IR  (1 << 3)
+#define IOC_IRQ_CLEAR_TF  (1 << 2)
 
 // IRQ B
 #define IOC_IRQ_STATUS_B  IOC_REG(0x20)
@@ -119,8 +123,8 @@ static void write_memc(
 #define IOC_TIMER0_GO     IOC_REG(0x48)
 #define IOC_TIMER0_LATCH  IOC_REG(0x4c)
 #define SETUP_IOC_TIMER0(ticks) do { \
-    IOC_TIMER0_HIGH = ((ticks) & 0xFF00) << 8; \
-    IOC_TIMER0_LOW = ((ticks) & 0xFF) << 16; \
+    IOC_TIMER0_HIGH = ((ticks) & 0xFF00) >> 8; \
+    IOC_TIMER0_LOW = (ticks) & 0xFF; \
   } while (0)
 
 // Timer 1: general purpose interval timer
@@ -130,8 +134,8 @@ static void write_memc(
 #define IOC_TIMER1_LATCH  IOC_REG(0x5c)
 #define IOC_TICKS_PER_US 2
 #define SETUP_IOC_TIMER1(ticks) do { \
-    IOC_TIMER1_HIGH = ((ticks) & 0xFF00) << 8; \
-    IOC_TIMER1_LOW = ((ticks) & 0xFF) << 16; \
+    IOC_TIMER1_HIGH = ((ticks) & 0xFF00) >> 8; \
+    IOC_TIMER1_LOW = (ticks) & 0xFF; \
   } while (0)
 #define IOC_DELAY_US(us) do { \
     SETUP_IOC_TIMER1((us) * IOC_TICKS_PER_US); \
