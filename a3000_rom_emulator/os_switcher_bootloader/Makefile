@@ -45,7 +45,8 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--section-start=.text=0 -o $@ $<
 
 %.rom: %.bin
-	python pad_to_rom.py $< $@
+	cp $< $@
+	#python pad_to_rom.py $< $@
 
 SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o
 

@@ -198,7 +198,24 @@ uint32_t flash_read(uint32_t A) {
   return D;
 }
 
+// 7 bits: reset_arm (0x40), use_la21 (0x20), use_la20 (0x10), bank:4
 static uint8_t flash_bank = 0;
+#define RESET_ARM 0x40
+#define BANK_4M   0x30
+#define BANK_2M   0x10
+#define BANK_1M   0x00
+
+static uint8_t banks[8] = {
+  // initial layout: four 1M banks, two 2M banks, two 4M banks = 16M total.
+  BANK_1M | 0,
+  BANK_1M | 1,
+  BANK_1M | 2,
+  BANK_1M | 3,
+  BANK_2M | 4,
+  BANK_2M | 6,
+  BANK_4M | 8,
+  BANK_4M | 12,
+};
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
@@ -206,7 +223,7 @@ void flash_unlock() {
 
   // Reset allowing_arm_access to 1 in the CPLD
   CPLD_SS_CLEAR();
-  spi_transfer(0x80 | flash_bank);
+  spi_transfer(0x80 | banks[flash_bank]);
   CPLD_SS_SET();
 }
 

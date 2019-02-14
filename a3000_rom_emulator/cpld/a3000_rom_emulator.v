@@ -134,8 +134,11 @@ reg allowing_arm_access = 1'b1;
 // 1 to use rom_A[19] (LA21) and provide 4MB of flash, 0 to ignore it and provide 2MB
 reg use_la21 = 1'b0;
 
-// Flash bank selected; bit 0 is ignored if use_la21==1
-reg [2:0] flash_bank = 3'b0;
+// 1 to use rom_A[18] (LA20) for a 2+MB bank, 0 for a 1MB bank
+reg use_la20 = 1'b1;
+
+// Flash bank selected; bit 1 is ignored if use_la21==1, bit 0 is ignored if use_la20==1
+reg [3:0] flash_bank = 4'b0;
 
 // set to 1 to reset the ARM, 0 to let it run
 reg reset_arm = 1'b0;
@@ -145,7 +148,7 @@ reg reset_arm = 1'b0;
 
 // 1 when rom_A is pointing at the top 16 bytes (4 words) of ROM
 wire accessing_signal_ROM;
-assign accessing_signal_ROM = (rom_A[18:3] == 16'b1111111111111111) ? 1'b1 : 1'b0;
+assign accessing_signal_ROM = (rom_A[18:3] == 16'b1111111111111111) ? 1'b1 : 1'b0;  // TODO this can prob be 18:2==17'b1...1 because we only need 2 bits
 
 // synchronize mcu-to-arm signals when romcs goes active.
 // any metastability should settle by the time these values are read.
@@ -203,7 +206,10 @@ end
 
 
 // ARM reset line; open collector
-assign arc_RESET = reset_arm == 1'b1 ? 1'b0 : 1'bZ;
+assign arc_RESET = (cpld_SS == 1'b1 && reset_arm == 1'b1) ? 1'b0 : 1'bZ;
+//assign arc_RESET = cpld_MOSI_sync;  // DEBUG: bit-banged serial
+//assign arc_RESET = cpld_MOSI;  // DEBUG: bit-banged serial
+//assign arc_RESET = cpld_MISO_TXD;  // DEBUG: bit-banged serial
 //assign arc_RESET = romcs_sync[1]; // DEBUG: synchronized romcs
 //assign arc_RESET = clock_divider[0]; // DEBUG
 //assign arc_RESET = cpld_clock_from_mcu; // DEBUG
@@ -240,7 +246,13 @@ assign rom_D = selected == 1'b1 ? 32'bZ : (
 assign flash_A = allowing_arm_access == 1'b1 ? (
     // If LA21 is connected, use top two bits of flash_bank and LA21:2.
     // If disconnected, use three bits of flash_bank and LA20:2.
-    use_la21 == 1'b1 ? {flash_bank[2:1], rom_A} : {flash_bank, rom_A[18:0]}
+    // use_la21 == 1'b1 ? {flash_bank[2:1], rom_A} : {flash_bank, rom_A[18:0]}
+    {
+      flash_bank[3:2],
+      (use_la21 == 1'b1 ? rom_A[19] : flash_bank[1]),
+      (use_la20 == 1'b1 ? rom_A[18] : flash_bank[0]),
+      rom_A[17:0]
+    }
   ) : (
     spi_A
   );
@@ -290,36 +302,46 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
       mcu_to_arm_read_state_sync <= mcu_to_arm_read_state;
       // $display("SPI: Set allowing_arm_access to %d", cpld_MOSI);
     end else if (allowing_arm_access == 1) begin
-      // allowing ARM access: rest of SPI transaction is a control message
-      if (spi_bit_count < 8) begin
-        flash_bank <= {flash_bank[1:0], cpld_MOSI};
-      end else if (spi_bit_count == 8) begin
-        use_la21 <= cpld_MOSI;
-      end else if (spi_bit_count == 9) begin
-        reset_arm <= cpld_MOSI;
-      end else if (spi_bit_count == 12) begin
-        if (enable_comms) begin
-          // mcu has data for me
-          mcu_to_arm_write_state <= cpld_MOSI;
-          spi_D[31] <= arm_to_mcu_write_state;  // HACK: 41.6ns to resolve metastability
-          // TODO toggle write state rather than copy
-        end
-      end else if (spi_bit_count == 13) begin
-        if (enable_comms) begin
-          // mcu has buffer space for me to transmit
-          arm_to_mcu_read_state <= cpld_MOSI;
-          // TODO toggle read state rather than copy
-          spi_D[31] <= mcu_to_arm_read_state;  // HACK: 41.6ns to resolve metastability
-        end
-      end else if (spi_bit_count == 14) begin
-        if (enable_comms) begin
-          // data bit from mcu
-          // TODO only replace if there's room
-          // (can dispense with this if we really need the space)
-          mcu_to_arm_buffer <= {cpld_MOSI};
-          spi_D[31] <= arm_to_mcu_buffer[0];  // HACK: 41.6ns to resolve metastability
-        end
-      end
+      // allowing ARM access: rest of SPI transaction (one byte) is a control message
+      // bit 1: reset_arm
+      // bit 2: use_la21
+      // bit 3: use_la20
+      // bit 4-7: flash_bank
+      reset_arm <= use_la21;
+      use_la21 <= use_la20;
+      use_la20 <= flash_bank[3];
+      flash_bank <= {flash_bank[2:0], cpld_MOSI};
+      // Macrocells Used Pterms Used Registers Used  Pins Used Function Block Inputs Used
+      // 142/144  (99%)  459/720  (64%)  79/144  (55%) 117/117  (100%) 319/432  (74%)
+      // if (spi_bit_count < 8) begin
+      //   flash_bank <= {flash_bank[1:0], cpld_MOSI};
+      // end else if (spi_bit_count == 8) begin
+      //   use_la21 <= cpld_MOSI;
+      // end else if (spi_bit_count == 9) begin
+      //   reset_arm <= cpld_MOSI;
+      // end else if (spi_bit_count == 12) begin
+      //   if (enable_comms) begin
+      //     // mcu has data for me
+      //     mcu_to_arm_write_state <= cpld_MOSI;
+      //     spi_D[31] <= arm_to_mcu_write_state;  // HACK: 41.6ns to resolve metastability
+      //     // TODO toggle write state rather than copy
+      //   end
+      // end else if (spi_bit_count == 13) begin
+      //   if (enable_comms) begin
+      //     // mcu has buffer space for me to transmit
+      //     arm_to_mcu_read_state <= cpld_MOSI;
+      //     // TODO toggle read state rather than copy
+      //     spi_D[31] <= mcu_to_arm_read_state;  // HACK: 41.6ns to resolve metastability
+      //   end
+      // end else if (spi_bit_count == 14) begin
+      //   if (enable_comms) begin
+      //     // data bit from mcu
+      //     // TODO only replace if there's room
+      //     // (can dispense with this if we really need the space)
+      //     mcu_to_arm_buffer <= {cpld_MOSI};
+      //     spi_D[31] <= arm_to_mcu_buffer[0];  // HACK: 41.6ns to resolve metastability
+      //   end
+      // end
     end else begin
       // not allowing ARM access: rest of SPI transaction is a flash access request
       if (spi_bit_count == 1) begin
