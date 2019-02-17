@@ -4,7 +4,7 @@ See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 AEXT
 - Value: Extras
 - Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
 
 AEXT2
 - Value: Addresses
@@ -189,16 +189,6 @@ R1
 R2
 - Value: 1k
 - Description: 1k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R4
-- Value: 10k
-- Description: 10k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R5
-- Value: 10k
-- Description: 10k resistor in 0805 package
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 REG

@@ -38,13 +38,11 @@
 
 module a3000_rom_emulator(
 
-  // ground this to reset the machine
-  inout wire arc_RESET,
-
   // connections to archimedes motherboard
   inout wire [31:0] rom_D,  // ARM data bus
   input wire [19:0] rom_A,  // LA21:2
   input wire rom_nCS,       // MEMC Romcs*
+  inout wire rom_nOE,       // Lionrw (latched IO nR/W) on a Risc PC, debug everywhere else
 
   // connections to two flash chips
   output wire [21:0] flash_A,
@@ -148,7 +146,10 @@ reg reset_arm = 1'b0;
 
 // 1 when rom_A is pointing at the top 16 bytes (4 words) of ROM
 wire accessing_signal_ROM;
-assign accessing_signal_ROM = (rom_A[18:3] == 16'b1111111111111111) ? 1'b1 : 1'b0;  // TODO this can prob be 18:2==17'b1...1 because we only need 2 bits
+assign accessing_signal_ROM = (
+    rom_A[18:3] == 16'b1111111111111111
+    && (use_la21 == 1'b0 || rom_A[19] == 1'b1)
+  ) ? 1'b1 : 1'b0;  // TODO this can prob be 18:2==17'b1...1 because we only need 2 bits
 
 // synchronize mcu-to-arm signals when romcs goes active.
 // any metastability should settle by the time these values are read.
@@ -205,15 +206,15 @@ always @(posedge cpld_clock_from_mcu) begin
 end
 
 
-// ARM reset line; open collector
-assign arc_RESET = (cpld_SS == 1'b1 && reset_arm == 1'b1) ? 1'b0 : 1'bZ;
-//assign arc_RESET = cpld_MOSI_sync;  // DEBUG: bit-banged serial
-//assign arc_RESET = cpld_MOSI;  // DEBUG: bit-banged serial
-//assign arc_RESET = cpld_MISO_TXD;  // DEBUG: bit-banged serial
-//assign arc_RESET = romcs_sync[1]; // DEBUG: synchronized romcs
-//assign arc_RESET = clock_divider[0]; // DEBUG
-//assign arc_RESET = cpld_clock_from_mcu; // DEBUG
-//assign arc_RESET = cpld_SCK; // DEBUG
+// latched nR/W (Lionrw) on a Risc PC, debug everywhere else
+assign rom_nOE = 1'bZ;
+//assign rom_nOE = cpld_MOSI_sync;  // DEBUG: bit-banged serial
+//assign rom_nOE = cpld_MOSI;  // DEBUG: bit-banged serial
+//assign rom_nOE = cpld_MISO_TXD;  // DEBUG: bit-banged serial
+//assign rom_nOE = romcs_sync[1]; // DEBUG: synchronized romcs
+//assign rom_nOE = clock_divider[0]; // DEBUG
+//assign rom_nOE = cpld_clock_from_mcu; // DEBUG
+//assign rom_nOE = cpld_SCK; // DEBUG
 
 
 wire selected;  // Romcs* low and power high

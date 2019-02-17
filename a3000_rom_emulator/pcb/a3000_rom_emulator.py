@@ -38,6 +38,22 @@
 # - min via: 0.45mm dia, 0.2mm drill
 # - vias inside BGA: 0.51mm (20.1 mil) dia, 0.25mm (9.8 mil) drill.
 
+# ASSEMBLY NOTES
+
+# 1. On an A3000, wire A21 to pin 19 of IC30 (La<21>)
+
+# v1 ASSEMBLY + ERRATA
+
+# 1. Don't fit R4 (rom_nCS pullup) and R5 (rom_A19 pullup); they can't pull up
+# when the host machine is powered down,  which results in them hovering
+# around the threshold voltage and overheating the CPLD.
+
+# 2. Fit a 10k+ resistor from rom_5V to GND (use the EXTPWR header), so we
+# don't think the host is powered on when it isn't.
+
+# 3. Wire rom_5V to the bottom right pad of the oscillator footprint, so we
+# can detect host power status.
+
 PROJECT_NAME = "a3000_rom_emulator"
 PATH_TO_CPLD = "../cpld"
 
@@ -48,10 +64,21 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
+# TODO(v2) add a diode and resistor so mcu can sense reset
+# TODO(v2) (maybe just leave things as-is, or...) tie GCLK_IO[0] pin high so we can detect we're on v2?  double check we can push a 48MHz clock out one of the GPIO pins first though.
+
+# TODO(v2) add a transistor so we can pull POR low, just in case IOC_IRQA really does clear POR on read.
+
+# TODO(v2) Add two holes which are also on the paste layer, so I can pin the paste mask to the board for perfect alignment
+
+# (done, v2) Connect pin 1 of rom1 to A19_ext and add a jumper (for A5000)
+
+# TODO(v2) Pullup on flash_nRESET to ensure everything works on boot
+
 # TODO consider DFM - https://rheingoldheavy.com/design-assembly-kicad/
-# TODO add 3 x FID
+# (done) add 3 x FID
 # TODO add soldermask chevrons in 3 corners of board to detect misregistration http://iconnect007.media/index.php/article/47987/soldermask-registration-considerations-for-fine-pitch-area-array-package-ass
-# TODO make sure the BOM comes out OK
+# (done) make sure the BOM comes out OK
 # TODO read stencil design guidelines in IPC-7525A
 
 # (done) can I use BGA?  xc95144 comes in cs144 package, which is 0.8mm 12x12mm (c.f. 22x22mm for TQ144) and flash comes in 1mm pitch 13x11 64-ball BGA
@@ -64,9 +91,13 @@ Pin = myelin_kicad_pcb.Pin
 # (done) use tag-connect instead of SWD, for low profile? -- http://www.tag-connect.com/Materials/TC2030-CTX.pdf
 # (done) add power diodes so we can power from USB or arc
 
+# TODO(v2) pull down rom_5V with 10k so we can for sure detect the power down situation.
+# TODO(v2) connect rom_5V to cpld_clock_osc for power down detection.
+
 # (done) add 10k pullup for Romcs* to help when not plugged in
-romcs_pullup = myelin_kicad_pcb.R0805("10k", "rom_nCS", "5V", ref="R4")
-a21_pullup = myelin_kicad_pcb.R0805("10k", "rom_A19", "5V", ref="R5")
+# (done) v2: don't fit pullups, because they don't work when the system is powered down
+# romcs_pullup = myelin_kicad_pcb.R0805("NF 10k", "rom_nCS", "5V", ref="R4")  # bad idea: can't fight powered down A3000
+# a21_pullup = myelin_kicad_pcb.R0805("NF 10k", "rom_A19", "5V", ref="R5")  # bad idea: can't fight powered down A3000
 # (done) add jumpers so we can get LA18, LA19 and LA20 from flying leads on pre-A3000 machines (IC28 on A3xx)
 # (done) add pin to wire to A21, so we can support 4MB ROMs
 # (done) add pin to wire to reset, so we can re-reset the machine once the board is alive
@@ -123,7 +154,7 @@ cpld = myelin_kicad_pcb.Component(
         Pin( "A4", "",         "rom_A19"),
         Pin( "A5", "",         "rom_A11"),
         Pin( "A6", "",         "rom_A10"),
-        Pin( "A7", "",         "arc_RESET"),
+        Pin( "A7", "",         "rom_nOE"),
         Pin( "A8", "",         "rom_A5"),
         Pin( "A9", "",         "rom_A16"),
         Pin("A10", "",         "rom_D6"),
@@ -316,7 +347,7 @@ regulator = myelin_kicad_pcb.Component(
     identifier="REG",
     value="AP7365-33YG-XX",  # 600 mA, 0.3V dropout
     desc="3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.",
-    # TODO verify pinout on PCB against datasheet
+    # (done) verify pinout on PCB against datasheet
     pins=[
         # MCP1700 and AP7365-YR: GND VIN VOUT
         # Pin(1, "GND", ["GND"]),
@@ -433,7 +464,7 @@ rom_headers = [
             Pin("20", "D6", "rom_D%d" % (rom_id * 8 + 6)),
             Pin("21", "D7", "rom_D%d" % (rom_id * 8 + 7)),
         ] + ([
-            Pin( "1", "Vpp"),  # On A5000 this can be A12; safest to leave NC
+            Pin( "1", "A19",    "rom_A19_ext"),  # 5V everywhere except A5000, where this is A21.  In v1 this was NC.
             Pin( "2", "A16",    "rom_A16_ext"),
             Pin( "3", "A15",    "rom_A15"),
             Pin( "4", "A12",    "rom_A12"),
@@ -447,7 +478,7 @@ rom_headers = [
             Pin("12", "A0",     "rom_A0"),
             Pin("22", "nROMCS", "rom_nCS"),
             Pin("23", "A10",    "rom_A10"),
-            Pin("24", "nOE"),  # grounded on A3000 depending on jumpers
+            Pin("24", "nOE",    "rom_nOE_ext"),  # grounded on A3000 depending on jumpers
             Pin("25", "A11",    "rom_A11"),
             Pin("26", "A9",     "rom_A9"),
             Pin("27", "A8",     "rom_A8"),
@@ -461,28 +492,37 @@ rom_headers = [
     for rom_id in range(4)
 ]
 
-# Jumpers / connectors for address lines not present on all boards
+# Jumpers / connectors for address lines not present on all boards.
+# Risc PC: connect all four.
+# A5000: connect A16, A17, A18, A19, ignore nOE
+# Everything else: connect A16, A17, A18, solder a wire for A19, ignore nOE
 address_jumpers = myelin_kicad_pcb.Component(
-    footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical",
     identifier="AEXT",
     value="Extras",
     pins=[
         # ARM LA18 / ROM A16
-        Pin(1, "arc_A16_LA18",   "rom_A16_ext"),  
-        Pin(2, "cpld_A16_LA18",  "rom_A16"),
+        Pin( 1, "arc_A16_LA18",   "rom_A16_ext"),
+        Pin( 2, "cpld_A16_LA18",  "rom_A16"),
         # ARM LA19 / ROM A17
-        Pin(3, "arc_A17_LA19",   "rom_A17_ext"),
-        Pin(4, "cpld_A17_LA19",  "rom_A17"),
+        Pin( 3, "arc_A17_LA19",   "rom_A17_ext"),
+        Pin( 4, "cpld_A17_LA19",  "rom_A17"),
         # ARM LA20 / ROM A18
-        Pin(5, "arc_A18_LA20",   "rom_A18_ext"),
-        Pin(6, "cpld_A18_LA20",  "rom_A18"),
-        # ARM LA21 / ROM A19 (optional extra, for 4MB ROM space)
-        Pin(7, "cpld_A19_LA21",  "rom_A19"),
-        # Resetter -- so we can reset the system once everything has started up (if necessary).
-        # This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
-        Pin(8, "reset",          "arc_RESET"),
+        Pin( 5, "arc_A18_LA20",   "rom_A18_ext"),
+        Pin( 6, "cpld_A18_LA20",  "rom_A18"),
+        # ARM LA21 / ROM A19 (optional extra, for 4MB ROM space.  Already
+        # connected on A5000, so this can take a jumper.)
+        Pin( 7, "arc_A19_LA21",   "rom_A19_ext"),
+        Pin( 8, "cpld_A19_LA21",  "rom_A19"),
+        # This was originally used as a connection to RESET, but now it's for
+        # either /OE on a Risc PC, or a general IO.
+        Pin( 9, "arc_nOE",        "rom_nOE_ext"),
+        Pin(10, "cpld_nOE",       "rom_nOE"),
     ],
 )
+
+# TODO(v2) add 74lvt125 for power detect, reset detect, reset control, and POR control
+# TODO(v2) reset control: This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
 
 # Second address hookup area, nearer ICs on A310/A3000
 address_hookup_2 = myelin_kicad_pcb.Component(
@@ -530,10 +570,10 @@ mcu = myelin_kicad_pcb.Component(
         Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
         Pin(3, "PA02/AIN0/DAC_OUT"),
         Pin(4, "PA03/ADC_VREFA/AIN1"),
-        Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"), # sercom0 is mcu comms
+        Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"),
         Pin(6, "PA05/SERCOM0.1/AIN5", "cpld_TCK"),
-        Pin(7, "PA06/SERCOM0.2/AIN6", "cpld_TMS"), # TXD0/RXD0
-        Pin(8, "PA07/SERCOM0.3/AIN7", "cpld_TDI"), # XCK0
+        Pin(7, "PA06/SERCOM0.2/AIN6", "cpld_TMS"),
+        Pin(8, "PA07/SERCOM0.3/AIN7", "cpld_TDI"),
         Pin(9, "VDDANA", ["3V3"]),  # decouple to GND
         Pin(10, "GND", ["GND"]),
         Pin(11, "PA08/NMI/SERCOM2.0/0.0/AIN16", "cpld_MOSI"), # TXRX0/2 -> cpld
