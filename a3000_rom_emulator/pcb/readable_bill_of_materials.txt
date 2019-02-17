@@ -12,7 +12,7 @@ AEXT2
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
 
 BUF
-- Value: Reset buffer
+- Value: 74LVT125PW
 - Description: 
 - KiCad package: Package_SO:TSSOP-14_4.4x5mm_P0.65mm
 
@@ -34,6 +34,11 @@ C11
 C12
 - Value: 1u
 - Description: 1u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C13
+- Value: 100n
+- Description: 100n capacitor in 0805 package
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C6

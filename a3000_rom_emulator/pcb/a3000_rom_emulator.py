@@ -535,7 +535,7 @@ address_jumpers = myelin_kicad_pcb.Component(
 power_reset_por_buffer = myelin_kicad_pcb.Component(
     footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm",
     identifier="BUF",
-    value="Reset buffer",
+    value="74LVT125PW",
     pins=[
         Pin( 1, "1nOE", "GND"),
         Pin( 2, "1A",   "rom_5V"),
@@ -553,6 +553,7 @@ power_reset_por_buffer = myelin_kicad_pcb.Component(
         Pin(14, "VCC",  "3V3"),
     ],
 )
+buffer_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C13")
 
 buffer_resistors = [
     # series resistor to avoid overloading BUF output during POR
