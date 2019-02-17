@@ -64,16 +64,23 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
-# TODO(v2) add a diode and resistor so mcu can sense reset
-# TODO(v2) (maybe just leave things as-is, or...) tie GCLK_IO[0] pin high so we can detect we're on v2?  double check we can push a 48MHz clock out one of the GPIO pins first though.
+# done(v2) add a diode and resistor so mcu can sense reset -- superseded by 74lvt125
 
-# TODO(v2) add a transistor so we can pull POR low, just in case IOC_IRQA really does clear POR on read.
+# done(v2) (maybe just leave things as-is, or...) tie GCLK_IO[0] pin high so
+# we can detect we're on v2?  double check we can push a 48MHz clock out one
+# of the GPIO pins first though. -- left as-is because GCLK_IO[0] worked fine,
+# and we can detect by setting rom_5V_buffered as INPUT_PULLUP and
+# INPUT_PULLDOWN and seeing if we can drive it or not.
+
+# done(v2) add a transistor so we can pull POR low, just in case IOC_IRQA
+# really does clear POR on read. -- superseded by 74lvt125 + 100R.
 
 # TODO(v2) Add two holes which are also on the paste layer, so I can pin the paste mask to the board for perfect alignment
 
-# (done, v2) Connect pin 1 of rom1 to A19_ext and add a jumper (for A5000)
+# done(v2) Connect pin 1 of rom1 to A19_ext and add a jumper (for A5000)
 
-# TODO(v2) Pullup on flash_nRESET to ensure everything works on boot
+# done(v2) Pullup on flash_nRESET to ensure everything works on boot -- didn't
+# do this because it works fine without a pullup in v1.
 
 # TODO consider DFM - https://rheingoldheavy.com/design-assembly-kicad/
 # (done) add 3 x FID
@@ -91,8 +98,8 @@ Pin = myelin_kicad_pcb.Pin
 # (done) use tag-connect instead of SWD, for low profile? -- http://www.tag-connect.com/Materials/TC2030-CTX.pdf
 # (done) add power diodes so we can power from USB or arc
 
-# TODO(v2) pull down rom_5V with 10k so we can for sure detect the power down situation.
-# TODO(v2) connect rom_5V to cpld_clock_osc for power down detection.
+# done(v2) pull down rom_5V with 10k so we can for sure detect the power down situation.
+# (done, )v2) connect rom_5V to cpld_clock_osc for power down detection.
 
 # (done) add 10k pullup for Romcs* to help when not plugged in
 # (done) v2: don't fit pullups, because they don't work when the system is powered down
@@ -106,20 +113,20 @@ Pin = myelin_kicad_pcb.Pin
 # (done) add USB MCU (atsamd51 or 21?)
 # (done) add 96MHz (64MHz?) oscillator footprint, in case we want that clock
 
-osc = myelin_kicad_pcb.Component(
-    footprint="Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering",
-    identifier="OSC",
-    value="osc",
-    # When ordering: double check it's the 3.2x2.5mm package
-    # http://ww1.microchip.com/downloads/en/DeviceDoc/20005529B.pdf
-    #    DSC100X-C-X-X-096.000-X
-    pins=[
-        Pin(1, "STANDBY#",  "3V3"),
-        Pin(2, "GND",       "GND"),
-        Pin(3, "OUT",       "cpld_clock_osc"),
-        Pin(4, "VDD",       "3V3"),
-    ],
-)
+# osc = myelin_kicad_pcb.Component(
+#     footprint="Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering",
+#     identifier="OSC",
+#     value="osc",
+#     # When ordering: double check it's the 3.2x2.5mm package
+#     # http://ww1.microchip.com/downloads/en/DeviceDoc/20005529B.pdf
+#     #    DSC100X-C-X-X-096.000-X
+#     pins=[
+#         Pin(1, "STANDBY#",  "3V3"),
+#         Pin(2, "GND",       "GND"),
+#         Pin(3, "OUT",       "cpld_clock_osc"),  # this used to connect to K2 on the CPLD (now used to detect rom_5V / host power)
+#         Pin(4, "VDD",       "3V3"),
+#     ],
+# )
 
 
 # Notes on BGA soldering (I'm using NSMD everywhere):
@@ -133,7 +140,7 @@ osc = myelin_kicad_pcb.Component(
     # version still isn't quick enough for single cycle access on
     # a 12MHz bus (e.g. A5000).
 
-# TODO verify cpld pinout against datasheet
+# (done) verify cpld pinout against datasheet
 cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
@@ -243,7 +250,7 @@ cpld = myelin_kicad_pcb.Component(
         Pin("J13", "VCCINT",   "3V3"),
 
         Pin( "K1", "GND",      "GND"),
-        Pin( "K2", "GCK1",     "cpld_clock_osc"),
+        Pin( "K2", "GCK1",     "rom_5V"),
         Pin( "K3", "",         "cpld_SS"),
         Pin( "K4", "",         "flash_A11"),
         Pin( "K5", "",         "flash_A9"),
@@ -371,7 +378,7 @@ ext_power = myelin_kicad_pcb.Component(
     pins=[
         Pin(1, "A", ["GND"]),
         Pin(2, "B", ["3V3"]),
-        Pin(3, "C", ["rom_5V"]),
+        Pin(3, "C", ["5V"]),
     ],
 )
 
@@ -521,8 +528,54 @@ address_jumpers = myelin_kicad_pcb.Component(
     ],
 )
 
-# TODO(v2) add 74lvt125 for power detect, reset detect, reset control, and POR control
-# TODO(v2) reset control: This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
+# done(v2) add 74lvt125 for power detect, reset detect, reset control, and POR control.
+# - reset control: This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
+# - POR connection: can go to capacitor or resistor that connect to IOC POR pin
+
+power_reset_por_buffer = myelin_kicad_pcb.Component(
+    footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm",
+    identifier="BUF",
+    value="Reset buffer",
+    pins=[
+        Pin( 1, "1nOE", "GND"),
+        Pin( 2, "1A",   "rom_5V"),
+        Pin( 3, "1Y",   "rom_5V_buffered"),
+        Pin( 4, "2nOE", "GND"),
+        Pin( 5, "2A",   "arc_RESET"),
+        Pin( 6, "2Y",   "arc_RESET_buffered"),
+        Pin( 7, "GND",  "GND"),
+        Pin( 8, "3Y",   "arc_RESET"),
+        Pin( 9, "3A",   "GND"),
+        Pin(10, "3nOE", "ndrive_arc_RESET"),
+        Pin(11, "4Y",   "arc_POR_R"),
+        Pin(12, "4A",   "GND"),
+        Pin(13, "4nOE", "ndrive_arc_POR"),
+        Pin(14, "VCC",  "3V3"),
+    ],
+)
+
+buffer_resistors = [
+    # series resistor to avoid overloading BUF output during POR
+    myelin_kicad_pcb.R0805("100R", "arc_POR_R", "arc_POR", ref="R3"),
+    # optional pullups for ndrive_arc_RESET and ndrive_ARC_POR
+    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_POR", "3V3", ref="R6"),
+    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_RESET", "3V3", ref="R7"),
+    # pulldown to ensure we don't get a fake rom_5V high when unplugged
+    myelin_kicad_pcb.R0805("10k", "rom_5V", "GND", ref="R8")
+]
+
+reset_por_header = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+    identifier="RESET",
+    value="reset/POR",
+    desc="1x2 0.1 inch male header",
+    pins=[
+        Pin(1, "A", ["arc_RESET"]),
+        Pin(2, "B", ["arc_POR"]),
+    ],
+)
+
+
 
 # Second address hookup area, nearer ICs on A310/A3000
 address_hookup_2 = myelin_kicad_pcb.Component(
@@ -568,8 +621,8 @@ mcu = myelin_kicad_pcb.Component(
 
         Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_debug_TXD"),
         Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
-        Pin(3, "PA02/AIN0/DAC_OUT"),
-        Pin(4, "PA03/ADC_VREFA/AIN1"),
+        Pin(3, "PA02/AIN0/DAC_OUT",   "arc_RESET_buffered"),
+        Pin(4, "PA03/ADC_VREFA/AIN1", "rom_5V_buffered"),
         Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"),
         Pin(6, "PA05/SERCOM0.1/AIN5", "cpld_TCK"),
         Pin(7, "PA06/SERCOM0.2/AIN6", "cpld_TMS"),
@@ -582,8 +635,8 @@ mcu = myelin_kicad_pcb.Component(
         Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "cpld_MISO"), # XCK0/2 -> cpld
         Pin(15, "PA14/XIN/SERCOM4.2/2.2", "flash_nRESET"), # TXRX2/4 -> cpld GCK
         Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "flash_READY"), # XCK2/4 -> cpld GCK
-        Pin(17, "PA16/SERCOM1.0/3.0", "mcu_GPIO5"), # TXRX1/3
-        Pin(18, "PA17/SERCOM1.1/3.1", "mcu_GPIO4"), # XCK1/3 -> cpld GCK
+        Pin(17, "PA16/SERCOM1.0/3.0", "ndrive_arc_RESET"), # TXRX1/3
+        Pin(18, "PA17/SERCOM1.1/3.1", "ndrive_arc_POR"), # XCK1/3 -> cpld GCK
         Pin(19, "PA18/SERCOM1.2/3.2", "mcu_GPIO3"), # TXRX1/3.  Not connected to an Arduino pin.
         Pin(20, "PA19/SERCOM1.3/3.3", "mcu_GPIO2"), # XCK1/3.  Not connected to an Arduino pin.
         Pin(21, "PA22/SERCOM3.0/5.0", "mcu_GPIO1"), # TXRX3/5
@@ -643,7 +696,7 @@ swd_alt = myelin_kicad_pcb.Component(
 
 # 0.1" header for a few more MCU pins
 mcu_gpio = myelin_kicad_pcb.Component(
-    footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical",
     identifier="GPIO",
     value="gpio",
     pins=[
@@ -653,8 +706,8 @@ mcu_gpio = myelin_kicad_pcb.Component(
         Pin(4, "GPIO1",  "mcu_GPIO1"),
         Pin(5, "GPIO2",  "mcu_GPIO2"),
         Pin(6, "GPIO3",  "mcu_GPIO3"),
-        Pin(7, "GPIO4",  "mcu_GPIO4"),
-        Pin(8, "GPIO5",  "mcu_GPIO5"),
+        # Pin(7, "GPIO4",  "mcu_GPIO4"),
+        # Pin(8, "GPIO5",  "mcu_GPIO5"),
     ],
 )
 

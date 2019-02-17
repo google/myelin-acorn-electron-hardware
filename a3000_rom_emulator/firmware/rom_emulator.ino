@@ -70,6 +70,15 @@
 // PA28 - D4 - cpld_clock_from_mcu (clock output)
 #define CPLD_CLOCK_FROM_MCU_PIN 4
 
+// PA16
+#define ndrive_arc_RESET_PIN 11
+// PA17
+#define ndrive_arc_POR_PIN 13
+// PA03
+#define rom_5V_buffered_PIN 42
+// PA02
+#define arc_RESET_buffered_PIN 14
+
 
 // Uncomment this to show every byte sent and received over SPI
 // #define SHOW_ALL_SPI_TRANSFERS
@@ -248,6 +257,18 @@ void flash_reset() {
 
 // System startup
 void setup() {
+
+  // TODO detect v1 or v2 board by attempting to pull rom_5V_buffered up/down.
+  // On a v1 board this is NC so we'll be able to pull it.  On v2 it'll remain
+  // driven.
+  pinMode(rom_5V_buffered_PIN, INPUT);
+  pinMode(arc_RESET_buffered_PIN, INPUT);
+
+  // On v2 boards we want to leave RESET and POR undriven by default
+  pinMode(ndrive_arc_RESET_PIN, OUTPUT);
+  digitalWrite(ndrive_arc_RESET_PIN, HIGH);
+  pinMode(ndrive_arc_POR_PIN, OUTPUT);
+  digitalWrite(ndrive_arc_POR_PIN, HIGH);
 
   // Set up fast SPI comms on SERCOM2 with CPLD
   pinMode(CPLD_SS_PIN, OUTPUT);

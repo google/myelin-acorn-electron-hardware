@@ -11,6 +11,11 @@ AEXT2
 - Description: 
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
 
+BUF
+- Value: Reset buffer
+- Description: 
+- KiCad package: Package_SO:TSSOP-14_4.4x5mm_P0.65mm
+
 C1
 - Value: 10u
 - Description: 10u capacitor in 0805 package
@@ -169,17 +174,12 @@ FLASH1
 GPIO
 - Value: gpio
 - Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
 
 MCU
 - Value: ATSAMD21E18A
 - Description: 
 - KiCad package: Package_QFP:TQFP-32_7x7mm_P0.8mm
-
-OSC
-- Value: osc
-- Description: 
-- KiCad package: Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering
 
 R1
 - Value: 10k
@@ -191,10 +191,35 @@ R2
 - Description: 1k resistor in 0805 package
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+R3
+- Value: 100R
+- Description: 100R resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R6
+- Value: NF 10k
+- Description: NF 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R7
+- Value: NF 10k
+- Description: NF 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R8
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 REG
 - Value: AP7365-33YG-XX
 - Description: 3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.
 - KiCad package: Package_TO_SOT_SMD:SOT-89-3
+
+RESET
+- Value: reset/POR
+- Description: 1x2 0.1 inch male header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
 
 ROM1
 - Value: ROM header

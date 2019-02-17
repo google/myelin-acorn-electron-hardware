@@ -1,6 +1,7 @@
 Identifier	Value	Description	KiCad package
 AEXT	Extras		Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
 AEXT2	Addresses		Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+BUF	Reset buffer		Package_SO:TSSOP-14_4.4x5mm_P0.65mm
 C1	10u	10u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C10	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C11	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
@@ -32,12 +33,16 @@ FID2	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
 FID3	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
 FLASH0	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
 FLASH1	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-GPIO	gpio		Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+GPIO	gpio		Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
 MCU	ATSAMD21E18A		Package_QFP:TQFP-32_7x7mm_P0.8mm
-OSC	osc		Oscillator:Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm_HandSoldering
 R1	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R2	1k	1k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R3	100R	100R resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R6	NF 10k	NF 10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R7	NF 10k	NF 10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R8	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 REG	AP7365-33YG-XX	3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.	Package_TO_SOT_SMD:SOT-89-3
+RESET	reset/POR	1x2 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
 ROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
 ROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
 ROM3	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
