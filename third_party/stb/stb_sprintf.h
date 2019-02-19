@@ -190,6 +190,13 @@ STBSP__PUBLICDEF void STB_SPRINTF_DECORATE(set_separators)(char comma, char peri
 #define stbsp__uint32 unsigned int
 #define stbsp__int32 signed int
 
+#ifdef STB_SPRINTF_NOINT64
+// Hack by Phillip Pearson to remove 64-bit support, which makes this compile
+// easier on ARMv2 targets (otherwise we need __aeabi_uldivmod, and all
+// arithmetic will be 64-bit).
+#define stbsp__uint64 stbsp__uint32
+#define stbsp__int64 stbsp__int32
+#else
 #ifdef _MSC_VER
 #define stbsp__uint64 unsigned __int64
 #define stbsp__int64 signed __int64
@@ -197,6 +204,8 @@ STBSP__PUBLICDEF void STB_SPRINTF_DECORATE(set_separators)(char comma, char peri
 #define stbsp__uint64 unsigned long long
 #define stbsp__int64 signed long long
 #endif
+#endif
+
 #define stbsp__uint16 unsigned short
 
 #ifndef stbsp__uintptr

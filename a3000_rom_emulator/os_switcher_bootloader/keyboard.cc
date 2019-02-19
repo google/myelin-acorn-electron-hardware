@@ -140,11 +140,7 @@ void keyboard_poll() {
     // Send SMAK (enable keyboard and mouse)
 
     // debug
-    display_print_hex(keyboard_state);
-    display_print(" ");
-    display_print_hex(data);
-    display_print(" ");
-
+    display_printf("%x %x", keyboard_state, data);
 
     // Handle reset commands at all times
     switch (data) {
@@ -238,10 +234,7 @@ void keyboard_poll() {
                 }
 
                 // Unknown or mismatched 2-byte code - fall through to reset
-                display_print_hex(keyboard_state);
-                display_print(" ");
-                display_print_hex(data);
-                display_print(" ");
+                display_printf("%x %x", keyboard_state, data);
             }
             // Fall through to reset at end of function
             break;

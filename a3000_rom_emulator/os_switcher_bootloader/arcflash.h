@@ -1,6 +1,11 @@
 #include <stdint.h>
 #include "arcregs.h"
 
+#define STB_SPRINTF_NOUNALIGNED
+#define STB_SPRINTF_NOINT64
+#define STB_SPRINTF_NOFLOAT
+#include "../../third_party/stb/stb_sprintf.h"
+
 // main.cc
 extern uint32_t _millis;
 inline uint32_t millis() { return _millis; }
@@ -19,6 +24,7 @@ extern void display_goto(int x, int y);
 extern void display_print_char(char c);
 extern void display_print(const char* s);
 extern void display_print_hex(uint32_t v);
+extern void display_printf(char const *format, ...);
 
 // keyboard.cc
 extern int mouse_x, mouse_y;

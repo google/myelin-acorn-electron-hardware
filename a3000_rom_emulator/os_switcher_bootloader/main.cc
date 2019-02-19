@@ -267,8 +267,7 @@ void keyboard_keydown(uint8_t keycode) {
     // TODO turn this into a proper keyboard handler, but for now assume a
     // keydown on 0-9 is to select an OS to boot
     display_goto(48, 64);
-    display_print("Selected OS ");
-    display_print_char(c);
+    display_printf("Selected OS %c", c);
     while (1) {
       write_serial_byte('*');
       write_serial_byte(c);
@@ -304,7 +303,7 @@ extern "C" void main_program() {
   }
 
   display_goto(0, 32);
-  display_print("Hit 0-9 to select OS to switch to, then hit RESET to boot into it.  "
+  display_printf("Hit 0-9 to select OS to switch to, then hit RESET to boot into it.  "
                 "(Currently we have no serial RX so there's no way to confirm that the flash bank has been selected.)");
 
   // TODO init IOC and check keyboard

@@ -1,4 +1,8 @@
+// include sprintf implementation when arcflash pulls in stb_sprintf.h
+#define STB_SPRINTF_IMPLEMENTATION
+
 #include "arcflash.h"
+#include <stdarg.h>
 
 int display_x = 0, display_y = 0;
 
@@ -88,4 +92,17 @@ void display_print_hex(uint32_t v) {
 	}
 	s[digits] = 0;
 	display_print(s);
+}
+
+void display_printf(char const *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	char buf[200];
+	int ret = stbsp_vsnprintf(buf, 200, format, ap);
+	if (ret < 0) {
+		display_print("printf error");
+	} else {
+		display_print(buf);
+	}
+	va_end(ap);
 }
