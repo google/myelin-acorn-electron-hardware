@@ -48,7 +48,12 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 	cp $< $@
 	#python pad_to_rom.py $< $@
 
-SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o ../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o
+SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o \
+	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o \
+	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o \
+	../../third_party/arm-trusted-firmware/memcpy.o \
+	../../third_party/arm-trusted-firmware/memset.o \
+	../../third_party/nanopb/pb_common.o ../../third_party/nanopb/pb_encode.o ../../third_party/nanopb/pb_decode.o
 
 switcher.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)
