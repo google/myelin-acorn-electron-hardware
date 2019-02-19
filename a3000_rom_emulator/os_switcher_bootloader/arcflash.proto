@@ -1,0 +1,28 @@
+// Protobuf definitions for Arcflash storage and network messages
+
+// Language reference: https://developers.google.com/protocol-buffers/
+
+syntax = "proto3";
+
+package arcflash;
+
+// Flash bank metadata
+message FlashBank {
+    // Bank ID
+    int32 bank_id = 1;
+
+    // Bank size (bytes), typically 512k/1M/2M/4M
+    int32 bank_size = 2;
+
+    // Name to display
+    string bank_name = 3;
+}
+
+// CMOS snapshot (stored in flash)
+message CMOS {
+    // Flash bank ID corresponding to this CMOS snapshot
+    int32 bank_id = 1;
+
+    // CMOS data bytes (all 256, including the timestamp)
+    bytes cmos_data = 2;
+}

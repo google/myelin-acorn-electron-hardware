@@ -17,7 +17,7 @@ CCC = arm-none-eabi-g++
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
-CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2
+CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb
 LDFLAGS = -nostdlib -lgcc
 
 .PHONY: default all clean
@@ -46,9 +46,17 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 
 %.rom: %.bin
 	cp $< $@
-	#python pad_to_rom.py $< $@
+
+# nanopb build step
+../../third_party/nanopb/generator/proto/nanopb_pb2.py: ../../third_party/nanopb/generator/proto/nanopb.proto
+	cd ../../third_party/nanopb/generator/proto; protoc --python_out=. nanopb.proto
+
+arcflash.pb arcflash.pb.c arcflash.pb.h arcflash_pb2.py: arcflash.proto ../../third_party/nanopb/generator/proto/nanopb_pb2.py
+	protoc --python_out=. -o$@ $<
+	python3 ../../third_party/nanopb/generator/nanopb_generator.py $@
 
 SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o \
+	arcflash.pb.o \
 	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o \
 	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o \
 	../../third_party/arm-trusted-firmware/memcpy.o \
