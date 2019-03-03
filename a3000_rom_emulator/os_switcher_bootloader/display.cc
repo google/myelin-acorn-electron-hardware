@@ -94,6 +94,7 @@ void display_print_hex(uint32_t v) {
 	display_print(s);
 }
 
+__attribute__((section(".ramfunc")))
 void display_printf(char const *format, ...) {
 	va_list ap;
 	va_start(ap, format);
