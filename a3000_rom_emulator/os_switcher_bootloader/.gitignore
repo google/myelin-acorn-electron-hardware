@@ -4,3 +4,7 @@
 *.bin
 *.elf
 *.rom
+*_pb2.py
+*.pb
+*.pb.h
+*.pb.c

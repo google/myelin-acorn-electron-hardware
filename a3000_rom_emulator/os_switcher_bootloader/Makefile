@@ -25,9 +25,9 @@ LDFLAGS = -nostdlib -lgcc
 default: all
 
 clean:
-	rm -vf *.bin *.elf *.o *.rom
+	rm -vf *.bin *.elf *.o *.rom *.pb *.pb.*
 
-all: switcher.rom jump_to_rom.bin
+all: switcher.rom jump_to_rom.bin ../python_lib/arcflash/bootloader.bin
 
 %.o: %.s
 	$(AS) -o $@ $<
@@ -51,9 +51,9 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 ../../third_party/nanopb/generator/proto/nanopb_pb2.py: ../../third_party/nanopb/generator/proto/nanopb.proto
 	cd ../../third_party/nanopb/generator/proto; protoc --python_out=. nanopb.proto
 
-arcflash.pb arcflash.pb.c arcflash.pb.h arcflash_pb2.py: arcflash.proto ../../third_party/nanopb/generator/proto/nanopb_pb2.py
-	protoc --python_out=. -o$@ $<
-	python3 ../../third_party/nanopb/generator/nanopb_generator.py $@
+arcflash.pb arcflash.pb.c arcflash.pb.h ../python_lib/arcflash/arcflash_pb2.py: arcflash.proto ../../third_party/nanopb/generator/proto/nanopb_pb2.py
+	protoc -o arcflash.pb --python_out=../python_lib/arcflash $<
+	python3 ../../third_party/nanopb/generator/nanopb_generator.py arcflash.pb
 
 SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o \
 	arcflash.pb.o \
@@ -71,3 +71,6 @@ switcher.elf: $(SWITCHER_OBJS)
 	arm-none-eabi-size $<
 	$(OBJCOPY) -O binary $< $@
 	ls -al $@
+
+../python_lib/arcflash/bootloader.bin: switcher.rom
+	cp $< $@

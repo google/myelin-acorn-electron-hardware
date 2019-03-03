@@ -8,21 +8,44 @@ package arcflash;
 
 // Flash bank metadata
 message FlashBank {
-    // Bank ID
-    int32 bank_id = 1;
+    // Bank pointer (byte offset into full flash)
+    int32 bank_ptr = 1;
+
+    // Bank string tag (optional)
+    string bank_tag = 2;
 
     // Bank size (bytes), typically 512k/1M/2M/4M
-    int32 bank_size = 2;
+    int32 bank_size = 3;
 
-    // Name to display
-    string bank_name = 3;
+    // Name to display in menu
+    string bank_name = 4;
+
+    // CMOS snapshot tag used for this flash bank.  Multiple
+    // banks can use the same CMOS snapshot if they are compatible.
+    string cmos_tag = 5;
+}
+
+// Entire metadata block used by bootloader
+message FlashDescriptor {
+    // Information about a single flash bank
+    repeated FlashBank bank = 1;
+
+    // SHA1 hash of the entire flash area
+    string hash_sha1 = 2;
 }
 
 // CMOS snapshot (stored in flash)
 message CMOS {
+    // Tag used to identify which OS this CMOS snapshot is used for.
+    // This is the main ID for a CMOS snapshot.
+    string cmos_tag = 1;
+
     // Flash bank ID corresponding to this CMOS snapshot
-    int32 bank_id = 1;
+    int32 bank_ptr = 2;
+
+    // Flash bank tag corresponding to this CMOS snapshot
+    string bank_tag = 3;
 
     // CMOS data bytes (all 256, including the timestamp)
-    bytes cmos_data = 2;
+    bytes cmos_data = 4;
 }
