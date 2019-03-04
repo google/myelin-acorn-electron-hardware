@@ -17,7 +17,7 @@ CCC = arm-none-eabi-g++
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
-CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb
+CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb -DPB_FIELD_16BIT
 LDFLAGS = -nostdlib -lgcc
 
 .PHONY: default all clean
@@ -25,7 +25,7 @@ LDFLAGS = -nostdlib -lgcc
 default: all
 
 clean:
-	rm -vf *.bin *.elf *.o *.rom *.pb *.pb.*
+	rm -vf *.bin *.elf *.o *.rom *.pb *.pb.* ../../third_party/nanopb/*.o
 
 all: switcher.rom jump_to_rom.bin ../python_lib/arcflash/bootloader.bin
 
@@ -46,6 +46,9 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 
 %.rom: %.bin
 	cp $< $@
+
+# Force protos to build first
+main.o: arcflash.pb.h
 
 # nanopb build step
 ../../third_party/nanopb/generator/proto/nanopb_pb2.py: ../../third_party/nanopb/generator/proto/nanopb.proto

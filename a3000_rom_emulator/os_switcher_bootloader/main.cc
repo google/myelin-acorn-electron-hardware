@@ -21,12 +21,17 @@
 // switching banks).
 
 #include "arcflash.h"
+#include "arcflash.pb.h"
+#include "pb_decode.h"
 
 #define BUF_SIZE 512
 uint32_t buf[BUF_SIZE];
 
 // Timer
 uint32_t _millis = 0;
+
+// Decoded descriptor proto, from flash
+arcflash_FlashDescriptor descriptor;
 
 // disable interrupts by setting bits 26 (F) and 27 (I) in the PSR
 void disable_interrupts() {
@@ -233,8 +238,8 @@ void loop() {
     int b = read_serial_rx();
     // write_serial_tx(b);  // DEBUG disabled this so i can see the write_serial_byte output (and tweak the NOPs to work at 8MHz)
     // output to screen
-    if (pixptr >= SCREEN_ADDR(0, 200)) {
-      pixptr = SCREEN_ADDR(0, 100);
+    if (pixptr >= SCREEN_ADDR(0, 248)) {
+      pixptr = SCREEN_ADDR(0, 240);
       ++white;
       write_serial_byte(debug_byte);
       ++debug_byte;
@@ -261,12 +266,38 @@ void keyboard_keydown(uint8_t keycode) {
     case KEY_8: c = '8'; break;
     case KEY_9: c = '9'; break;
     case KEY_0: c = '0'; break;
+    case KEY_A: c = 'A'; break;
+    case KEY_B: c = 'B'; break;
+    case KEY_C: c = 'C'; break;
+    case KEY_D: c = 'D'; break;
+    case KEY_E: c = 'E'; break;
+    case KEY_F: c = 'F'; break;
+    case KEY_G: c = 'G'; break;
+    case KEY_H: c = 'H'; break;
+    case KEY_I: c = 'I'; break;
+    case KEY_J: c = 'J'; break;
+    case KEY_K: c = 'K'; break;
+    case KEY_L: c = 'L'; break;
+    case KEY_M: c = 'M'; break;
+    case KEY_N: c = 'N'; break;
+    case KEY_O: c = 'O'; break;
+    case KEY_P: c = 'P'; break;
+    case KEY_Q: c = 'Q'; break;
+    case KEY_R: c = 'R'; break;
+    case KEY_S: c = 'S'; break;
+    case KEY_T: c = 'T'; break;
+    case KEY_U: c = 'U'; break;
+    case KEY_V: c = 'V'; break;
+    case KEY_W: c = 'W'; break;
+    case KEY_X: c = 'X'; break;
+    case KEY_Y: c = 'Y'; break;
+    case KEY_Z: c = 'Z'; break;
   }
 
-  if (c) {
+  if (c && c >= 'A' && c < 'A' + descriptor.bank_count) {
     // TODO turn this into a proper keyboard handler, but for now assume a
     // keydown on 0-9 is to select an OS to boot
-    display_goto(48, 64);
+    display_goto(48, 216);
     display_printf("Selected OS %c", c);
     while (1) {
       write_serial_byte('*');
@@ -296,15 +327,47 @@ extern "C" void main_program() {
 
   // Draw something on screen
   uint8_t c = 0;
-  for (uint32_t y = 24; y < HEIGHT; ++y) {
+  for (uint32_t y = 24; y < 32; ++y) {
+    for (uint32_t x = 0; x < WIDTH; ++x) {
+      SCREEN[y * WIDTH + x] = c++;
+    }
+  }
+  for (uint32_t y = 232; y < 240; ++y) {
     for (uint32_t x = 0; x < WIDTH; ++x) {
       SCREEN[y * WIDTH + x] = c++;
     }
   }
 
-  display_goto(0, 32);
-  display_printf("Hit 0-9 to select OS to switch to, then hit RESET to boot into it.  "
-                "(Currently we have no serial RX so there's no way to confirm that the flash bank has been selected.)");
+  display_goto(0, 40);
+
+  // Descriptor is placed at the end of the first 128k of ROM space
+  const uint32_t* descriptor_size = (uint32_t*)(0x3800000L + 128*1024 - 4);
+  // display_printf("descriptor size %08lx\n", *descriptor_size);
+
+  const uint8_t* descriptor_ptr = (uint8_t*)(0x3800000L + 128*1024 - 4 - *descriptor_size);
+  // display_printf("descriptor at %08lx\n", (uint32_t)descriptor);
+
+  pb_istream_t stream = pb_istream_from_buffer(descriptor_ptr, *descriptor_size);
+  if (!pb_decode(&stream, arcflash_FlashDescriptor_fields, &descriptor)) {
+    display_printf("ERROR: Failed to decode flash descriptor - please reprogram flash.\n");
+    while (1);  // Fatal error
+  } else {
+    char bank_key = 'A';
+    // display_printf("hash %s\n", descriptor.hash_sha1);
+    // display_printf("bank count %d\n", descriptor.bank_count);
+
+    display_printf("Please select an operating system to boot:\n\n");
+    for (int bank_id = 0; bank_id < descriptor.bank_count; ++bank_id, ++bank_key) {
+      arcflash_FlashBank* bank = &descriptor.bank[bank_id];
+      display_printf("    %c: %s [%dM]\n", bank_key, bank->bank_name, bank->bank_size/1048576);
+    }
+
+    display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.  "
+                  "(Currently we have no serial RX so there's no way to confirm that the "
+                  "flash bank has been selected.)",
+                  bank_key-1);
+  }
+
 
   // TODO init IOC and check keyboard
 

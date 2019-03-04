@@ -7,7 +7,7 @@ MEMORY {
 	RAM (rwx) : ORIGIN = 0x2028000, LENGTH = 512k  /* first 160k is screen mem */
 }
 
-C_STACK_SIZE = 16384;
+C_STACK_SIZE = 65536;
 
 SECTIONS {
 	/* reset code, runs from zero */

@@ -5,6 +5,8 @@ from __future__ import print_function
 import hashlib
 import pkg_resources
 import struct
+import sys
+
 import arcflash_pb2
 
 __all__ = ["_1M", "_2M", "_4M", "ROM", "FlashImage"]
@@ -50,6 +52,12 @@ class ROM:
 
 def FlashImage(roms):
     print("Arcflash ROM builder / image flasher\n")
+
+    args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    if len(args):
+        cmd = args.pop(0)
+    else:
+        cmd = 'build'
 
     # Arcflash v1 has 16MB of flash
     flash_size = _1M * 16
@@ -146,12 +154,18 @@ def FlashImage(roms):
     bootloader_binary = pkg_resources.resource_string(__name__, "bootloader.bin")
     descriptor_binary = descriptor.SerializeToString()
 
+    assert len(bootloader_binary) + len(descriptor_binary) + 4 < 128*1024, \
+        "Bootloader binary plus descriptor won't fit in 128K - need to change memory map"
     bootloader_bank = (
+        # Start with the binary
         bootloader_binary +
-        ("\xff" * (bootloader_bank_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
+        # Then padding to make binary + padding + descriptor + length == 128k
+        ("\xff" * (128*1024 - len(bootloader_binary) - len(descriptor_binary) - 4)) +
         descriptor_binary +
-        struct.pack("<i", len(descriptor_binary))
-        )
+        struct.pack("<i", len(descriptor_binary)) +
+        # Then padding to 1M (which in future will also contain CMOS data)
+        ("\xff" * (bootloader_bank_size - 128*1024))
+    )
     assert(len(bootloader_bank) == bootloader_bank_size)
     print("Bootloader added.")
 
@@ -161,4 +175,14 @@ def FlashImage(roms):
         "An error occurred: flash ended up %d bytes long and should be max %d" % (len(flash), flash_size)
 
     # And save it!  (Or upload it)
-    # TODO
+    if cmd == 'save':
+        if not len(args):
+            raise Exception("Syntax: %s save <filename>" % sys.argv[0])
+        fn = args.pop(0)
+        print("Saving flash image to %s" % fn)
+        open(fn, "wb").write(flash)
+        return
+
+    if cmd == 'upload':
+        print("Uploading to flash")
+        # TODO
