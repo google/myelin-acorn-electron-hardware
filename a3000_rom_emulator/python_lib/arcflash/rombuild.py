@@ -8,6 +8,7 @@ import struct
 import sys
 
 import arcflash_pb2
+import uploader
 
 __all__ = ["_1M", "_2M", "_4M", "ROM", "FlashImage"]
 
@@ -185,4 +186,4 @@ def FlashImage(roms):
 
     if cmd == 'upload':
         print("Uploading to flash")
-        # TODO
+        uploader.upload(flash)
