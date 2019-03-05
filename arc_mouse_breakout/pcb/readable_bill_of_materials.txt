@@ -1,0 +1,13 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+HDR
+- Value: Mouse
+- Description: 1x10 0.1 inch male header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x10_P2.54mm_Vertical
+
+MOUSE
+- Value: CUI-MD90S
+- Description: 
+- KiCad package: myelin-kicad:minidin_9_pcb_mount
+

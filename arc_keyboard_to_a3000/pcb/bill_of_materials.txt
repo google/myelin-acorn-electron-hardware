@@ -1,0 +1,3 @@
+Identifier	Value	Description	KiCad package
+HDR	A3000 KB	1x6 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
+KB	CUI-MD60S		myelin-kicad:minidin_6_ps2_pcb_mount
