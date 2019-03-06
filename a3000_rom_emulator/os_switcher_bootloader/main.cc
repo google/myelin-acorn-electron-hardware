@@ -241,7 +241,7 @@ void loop() {
     if (pixptr >= SCREEN_ADDR(0, 248)) {
       pixptr = SCREEN_ADDR(0, 240);
       ++white;
-      write_serial_byte(debug_byte);
+      if (debug_byte != '*') write_serial_byte(debug_byte);
       ++debug_byte;
       if (debug_byte > 126) debug_byte = 32;
     }
@@ -296,12 +296,29 @@ void keyboard_keydown(uint8_t keycode) {
 
   if (c && c >= 'A' && c < 'A' + descriptor.bank_count) {
     // TODO turn this into a proper keyboard handler, but for now assume a
-    // keydown on 0-9 is to select an OS to boot
+    // keydown on A-Z is to select an OS to boot
+
+    int bank_id = c - 'A';
+    arcflash_FlashBank* bank = &descriptor.bank[bank_id];
+
     display_goto(48, 216);
-    display_printf("Selected OS %c", c);
+    display_printf("Selected OS %c (%s)", c, bank->bank_name);
+
+    // This is the lower 7 bits of the byte that rom_emulator.ino sends to the
+    // CPLD to select the flash bank.  As such, this msut stay in sync with
+    // a3000_rom_emulator.v -- if we switch to 512k banks, the format will
+    // change.
+    uint8_t flash_bank_select_command =
+      // 0x30 for 4M, 0x10 for 2M, 0 for 1M
+      (bank->bank_size > 2*1048576 ? 0x30 :
+        (bank->bank_size > 1048576 ? 0x10 : 0)) |
+      // 0-15 in 1MB increments
+      (bank->bank_ptr / 1048576);
+
+    // Keep sending it to the MCU
     while (1) {
       write_serial_byte('*');
-      write_serial_byte(c);
+      write_serial_byte(flash_bank_select_command);
       delay(500);
     }
   }
@@ -322,6 +339,9 @@ extern "C" void main_program() {
   SETUP_IOC_TIMER0(IOC_TICKS_PER_US * 1000);
   IOC_TIMER0_GO = 0;
 
+  // Initialize serial output
+  write_serial_byte(0);
+
   // Initialize keyboard (IOC timer3 etc)
   keyboard_init();
 
@@ -332,9 +352,19 @@ extern "C" void main_program() {
       SCREEN[y * WIDTH + x] = c++;
     }
   }
+  for (uint32_t y = 32; y < 232; ++y) {
+    for (uint32_t x = 0; x < WIDTH; ++x) {
+      SCREEN[y * WIDTH + x] = 0;
+    }
+  }
   for (uint32_t y = 232; y < 240; ++y) {
     for (uint32_t x = 0; x < WIDTH; ++x) {
       SCREEN[y * WIDTH + x] = c++;
+    }
+  }
+  for (uint32_t y = 240; y < HEIGHT; ++y) {
+    for (uint32_t x = 0; x < WIDTH; ++x) {
+      SCREEN[y * WIDTH + x] = 0;
     }
   }
 

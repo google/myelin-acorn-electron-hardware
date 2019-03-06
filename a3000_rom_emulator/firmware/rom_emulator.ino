@@ -207,42 +207,30 @@ uint32_t flash_read(uint32_t A) {
   return D;
 }
 
-// 7 bits: reset_arm (0x40), use_la21 (0x20), use_la20 (0x10), bank:4
-static uint8_t flash_bank = 0;
-#define RESET_ARM 0x40
+// 7 bits: unused, previously reset_arm (0x40), use_la21 (0x20), use_la20 (0x10), bank:4
+// TODO see if we can add in a use_la19 for 512k banks
+static uint8_t flash_bank_select_command = 0;  // initial: bootloader bank, 1M
 #define BANK_4M   0x30
 #define BANK_2M   0x10
 #define BANK_1M   0x00
-
-static uint8_t banks[8] = {
-  // initial layout: four 1M banks, two 2M banks, two 4M banks = 16M total.
-  BANK_1M | 0,
-  BANK_1M | 1,
-  BANK_1M | 2,
-  BANK_1M | 3,
-  BANK_2M | 4,
-  BANK_2M | 6,
-  BANK_4M | 8,
-  BANK_4M | 12,
-};
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
   select_spi();
 
-  // Reset allowing_arm_access to 1 in the CPLD
+  // Reset allowing_arm_access to 1 in the CPLD, and update the bank
+  // select settings if they have changed.
   CPLD_SS_CLEAR();
-  spi_transfer(0x80 | banks[flash_bank]);
+  spi_transfer(0x80 | flash_bank_select_command);
   CPLD_SS_SET();
 }
 
-// Select a particular flash bank
-void select_flash_bank(uint8_t bank) {
-  if (bank > 7) bank = 0;
-  flash_bank = bank;
+// Select a particular flash bank.
+void select_flash_bank(uint8_t bank_select_command) {
+  flash_bank_select_command = bank_select_command;
   if (Serial.dtr()) {
-    Serial.print("Selecting flash bank ");
-    Serial.println(flash_bank);
+    Serial.print("Send flash bank select command 0x");
+    Serial.println(flash_bank_select_command, HEX);
   }
   flash_unlock();
 }
@@ -683,6 +671,10 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
 
 void loop() {
 
+  // Switch to serial mode if we're in SPI mode.  This will do nothing
+  // if we're already in serial mode.
+  select_uart();
+
   // DEBUG: output 0-255 on cpld_uart
   static uint8_t uart_debug_char = 0;
   static long last_char_written = 0;
@@ -694,20 +686,33 @@ void loop() {
   }
 
   if (sercom2.availableDataUART()) {
-    uint8_t c = sercom2.readDataUART();
-    if (Serial.dtr()) {
-      Serial.print("received: ");
-      Serial.println((char)c);
-    }
-
-    static int bitbang_serial_have_star = 0;
-    if (c == '*') {
-      bitbang_serial_have_star = 1;
-    } else {
-      if (c >= '0' && c <= '7' && bitbang_serial_have_star) {
-        select_flash_bank(c - '0');
+    if (sercom2.isFrameErrorUART()) {
+      // Ignore char with frame error
+      sercom2.clearFrameErrorUART();
+      uint8_t c = sercom2.readDataUART();
+      if (Serial.dtr() && c != 0 && c != 0xFF) {
+        Serial.print("frame error: ");
+        Serial.println(c, HEX);
       }
-      bitbang_serial_have_star = 0;
+    } else {
+      // Process correctly-received char
+      uint8_t c = sercom2.readDataUART();
+      if (Serial.dtr() &&
+          // TODO figure out why we sometimes get a nonstop stream of 0xFF.
+          // Setting the line high should result in idle, not this.
+          c != 0xFF) {
+        Serial.print("received: ");
+        Serial.println(c, HEX);
+      }
+
+      static int bitbang_serial_have_star = 0;
+      if (bitbang_serial_have_star) {
+        // Byte is a flash bank select command
+        select_flash_bank(c);
+        bitbang_serial_have_star = 0;
+      } else if (c == '*') {
+        bitbang_serial_have_star = 1;
+      }
     }
   }
 
@@ -825,6 +830,12 @@ void loop() {
         sercom2.writeDataUART(42);
         while (!sercom2.isDataRegisterEmptyUART());
         Serial.println("done");
+        break;
+      }
+      case 'X': {
+        // restart
+        Serial.println("Reset to bootloader");
+        select_flash_bank(0);
         break;
       }
       case 'Z': {

@@ -1,0 +1,10 @@
+arcflash.FlashBank.bank_tag max_size:32
+arcflash.FlashBank.bank_name max_size:255
+arcflash.FlashBank.cmos_tag max_size:32
+
+arcflash.FlashDescriptor.bank max_count:32
+arcflash.FlashDescriptor.hash_sha1 max_size:64
+
+arcflash.CMOS.cmos_tag max_size:32
+arcflash.CMOS.cmos_data max_size:255
+arcflash.CMOS.bank_tag max_size:32
