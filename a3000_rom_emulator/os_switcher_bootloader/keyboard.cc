@@ -21,6 +21,8 @@
 // Globals
 int mouse_x = WIDTH / 2, mouse_y = HEIGHT / 2;
 
+static int kb_display_x = 0, kb_display_y = HEIGHT-8;
+
 // Reset codes
 #define HRST 0xff
 #define RAK1 0xfe
@@ -100,12 +102,13 @@ void keyboard_init() {
 __attribute__((section(".ramfunc")))
 void keyboard_set_state(keyboard_state_t state) {
     if (keyboard_state < KEYBOARD_IDLE && state >= KEYBOARD_IDLE) {
-        display_goto(50, HEIGHT-8);
-        display_print("KB OK");
+        display_goto(0, kb_display_y);
+        display_print("KB OK ");
     } else if (state < KEYBOARD_IDLE) {
-        display_goto(50, HEIGHT-8);
-        display_print("KB ??");
+        display_goto(0, kb_display_y);
+        display_print("KB ?? ");
     }
+    kb_display_x = display_x;
     keyboard_state = state;
 }
 
@@ -140,7 +143,9 @@ void keyboard_poll() {
     // Send SMAK (enable keyboard and mouse)
 
     // debug
-    display_printf("%x %x", keyboard_state, data);
+    if (kb_display_x > WIDTH-100) kb_display_x = 0;
+    display_goto(kb_display_x, kb_display_y);
+    display_printf("%x %x ", keyboard_state, data);
 
     // Handle reset commands at all times
     switch (data) {

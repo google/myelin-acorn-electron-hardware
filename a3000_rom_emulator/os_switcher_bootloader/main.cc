@@ -390,6 +390,7 @@ extern "C" void main_program() {
     for (int bank_id = 0; bank_id < descriptor.bank_count; ++bank_id, ++bank_key) {
       arcflash_FlashBank* bank = &descriptor.bank[bank_id];
       display_printf("    %c: %s [%dM]\n", bank_key, bank->bank_name, bank->bank_size/1048576);
+      // display_goto(display_x, display_y+2);
     }
 
     display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.\n"
