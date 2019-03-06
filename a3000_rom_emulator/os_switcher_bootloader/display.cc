@@ -98,8 +98,8 @@ __attribute__((section(".ramfunc")))
 void display_printf(char const *format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	char buf[200];
-	int ret = stbsp_vsnprintf(buf, 200, format, ap);
+	char buf[500];
+	int ret = stbsp_vsnprintf(buf, 500, format, ap);
 	if (ret < 0) {
 		display_print("printf error");
 	} else {

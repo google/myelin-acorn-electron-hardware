@@ -392,9 +392,9 @@ extern "C" void main_program() {
       display_printf("    %c: %s [%dM]\n", bank_key, bank->bank_name, bank->bank_size/1048576);
     }
 
-    display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.  "
-                  "(Currently we have no serial RX so there's no way to confirm that the "
-                  "flash bank has been selected.)",
+    display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.\n"
+                  "(Currently we have no serial RX so there's no way to confirm that the\n"
+                  "flash bank has been selected.  Just wait a second, then hit RESET.)\n\n",
                   bank_key-1);
   }
 
