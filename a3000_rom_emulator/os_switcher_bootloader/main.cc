@@ -16,9 +16,12 @@
 // Main C++ entrypoint.  By the time this is called, we know the memory is
 // working, and everything necessary to execute C++ code has been done.
 
-// Most of the functions here are placed in .ramfunc so they can run while the
-// flash is inaccessible (i.e. when it's being updated, or when we're
-// switching banks).
+// All of this code will execute from RAM, because .text and .rodata are
+// placed in the .data segment by switcher.ld, and are copied into RAM in
+// start.s, right before branching to cstartup. This allows everything to run
+// while the flash is inaccessible (i.e. when it's being updated, or when
+// we're switching banks), and gives us a speed boost without having to
+// configure the ROM access timing.
 
 #include "arcflash.h"
 #include "arcflash.pb.h"
@@ -55,7 +58,6 @@ void enable_interrupts() {
 
 #define UART_HALF_BIT_TIME true
 #define UART_FULL_BIT_TIME false
-__attribute__((section(".ramfunc")))
 static void setup_bitbang_uart(bool half_time) {
   // Set IOC timer period to support bit-banged UART operation.
 
@@ -71,19 +73,16 @@ static void setup_bitbang_uart(bool half_time) {
   SETUP_IOC_TIMER1(uart_timer);
 }
 
-__attribute__((section(".ramfunc")))
 void write_serial_tx(int b) {
   volatile uint32_t *ptr = (volatile uint32_t *)(0x3fffff0L + ((b & 1) ? 4 : 0));
   // force compiler to read *ptr even though we don't care about the result
   asm volatile ("" : "=m" (*ptr) : "r" (*ptr));
 }
 
-__attribute__((section(".ramfunc")))
 int read_serial_rx() {
   return (*(volatile uint32_t *)0x3fffff8L) & 1;
 }
 
-__attribute__((section(".ramfunc")))
 void write_serial_byte(uint8_t c) {
   volatile uint32_t *zero = (volatile uint32_t *)0x3fffff0L;
   volatile uint32_t *one = (volatile uint32_t *)0x3fffff4L;
@@ -151,7 +150,6 @@ void write_serial_byte(uint8_t c) {
 #define SERIAL_FRAMING_ERROR 0x100
 // - or 0x200 for a timeout
 #define SERIAL_TIMEOUT 0x200
-__attribute__((section(".ramfunc")))
 uint32_t read_serial_byte() {
   volatile uint32_t *rxd = (volatile uint32_t *)0x3fffff8L;
 #define RXD ((*rxd) & 1)
@@ -206,7 +204,6 @@ uint32_t read_serial_byte() {
   return data & 0xFF;
 }
 
-__attribute__((section(".ramfunc")))
 void timer_poll() {
     if (IOC_TM0) {
       IOC_CLEAR_TM0();
@@ -214,7 +211,6 @@ void timer_poll() {
     }
 }
 
-__attribute__((section(".ramfunc")))
 void delay(int ms) {
   uint32_t start = millis();
   while ((millis() - start) < ms) {
@@ -222,7 +218,6 @@ void delay(int ms) {
   }
 }
 
-__attribute__((section(".ramfunc")))
 void loop() {
   volatile uint8_t *pixptr = SCREEN_END;
   uint8_t debug_byte = 32;
@@ -252,7 +247,6 @@ void loop() {
   }
 }
 
-__attribute__((section(".ramfunc")))
 void keyboard_keydown(uint8_t keycode) {
   char c = 0;
   switch (keycode) {
@@ -324,7 +318,6 @@ void keyboard_keydown(uint8_t keycode) {
   }
 }
 
-__attribute__((section(".ramfunc")))
 void keyboard_keyup(uint8_t keycode) {
   // ignore
 }
@@ -352,19 +345,9 @@ extern "C" void main_program() {
       SCREEN[y * WIDTH + x] = c++;
     }
   }
-  for (uint32_t y = 32; y < 232; ++y) {
-    for (uint32_t x = 0; x < WIDTH; ++x) {
-      SCREEN[y * WIDTH + x] = 0;
-    }
-  }
   for (uint32_t y = 232; y < 240; ++y) {
     for (uint32_t x = 0; x < WIDTH; ++x) {
       SCREEN[y * WIDTH + x] = c++;
-    }
-  }
-  for (uint32_t y = 240; y < HEIGHT; ++y) {
-    for (uint32_t x = 0; x < WIDTH; ++x) {
-      SCREEN[y * WIDTH + x] = 0;
     }
   }
 

@@ -99,7 +99,6 @@ void keyboard_init() {
     keyboard_state = KEYBOARD_INIT;
 }
 
-__attribute__((section(".ramfunc")))
 void keyboard_set_state(keyboard_state_t state) {
     if (keyboard_state < KEYBOARD_IDLE && state >= KEYBOARD_IDLE) {
         display_goto(0, kb_display_y);
@@ -112,7 +111,6 @@ void keyboard_set_state(keyboard_state_t state) {
     keyboard_state = state;
 }
 
-__attribute__((section(".ramfunc")))  // so this can run while ROM is inaccessible
 void keyboard_poll() {
     if (!IOC_RX_FULL) {
         // Are we stalled in the reset process?

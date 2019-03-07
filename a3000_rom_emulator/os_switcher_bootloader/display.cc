@@ -11,13 +11,11 @@ extern "C" {
 	extern const uint8_t riscos_font[8 * 256];
 }
 
-__attribute__((section(".ramfunc")))
 void display_goto(int x, int y) {
 	display_x = x;
 	display_y = y;
 }
 
-__attribute__((section(".ramfunc")))
 static void newline() {
 	display_x = 0;
 	display_y += 8;
@@ -33,7 +31,6 @@ static void newline() {
 	}
 }
 
-__attribute__((section(".ramfunc")))
 void display_print_char(char c) {
 	switch (c) {
 		case '\r':
@@ -60,14 +57,12 @@ void display_print_char(char c) {
 	}
 }
 
-__attribute__((section(".ramfunc")))
 void display_print(const char* s) {
 	for (const uint8_t *sptr = (const uint8_t *)s; *sptr; sptr++) {
 		display_print_char(*sptr);
 	}
 }
 
-__attribute__((section(".ramfunc")))
 char hex_digit(int v) {
 	if (v < 10)
 		return '0' + v;
@@ -76,7 +71,6 @@ char hex_digit(int v) {
 	return 'X';
 }
 
-__attribute__((section(".ramfunc")))
 void display_print_hex(uint32_t v) {
 	char s[9];
 	int digits = 1;
@@ -94,7 +88,6 @@ void display_print_hex(uint32_t v) {
 	display_print(s);
 }
 
-__attribute__((section(".ramfunc")))
 void display_printf(char const *format, ...) {
 	va_list ap;
 	va_start(ap, format);

@@ -31,6 +31,9 @@
 .global _start
 
 _start:
+    @ TODO add in arm7500 startup (16-to-32 bit setup code)
+    @ TODO detect Arc vs RPC -- https://stardot.org.uk/forums/viewtopic.php?f=29&t=16647&e=1&view=unread#p230002 -- and jump into IOMDHAL/s/Top if we're not on an Arc.
+
     @ On reset, pc==0, but we want to be at 0x3800000.
     @ Jump to in_rom_now by loading its proper address into pc.
     ldr pc, in_rom_now_addr
@@ -172,7 +175,7 @@ vidc_setup_done:
     @ blank video memory
     mov r0, #0
     ldr r1, =0x02000000
-    ldr r2, =0x02004000
+    ldr r2, =0x02028000
 still_clearing_video_memory:
     cmp r1, r2
     strlo r0, [r1], #4

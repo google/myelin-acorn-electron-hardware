@@ -14,13 +14,19 @@ SECTIONS {
 	. = 0x0;
 	.reset : {
 		*start.o (.text)
+		*riscos_font.o (.text)
 		. = ALIGN(0x4);
 	} >ROM
 
 	/* main code, runs from rom */
 	.text : {
+		_text = .;
+		/* These normally go here, but I've moved them into .data,
+		 * after .ramfunc, so they run from RAM and won't be disturbed
+		 * by flash reprogramming.
 		*(.text .text* .gnu.linkonce.t.*)
 		*(.rodata .rodata* .gnu.linkonce.r.*)
+		*/
 		. = ALIGN(0x4);
 		_etext = .;  /* used to locate initial values for .data */
 	} >ROM
@@ -30,6 +36,9 @@ SECTIONS {
 		_data = .;
 		*(.data)
 		*(.ramfunc)
+		/* Moved from .text above so we execute from RAM */
+		*(.text .text* .gnu.linkonce.t.*)
+		*(.rodata .rodata* .gnu.linkonce.r.*)
 		. = ALIGN(0x4);
 		_edata = .;
 	} >RAM AT>ROM
