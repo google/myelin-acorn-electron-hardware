@@ -395,8 +395,12 @@ extern "C" void main_program() {
 
     display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.\n"
                   "(Currently we have no serial RX so there's no way to confirm that the\n"
-                  "flash bank has been selected.  Just wait a second, then hit RESET.)\n\n",
-                  bank_key-1);
+                  "flash bank has been selected.  Just wait a second, then hit RESET.)\n\n"
+                  "Flash usage: %dk out of %dk; %dk free.\n\n",
+                  bank_key-1,
+                  (descriptor.flash_size - descriptor.free_space) / 1024,
+                  descriptor.flash_size / 1024,
+                  descriptor.free_space / 1024);
   }
 
 

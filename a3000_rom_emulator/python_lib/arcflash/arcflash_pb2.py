@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='arcflash',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0e\x61rcflash.proto\x12\x08\x61rcflash\"g\n\tFlashBank\x12\x10\n\x08\x62\x61nk_ptr\x18\x01 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x02 \x01(\t\x12\x11\n\tbank_size\x18\x03 \x01(\x05\x12\x11\n\tbank_name\x18\x04 \x01(\t\x12\x10\n\x08\x63mos_tag\x18\x05 \x01(\t\"G\n\x0f\x46lashDescriptor\x12!\n\x04\x62\x61nk\x18\x01 \x03(\x0b\x32\x13.arcflash.FlashBank\x12\x11\n\thash_sha1\x18\x02 \x01(\t\"O\n\x04\x43MOS\x12\x10\n\x08\x63mos_tag\x18\x01 \x01(\t\x12\x10\n\x08\x62\x61nk_ptr\x18\x02 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x03 \x01(\t\x12\x11\n\tcmos_data\x18\x04 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\x0e\x61rcflash.proto\x12\x08\x61rcflash\"g\n\tFlashBank\x12\x10\n\x08\x62\x61nk_ptr\x18\x01 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x02 \x01(\t\x12\x11\n\tbank_size\x18\x03 \x01(\x05\x12\x11\n\tbank_name\x18\x04 \x01(\t\x12\x10\n\x08\x63mos_tag\x18\x05 \x01(\t\"o\n\x0f\x46lashDescriptor\x12!\n\x04\x62\x61nk\x18\x01 \x03(\x0b\x32\x13.arcflash.FlashBank\x12\x11\n\thash_sha1\x18\x02 \x01(\t\x12\x12\n\nflash_size\x18\x03 \x01(\x05\x12\x12\n\nfree_space\x18\x04 \x01(\x05\"O\n\x04\x43MOS\x12\x10\n\x08\x63mos_tag\x18\x01 \x01(\t\x12\x10\n\x08\x62\x61nk_ptr\x18\x02 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x03 \x01(\t\x12\x11\n\tcmos_data\x18\x04 \x01(\x0c\x62\x06proto3')
 )
 
 
@@ -105,6 +105,20 @@ _FLASHDESCRIPTOR = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='flash_size', full_name='arcflash.FlashDescriptor.flash_size', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='free_space', full_name='arcflash.FlashDescriptor.free_space', index=3,
+      number=4, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -118,7 +132,7 @@ _FLASHDESCRIPTOR = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=133,
-  serialized_end=204,
+  serialized_end=244,
 )
 
 
@@ -169,8 +183,8 @@ _CMOS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=206,
-  serialized_end=285,
+  serialized_start=246,
+  serialized_end=325,
 )
 
 _FLASHDESCRIPTOR.fields_by_name['bank'].message_type = _FLASHBANK

@@ -32,6 +32,12 @@ message FlashDescriptor {
 
     // SHA1 hash of the entire flash area
     string hash_sha1 = 2;
+
+    // Flash size in bytes (currently only 16M, but may change in future)
+    int32 flash_size = 3;
+
+    // Free bytes in the flash
+    int32 free_space = 4;
 }
 
 // CMOS snapshot (stored in flash)

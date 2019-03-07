@@ -107,7 +107,10 @@ def FlashImage(roms):
     print()
 
     descriptor = arcflash_pb2.FlashDescriptor(
-        bank=[rom.as_proto() for rom in roms])
+        bank=[rom.as_proto() for rom in roms],
+        flash_size=flash_size,
+        free_space=flash_free,
+    )
 
     # Time to build the flash image!
     # Start by collecting all images aside from the bootloader.
