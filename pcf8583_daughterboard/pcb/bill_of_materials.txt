@@ -1,0 +1,12 @@
+Identifier	Value	Description	KiCad package
+BATT	Battery		Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+C1	10u	10u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C3	15p	15p capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+D1	S1ATR	Rectifier diode	Diode_SMD:D_SMA
+D2	S1ATR	Rectifier diode	Diode_SMD:D_SMA
+HDR	Ext	4 pin 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+NVRAM	PCF8583P		Package_DIP:DIP-8_W7.62mm
+R1	100R	100R resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R2	100R	100R resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+XTAL	32.768kHz		Crystal:Crystal_AT310_D3.0mm_L10.0mm_Horizontal_1EP_style2

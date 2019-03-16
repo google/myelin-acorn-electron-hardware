@@ -1,0 +1,58 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+BATT
+- Value: Battery
+- Description: 
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+
+C1
+- Value: 10u
+- Description: 10u capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C2
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C3
+- Value: 15p
+- Description: 15p capacitor in 0805 package
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+D1
+- Value: S1ATR
+- Description: Rectifier diode
+- KiCad package: Diode_SMD:D_SMA
+
+D2
+- Value: S1ATR
+- Description: Rectifier diode
+- KiCad package: Diode_SMD:D_SMA
+
+HDR
+- Value: Ext
+- Description: 4 pin 0.1 inch male header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+
+NVRAM
+- Value: PCF8583P
+- Description: 
+- KiCad package: Package_DIP:DIP-8_W7.62mm
+
+R1
+- Value: 100R
+- Description: 100R resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R2
+- Value: 100R
+- Description: 100R resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+XTAL
+- Value: 32.768kHz
+- Description: 
+- KiCad package: Crystal:Crystal_AT310_D3.0mm_L10.0mm_Horizontal_1EP_style2
+
