@@ -3,7 +3,15 @@ OUTPUT_ARCH("arm")
 ENTRY(_start)
 
 MEMORY {
-	ROM (rx)  : ORIGIN = 0x3800000, LENGTH = 2M
+	/* ROM layout:
+		0 - IOMD32 RISC OS image
+		336k - pointer to Risc PC bootloader
+		336k+4 - pointer to Arc bootloader
+		336k+8 = 0x54008 - Arc bootloader
+		? - Risc PC bootloader (movable bc it gets copied straight to RAM)
+	*/
+	/* ROM (rx)  : ORIGIN = 0x3800000, LENGTH = 512k */
+	ROM (rx)  : ORIGIN = 0x3854008, LENGTH = 512k
 	RAM (rwx) : ORIGIN = 0x2028000, LENGTH = 512k  /* first 160k is screen mem */
 }
 

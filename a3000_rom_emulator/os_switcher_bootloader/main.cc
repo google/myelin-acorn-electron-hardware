@@ -24,8 +24,6 @@
 // configure the ROM access timing.
 
 #include "arcflash.h"
-#include "arcflash.pb.h"
-#include "pb_decode.h"
 
 #define BUF_SIZE 512
 uint32_t buf[BUF_SIZE];
@@ -338,7 +336,7 @@ extern "C" void main_program() {
   // Initialize keyboard (IOC timer3 etc)
   keyboard_init();
 
-  // Draw something on screen
+  // Draw horizontal (rainbow) bars on screen
   uint8_t c = 0;
   for (uint32_t y = 24; y < 32; ++y) {
     for (uint32_t x = 0; x < WIDTH; ++x) {
@@ -353,39 +351,9 @@ extern "C" void main_program() {
 
   display_goto(0, 40);
 
-  // Descriptor is placed at the end of the first 128k of ROM space
-  const uint32_t* descriptor_size = (uint32_t*)(0x3800000L + 128*1024 - 4);
-  // display_printf("descriptor size %08lx\n", *descriptor_size);
+  read_cmos();
 
-  const uint8_t* descriptor_ptr = (uint8_t*)(0x3800000L + 128*1024 - 4 - *descriptor_size);
-  // display_printf("descriptor at %08lx\n", (uint32_t)descriptor);
-
-  pb_istream_t stream = pb_istream_from_buffer(descriptor_ptr, *descriptor_size);
-  if (!pb_decode(&stream, arcflash_FlashDescriptor_fields, &descriptor)) {
-    display_printf("ERROR: Failed to decode flash descriptor - please reprogram flash.\n");
-    while (1);  // Fatal error
-  } else {
-    char bank_key = 'A';
-    // display_printf("hash %s\n", descriptor.hash_sha1);
-    // display_printf("bank count %d\n", descriptor.bank_count);
-
-    display_printf("Please select an operating system to boot:\n\n");
-    for (int bank_id = 0; bank_id < descriptor.bank_count; ++bank_id, ++bank_key) {
-      arcflash_FlashBank* bank = &descriptor.bank[bank_id];
-      display_printf("    %c: %s [%dM]\n", bank_key, bank->bank_name, bank->bank_size/1048576);
-      // display_goto(display_x, display_y+2);
-    }
-
-    display_printf("\nHit A-%c to select OS to switch to, then hit RESET to boot into it.\n"
-                  "(Currently we have no serial RX so there's no way to confirm that the\n"
-                  "flash bank has been selected.  Just wait a second, then hit RESET.)\n\n"
-                  "Flash usage: %dk out of %dk; %dk free.\n\n",
-                  bank_key-1,
-                  (descriptor.flash_size - descriptor.free_space) / 1024,
-                  descriptor.flash_size / 1024,
-                  descriptor.free_space / 1024);
-  }
-
+  parse_descriptor_and_print_menu(ARC_ROM_BASE, &descriptor);
 
   // TODO init IOC and check keyboard
 

@@ -18,6 +18,31 @@ appropriately.  (For example, if you save it as roms/riscos3/switcher.rom, you
 want to have rom_set = 3 in arc.cfg.  Make sure there are no other ROM files
 in the same folder.)
 
+ROM structure
+-------------
+
+The ROM is designed to run on both Archimedes (26-bit ARMv2, MEMC) and Risc PC
+(32-bit IOMD) machines.  The Archimedes code is "freestanding", handling all
+IO etc itself, whereas the Risc PC code runs under a stripped-down RISC OS
+build and uses RISC OS SWI commands for its UI, to access the NVRAM, etc.  To
+make all this work, a number of images are concatenated to make the actual
+ROM:
+
+- 336k: RISC OS build, with modifications:
+  - CPU test on startup, jumping to Archimedes bootloader if ARMv2 detected
+  - No 3 second wait for special keys on boot
+  - Instead of running the configured language module, run RPC bootloader
+- 4 bytes: offset of RPC bootloader
+- 4 bytes: offset of Arc bootloader
+- Arc bootloader
+- RPC bootloader
+
+The Arc bootloader is almost but not quite position-independent code, so it's
+built with a start address of 0x3854008 (Arc ROM area + 336k + 8 bytes), which
+will need to be changed if the RISC OS image ever changes size.  The RPC
+bootloader is copied to RAM by the final boot step in the RISC OS build, so
+it's built with a start address of 0x8000.
+
 Notes about bare metal programming for the Archimedes
 -----------------------------------------------------
 

@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include "arcregs.h"
+#include "arcflash.pb.h"
+
 
 #define STB_SPRINTF_NOUNALIGNED
 #define STB_SPRINTF_NOINT64
@@ -11,6 +13,12 @@ extern uint32_t _millis;
 inline uint32_t millis() { return _millis; }
 extern void keyboard_keydown(uint8_t keycode);
 extern void keyboard_keyup(uint8_t keycode);
+
+// cmos.cc
+extern void read_cmos();
+
+// descriptor.cc
+extern void parse_descriptor_and_print_menu(uint32_t rom_base, arcflash_FlashDescriptor* desc);
 
 // display.cc
 #define WIDTH 640

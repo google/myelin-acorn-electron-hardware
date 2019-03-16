@@ -31,8 +31,6 @@
 .global _start
 
 _start:
-    @ TODO add in arm7500 startup (16-to-32 bit setup code)
-    @ TODO detect Arc vs RPC -- https://stardot.org.uk/forums/viewtopic.php?f=29&t=16647&e=1&view=unread#p230002 -- and jump into IOMDHAL/s/Top if we're not on an Arc.
 
     @ On reset, pc==0, but we want to be at 0x3800000.
     @ Jump to in_rom_now by loading its proper address into pc.
@@ -109,8 +107,9 @@ in_rom_now:
     @ VIDC registers
     ldr r1, =0x03400000  @ VIDCR
 
-    ldr r2, =vidc_reg_table
-    ldr r3, =vidc_setup_done
+    #ldr r2, =vidc_reg_table
+    adr r2, vidc_reg_table
+    adr r3, vidc_setup_done
 write_to_one_vidc_reg:
     cmp r2, r3
     ldrlo r0, [r2], #4
@@ -194,10 +193,13 @@ display_y .req r13  @ y position for plotting text
     @bl plot_character
     @add display_y, display_y, #8
 
-    ldr r0, =banner
+    cmp r11, #0  @ DEBUG - eq if on Arc, ne for IOMD
+    adreq r0, banner
+    adrne r0, iomd_banner
     bl print_string
     b print_banner_done
 banner: .asciz "Arcflash - http://myelin.nz/arcflash"
+iomd_banner: .asciz "Arcflash - http://myelin.nz/arcflash - IOMD"
     .align
 print_banner_done:
 
@@ -223,7 +225,7 @@ still_clearing_bss:
     blo still_clearing_bss
 
     @ copy initial values from rom (_etext) into .data (_data)
-    ldr r1, =_etext
+    ldr r1, =_etext  @ TODO not PIC
     ldr r2, =_data
     ldr r3, =_edata
 still_copying_data:
@@ -259,7 +261,7 @@ plot_character:
 
     @  pattern = charno * 8 [charno<<3] + riscos_font
     lsl plot_pattern_ptr, r0, #3
-    ldr plot_tmp, =riscos_font
+    ldr plot_tmp, =riscos_font  @ TODO not PIC
     add plot_pattern_ptr, plot_pattern_ptr, plot_tmp
     @ for py = 0-7
     mov plot_py, #0

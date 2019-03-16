@@ -151,26 +151,31 @@ def FlashImage(roms):
     descriptor.hash_sha1 = hashlib.sha1(flash).hexdigest()
     print("Flash images collected; %dk, hash %s" % (len(flash)/1024, descriptor.hash_sha1))
 
-    # The bootloader goes at the start of first 128k, and the encoded
+    bootloader_size = 384 * 1024
+    # The bootloader goes at the start of first 384k, and the encoded
     # descriptor followed by a length word goes at the end.  We can't put this
     # in until the end though, as it contains a hash of the rest of the flash
     # data.
     bootloader_binary = pkg_resources.resource_string(__name__, "bootloader.bin")
     descriptor_binary = descriptor.SerializeToString()
 
-    assert len(bootloader_binary) + len(descriptor_binary) + 4 < 128*1024, \
-        "Bootloader binary plus descriptor won't fit in 128K - need to change memory map"
+    assert len(bootloader_binary) + len(descriptor_binary) + 4 < bootloader_size, \
+        "Bootloader binary plus descriptor won't fit in %sk - need to change memory map" % (bootloader_size/1024)
     bootloader_bank = (
         # Start with the binary
         bootloader_binary +
-        # Then padding to make binary + padding + descriptor + length == 128k
-        ("\xff" * (128*1024 - len(bootloader_binary) - len(descriptor_binary) - 4)) +
+        # Then padding to make binary + padding + descriptor + length == 384k
+        ("\xff" * (bootloader_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
         descriptor_binary +
         struct.pack("<i", len(descriptor_binary)) +
         # Then padding to 1M (which in future will also contain CMOS data)
-        ("\xff" * (bootloader_bank_size - 128*1024))
+        ("\xff" * (bootloader_bank_size - bootloader_size))
     )
     assert(len(bootloader_bank) == bootloader_bank_size)
+    print("Descriptor is %d bytes long, placed at %08X." % (
+        len(descriptor_binary),
+        bootloader_size - 4 - len(descriptor_binary)),
+    )
     print("Bootloader added.")
 
     # Now put it all together

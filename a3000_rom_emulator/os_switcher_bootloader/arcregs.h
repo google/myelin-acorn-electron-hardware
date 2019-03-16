@@ -13,6 +13,13 @@
 // limitations under the License.
 
 
+// Arc and RPC ROM locations
+#define ARC_ROM_BASE 0x03800000L
+#define RPC_ROM_BASE 0xFC000000L
+
+// Bootloader ROM size
+#define BOOT_ROM_SIZE (384 * 1024)
+
 // Acorn A3000 era system registers
 
 // Word register; something to be accessed with LDR and STR

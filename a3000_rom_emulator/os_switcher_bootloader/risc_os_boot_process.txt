@@ -1,0 +1,16 @@
+The RISC OS boot process
+------------------------
+
+On IOMD, execution starts at apache/RiscOS/HAL/IOMD/s/Top for initial
+RPC boot code.
+
+This calls Kernel/s/HAL
+
+Which calls Kernel/s/NewReset
+
+Which finally reads the ID of the language module to boot from the
+CMOS (index = LanguageCMOS).  This defaults to 11, the index of the
+Desktop module, and can be overridden in the project file
+(e.g. BCM2835Pico replaces it with 10, the index of BASIC64).  It then
+enters the module by calling SWI OS_Module with
+reason=ModHandReason_Enter, module="Desktop".

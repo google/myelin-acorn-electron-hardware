@@ -45,8 +45,7 @@
 // http://www.riscos.com/support/developers/prm/memoryman.html#40894 shows the map for RISC OS 3.11
 // http://www.riscos.com/support/developers/prm/cmos.html shows the map for RISC OS 3.6
 
-#include <stdint.h>
-#include "arcregs.h"
+#include "arcflash.h"
 
 void cmos_wait() {
 	// TODO
@@ -130,6 +129,12 @@ void read_cmos() {
 		data[i] = cmos_receive((i == 255) ? 0 : 1);  // Ack all but last byte
 	}
 	cmos_stop();
+
+	display_printf("CMOS: ");
+	for (int i = 0; i < 256; ++i) {
+		display_printf(" %x", data[i]);
+	}
+	display_printf("\n");
 }
 
 void write_cmos() {

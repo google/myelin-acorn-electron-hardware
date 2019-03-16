@@ -17,20 +17,29 @@ CCC = arm-none-eabi-g++
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
+
+# assembler: generate PIC code
+ASFLAGS = -k
+# c compiler: target ARM2, use 'mov pc, lr' rather than 'bx lr', skip c++
+# exceptions, don't include most of the clib, optimize, include nanopb
 CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb -DPB_FIELD_16BIT
-LDFLAGS = -nostdlib -lgcc
+# don't include the standard library (which uses 'bx lr' everywhere)
+LDFLAGS = -nostdlib
+# this was in LDFLAGS, but doesn't appear necessary; did I pull in everything
+# needed from arm-trusted-firmware?
+# -lgcc
 
 .PHONY: default all clean
 
 default: all
 
 clean:
-	rm -vf *.bin *.elf *.o *.rom *.pb *.pb.* ../../third_party/nanopb/*.o
+	rm -vf *_boot.bin *.elf *.list *.o *.rom *.pb *.pb.* ../../third_party/nanopb/*.o
 
-all: switcher.rom jump_to_rom.bin ../python_lib/arcflash/bootloader.bin
+all: arcflash.rom jump_to_rom.bin ../python_lib/arcflash/bootloader.bin
 
 %.o: %.s
-	$(AS) -o $@ $<
+	$(AS) $(ASFLAGS) -o $@ $<
 
 riscos_font.o: ../../third_party/riscos/riscos_font.s
 	$(AS) -o $@ $<
@@ -48,7 +57,7 @@ riscos_font.o: ../../third_party/riscos/riscos_font.s
 	cp $< $@
 
 # Force protos to build first
-main.o: arcflash.pb.h
+cstartup.o: arcflash.pb.h
 
 # nanopb build step
 ../../third_party/nanopb/generator/proto/nanopb_pb2.py: ../../third_party/nanopb/generator/proto/nanopb.proto
@@ -58,22 +67,38 @@ arcflash.pb arcflash.pb.c arcflash.pb.h ../python_lib/arcflash/arcflash_pb2.py: 
 	protoc -o arcflash.pb --python_out=../python_lib/arcflash $<
 	python3 ../../third_party/nanopb/generator/nanopb_generator.py arcflash.pb
 
-SWITCHER_OBJS=cmos.o display.o cstartup.o keyboard.o main.o riscos_font.o start.o \
+SHARED_OBJS=cstartup.o \
 	arcflash.pb.o \
+	descriptor.o \
+	printf.o \
 	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod.o \
 	../../third_party/arm-trusted-firmware/arm32_aeabi_divmod_a32.o \
 	../../third_party/arm-trusted-firmware/memcpy.o \
 	../../third_party/arm-trusted-firmware/memset.o \
 	../../third_party/nanopb/pb_common.o ../../third_party/nanopb/pb_encode.o ../../third_party/nanopb/pb_decode.o
 
-switcher.elf: $(SWITCHER_OBJS)
-	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,switcher.map -o $@ $(SWITCHER_OBJS)
-	arm-none-eabi-objdump -S --disassemble switcher.elf > switcher.list
+SWITCHER_OBJS=$(SHARED_OBJS) cmos.o display.o keyboard.o main.o riscos_font.o start.o
+
+RPC_BOOT_OBJS=$(SHARED_OBJS) rpc_main.o rpc_start.o
+
+arc_boot.elf: $(SWITCHER_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,arc_boot.map -o $@ $(SWITCHER_OBJS)
+	arm-none-eabi-objdump -S --disassemble arc_boot.elf > arc_boot.list
+
+rpc_boot.elf: $(RPC_BOOT_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=rpc_boot.ld -Wl,-Map,rpc_boot.map -o $@ $(RPC_BOOT_OBJS)
+	arm-none-eabi-objdump -S --disassemble rpc_boot.elf > rpc_boot.list
 
 %.bin: %.elf
 	arm-none-eabi-size $<
 	$(OBJCOPY) -O binary $< $@
 	ls -al $@
 
-../python_lib/arcflash/bootloader.bin: switcher.rom
+arcflash.rom: risc_os.bin arc_boot.bin rpc_boot.bin
+	python merge_binaries.py $@
+	# to make addresses correct for Arc: --adjust-vma=0x03800000
+	# to make addresses correct for RPC: --adjust-vma=0xfc000000
+	arm-none-eabi-objdump -D -bbinary -marm -Mno-force-thumb -Mreg-names-raw --adjust-vma=0x03800000 $@ > arcflash.list
+
+../python_lib/arcflash/bootloader.bin: arcflash.rom
 	cp $< $@
