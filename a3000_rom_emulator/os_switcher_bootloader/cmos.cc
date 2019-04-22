@@ -132,7 +132,7 @@ void read_cmos() {
 
 	display_printf("CMOS: ");
 	for (int i = 0; i < 256; ++i) {
-		display_printf(" %x", data[i]);
+		display_printf("%02x", data[i]);
 	}
 	display_printf("\n");
 }

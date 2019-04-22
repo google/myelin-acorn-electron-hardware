@@ -31,6 +31,9 @@ uint32_t buf[BUF_SIZE];
 // Timer
 uint32_t _millis = 0;
 
+// mouse position on screen
+int mouse_x = WIDTH / 2, mouse_y = HEIGHT / 2;
+
 // Decoded descriptor proto, from flash
 arcflash_FlashDescriptor descriptor;
 
@@ -318,6 +321,16 @@ void keyboard_keydown(uint8_t keycode) {
 
 void keyboard_keyup(uint8_t keycode) {
   // ignore
+}
+
+void keyboard_mousemove(int mouse_dx, int mouse_dy) {
+  mouse_x += mouse_dx;
+  mouse_y -= mouse_dy;
+  if (mouse_x < 0) mouse_x = 0;
+  if (mouse_x >= WIDTH) mouse_x = WIDTH - 1;
+  if (mouse_y < 0) mouse_y = 0;
+  if (mouse_y >= HEIGHT) mouse_y = HEIGHT - 1;
+  *SCREEN_ADDR(mouse_x, mouse_y) = WHITE;
 }
 
 extern "C" void main_program() {

@@ -68,6 +68,8 @@ still_clearing_bss:
     strlo r0, [r1], #4
     blo still_clearing_bss
 
+    @ TODO probably need to update dynamic areas to make this work on StronARM
+
     swi OS_WriteS
     .asciz "rpc_start: Jumping to C code\r\n"
     .align

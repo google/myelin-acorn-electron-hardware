@@ -22,7 +22,7 @@ OBJCOPY = arm-none-eabi-objcopy
 ASFLAGS = -k
 # c compiler: target ARM2, use 'mov pc, lr' rather than 'bx lr', skip c++
 # exceptions, don't include most of the clib, optimize, include nanopb
-CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb -DPB_FIELD_16BIT
+CFLAGS = -mcpu=arm2 -mno-thumb-interwork -fno-exceptions -ffreestanding -O2 -I../../third_party/nanopb -DPB_FIELD_16BIT -DARCFLASH
 # don't include the standard library (which uses 'bx lr' everywhere)
 LDFLAGS = -nostdlib
 # this was in LDFLAGS, but doesn't appear necessary; did I pull in everything
