@@ -51,7 +51,36 @@ class ROM:
         desc += " [%s]" % self.readable_size()
         return desc
 
-def FlashImage(roms):
+def read_rom_file(fn, byte_order):
+    bytes = open(fn).read()
+
+    if len(bytes) % 4:
+        raise Exception("Size of file %s (%d) is not a multiple of 4" % (fn, len(bytes)))
+
+    if byte_order == "0123":
+        return bytes
+
+    if byte_order == "2301":
+        # swap pairs of bytes (Risc PC adapter)
+        output = []
+        for idx in xrange(0, len(bytes), 4):
+            output.append(bytes[idx+2] + bytes[idx+3] + bytes[idx] + bytes[idx+1])
+        return "".join(output)
+
+    if byte_order == "3210":
+        # reverse bytes in each word (A5000 adapter)
+        output = []
+        for idx in xrange(0, len(bytes), 4):
+            output.append(bytes[idx+3] + bytes[idx+2] + bytes[idx+1] + bytes[idx])
+        return "".join(output)
+
+    raise ValueError("Invalid byte_order value: %s" % byte_order)
+
+def FlashImage(roms,
+               byte_order="0123",
+               bootloader_512k=False,
+               bootloader_image_override=None,
+               skip_bootloader=False):
     print("Arcflash ROM builder / image flasher\n")
 
     args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
@@ -62,7 +91,7 @@ def FlashImage(roms):
 
     # Arcflash v1 has 16MB of flash
     flash_size = _1M * 16
-    bootloader_bank_size = _1M
+    bootloader_bank_size = 0 if skip_bootloader else _1M
 
     # Fit ROM images into the space available.  We have 16M, but flash banks
     # must be aligned -- 4M banks must be on a 4M boundary, and 2M banks must
@@ -127,7 +156,7 @@ def FlashImage(roms):
         data = []
         size = 0
         for fn in rom.files:
-            fdata = open(fn).read()
+            fdata = read_rom_file(fn, byte_order)
             data.append(fdata)
             size += len(fdata)
         assert size <= rom.size, \
@@ -151,32 +180,47 @@ def FlashImage(roms):
     descriptor.hash_sha1 = hashlib.sha1(flash).hexdigest()
     print("Flash images collected; %dk, hash %s" % (len(flash)/1024, descriptor.hash_sha1))
 
-    bootloader_size = 384 * 1024
-    # The bootloader goes at the start of first 384k, and the encoded
-    # descriptor followed by a length word goes at the end.  We can't put this
-    # in until the end though, as it contains a hash of the rest of the flash
-    # data.
-    bootloader_binary = pkg_resources.resource_string(__name__, "bootloader.bin")
-    descriptor_binary = descriptor.SerializeToString()
+    if skip_bootloader:
+        bootloader_bank = ''
+    else:
+        bootloader_size = 384 * 1024
+        # The bootloader goes at the start of first 384k, and the encoded
+        # descriptor followed by a length word goes at the end.  We can't put this
+        # in until the end though, as it contains a hash of the rest of the flash
+        # data.
+        bootloader_binary = pkg_resources.resource_string(__name__, "bootloader.bin")
+        descriptor_binary = descriptor.SerializeToString()
 
-    assert len(bootloader_binary) + len(descriptor_binary) + 4 < bootloader_size, \
-        "Bootloader binary plus descriptor won't fit in %sk - need to change memory map" % (bootloader_size/1024)
-    bootloader_bank = (
-        # Start with the binary
-        bootloader_binary +
-        # Then padding to make binary + padding + descriptor + length == 384k
-        ("\xff" * (bootloader_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
-        descriptor_binary +
-        struct.pack("<i", len(descriptor_binary)) +
-        # Then padding to 1M (which in future will also contain CMOS data)
-        ("\xff" * (bootloader_bank_size - bootloader_size))
-    )
+        assert len(bootloader_binary) + len(descriptor_binary) + 4 < bootloader_size, \
+            "Bootloader binary plus descriptor won't fit in %sk - need to change memory map" % (bootloader_size/1024)
+        bootloader_bank = (
+            # Start with the binary
+            bootloader_binary +
+            # Then padding to make binary + padding + descriptor + length == 384k
+            ("\xff" * (bootloader_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
+            descriptor_binary +
+            struct.pack("<i", len(descriptor_binary)) +
+            # Then padding to 1M (which in future will also contain CMOS data)
+            ("\xff" * (bootloader_bank_size - bootloader_size))
+        )
+        if bootloader_image_override:
+            # Bootloader image overridden -- ignore descriptor etc
+            bootloader_binary = read_rom_file(bootloader_image_override, byte_order)
+            bootloader_bank = (
+                bootloader_binary +
+                ("\xff" * (bootloader_bank_size - len(bootloader_binary)))
+            )
+        if bootloader_512k:
+            # Hack to allow running the bootloader on an A310 and Arcflash v1 without modifying LK12.
+            # Electrically this has LA18 coming in on the nOE pin, but this is OC on Arcflash v1.
+            print("Repeating bootloader twice in first 1MB, to accommodate unmodified A310")
+            bootloader_bank = bootloader_bank[:512*1024] + bootloader_bank[:512*1024]
+        print("Descriptor is %d bytes long, placed at %08X." % (
+            len(descriptor_binary),
+            bootloader_size - 4 - len(descriptor_binary)),
+        )
+        print("Bootloader added.")
     assert(len(bootloader_bank) == bootloader_bank_size)
-    print("Descriptor is %d bytes long, placed at %08X." % (
-        len(descriptor_binary),
-        bootloader_size - 4 - len(descriptor_binary)),
-    )
-    print("Bootloader added.")
 
     # Now put it all together
     flash = bootloader_bank + flash
