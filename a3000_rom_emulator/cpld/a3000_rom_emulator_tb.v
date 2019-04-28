@@ -48,10 +48,12 @@ module a3000_rom_emulator_tb;
   reg [6:0] spi_count;
 
   reg rom_nCS = 1'b0;
+  reg rom_nOE = 1'b0;
+  reg rom_5V = 1'b1;
 
   // module under test
   a3000_rom_emulator dut(
-    .arc_RESET(arc_RESET),
+    .rom_nOE(rom_nOE),
     .rom_D(arm_D),
     .rom_A(arm_A),
     .rom_nCS(rom_nCS),
@@ -62,7 +64,7 @@ module a3000_rom_emulator_tb;
     .flash_nOE(flash_nOE),
     .flash_nWE(flash_nWE),
     .cpld_clock_from_mcu(cpld_clock_from_mcu),
-    .cpld_clock_osc(cpld_clock_osc),
+    .rom_5V(rom_5V),
     .cpld_MOSI(spi_mosi),
     .cpld_SS(spi_ss),
     .cpld_SCK(spi_sck),

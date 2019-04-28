@@ -42,7 +42,7 @@ module a3000_rom_emulator(
   inout wire [31:0] rom_D,  // ARM data bus
   input wire [19:0] rom_A,  // LA21:2
   input wire rom_nCS,       // MEMC Romcs*
-  inout wire rom_nOE,       // Lionrw (latched IO nR/W) on a Risc PC, debug everywhere else
+  input wire rom_nOE,       // Lionrw (latched IO nR/W) on a Risc PC, debug everywhere else
 
   // connections to two flash chips
   output wire [21:0] flash_A,
@@ -54,7 +54,7 @@ module a3000_rom_emulator(
 
   // possible clocks (unused)
   input wire cpld_clock_from_mcu,
-  input wire cpld_clock_osc,  // TODO rename: 5V power signal from rom pin 32
+  input wire rom_5V,
   
   // SPI connection to MCU
   input wire cpld_MOSI,  // doubles as serial RXD when cpld_SS=1
@@ -63,11 +63,15 @@ module a3000_rom_emulator(
   output wire cpld_MISO  // doubles as serial TXD when cpld_SS=1
 );
 
+// set to 1 for v2 boards and v1 with Risc PC adapter
+parameter use_output_enable_signal_from_host = 1;
+wire host_output_enable;
+assign host_output_enable = use_output_enable_signal_from_host ? rom_nOE : 1'b0;
 
-// set to 1 once the power signal has been wired to cpld_clock_osc
+// set to 1 once the power signal has been wired to rom_5V
 parameter use_power_signal_from_host = 1;
 wire host_power_on;
-assign host_power_on = use_power_signal_from_host ? cpld_clock_osc : 1'b1;
+assign host_power_on = use_power_signal_from_host ? rom_5V : 1'b1;
 
 
 // ----- ARM-MCU comms with handshaking -- better than bit-banged serial, but won't fit in XC95144) -----
@@ -207,21 +211,22 @@ end
 
 
 // latched nR/W (Lionrw) on a Risc PC, debug everywhere else
-assign rom_nOE = 1'bZ;
-//assign rom_nOE = cpld_MOSI_sync;  // DEBUG: bit-banged serial
-//assign rom_nOE = cpld_MOSI;  // DEBUG: bit-banged serial
-//assign rom_nOE = cpld_MISO_TXD;  // DEBUG: bit-banged serial
-//assign rom_nOE = romcs_sync[1]; // DEBUG: synchronized romcs
-//assign rom_nOE = clock_divider[0]; // DEBUG
-//assign rom_nOE = cpld_clock_from_mcu; // DEBUG
-//assign rom_nOE = cpld_SCK; // DEBUG
+// (see use_output_enable_signal_from_host above)
+// assign rom_nOE = 1'bZ;
+// assign rom_nOE = cpld_MOSI_sync;  // DEBUG: bit-banged serial
+// assign rom_nOE = cpld_MOSI;  // DEBUG: bit-banged serial
+// assign rom_nOE = cpld_MISO_TXD;  // DEBUG: bit-banged serial
+// assign rom_nOE = romcs_sync[1]; // DEBUG: synchronized romcs
+// assign rom_nOE = clock_divider[0]; // DEBUG
+// assign rom_nOE = cpld_clock_from_mcu; // DEBUG
+// assign rom_nOE = cpld_SCK; // DEBUG
 
 
-wire selected;  // Romcs* low and power high
-assign selected = (rom_nCS == 1'b0 && host_power_on == 1'b1) ? 1'b0 : 1'b1;
+wire n_selected;  // Romcs* low and power high
+assign n_selected = (rom_nCS == 1'b0 && host_power_on == 1'b1 && host_output_enable == 1'b0) ? 1'b0 : 1'b1;
 
 // ARM data bus
-assign rom_D = selected == 1'b1 ? 32'bZ : (
+assign rom_D = n_selected == 1'b1 ? 32'bZ : (
   allowing_arm_access == 1'b1 ? (
     // Pass flash output through to rom_D
     // DEBUG actually should be mcu_to_arm_buffer, but this lets us loopback
@@ -263,8 +268,8 @@ assign flash0_DQ = allowing_arm_access == 1'b1 ? 16'bZ : (accessing_flash == 1'b
 assign flash1_DQ = allowing_arm_access == 1'b1 ? 16'bZ : (accessing_flash == 1'b1 && spi_rnw == 1'b0 ? spi_D[31:16] : 16'bZ);
 
 // Flash chip control lines
-assign flash_nCE = allowing_arm_access == 1'b1 ? selected : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
-assign flash_nOE = allowing_arm_access == 1'b1 ? selected : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
+assign flash_nCE = allowing_arm_access == 1'b1 ? n_selected : (accessing_flash == 1'b1 ? 1'b0 : 1'b1);
+assign flash_nOE = allowing_arm_access == 1'b1 ? n_selected : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
 assign flash_nWE = allowing_arm_access == 1'b1 ? 1'b1 : (writing_flash == 1'b1 ? 1'b0 : 1'b1);
 
 

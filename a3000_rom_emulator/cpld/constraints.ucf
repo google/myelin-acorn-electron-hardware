@@ -28,11 +28,6 @@ NET cpld_clock_from_mcu BUFG = CLK;
 NET cpld_clock_from_mcu TNM = clock_from_mcu;
 TIMESPEC TS_clock_from_mcu = PERIOD "clock_from_mcu" 21 ns;
 
-NET cpld_clock_osc LOC = K2;
-# NET cpld_clock_osc BUFG = CLK;
-# NET cpld_clock_osc TNM=clock_osc;
-# TIMESPEC TS_clock_osc = PERIOD "clock_osc" 11 ns;
-
 NET flash0_DQ<0> LOC = J2;
 NET flash0_DQ<10> LOC = M10;
 NET flash0_DQ<11> LOC = D4;
@@ -144,3 +139,4 @@ NET rom_D<8> LOC = H12;
 NET rom_D<9> LOC = G10;
 NET rom_nCS LOC = C6;
 NET rom_nOE LOC = A7;
+NET rom_5V LOC = K2;
