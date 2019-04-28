@@ -151,8 +151,9 @@ def FlashImage(roms,
         assert ptr <= rom.ptr
         if rom.ptr > ptr:
             pad_len = (rom.ptr - ptr)
-            if EXPLAIN_FLASH_BUILD: print("Adding padding of %d bytes" % pad_len)
+            if EXPLAIN_FLASH_BUILD: print("- Adding padding of %d bytes first" % pad_len)
             flash += "\xFF" * pad_len
+            ptr += pad_len
         data = []
         size = 0
         for fn in rom.files:
@@ -165,13 +166,13 @@ def FlashImage(roms,
             data.append("\xFF" * (rom.size - size))
         data = "".join(data)
         assert len(data) == rom.size
-        if EXPLAIN_FLASH_BUILD: print("Adding %d bytes for ROM %s" % (len(data), rom))
+        if EXPLAIN_FLASH_BUILD: print("- Adding %d bytes (ROM %s)" % (len(data), rom))
         flash += data
         ptr += rom.size
     build_flash_size = flash_size - bootloader_bank_size
     if len(flash) < build_flash_size:
         pad_len = build_flash_size - len(flash)
-        if EXPLAIN_FLASH_BUILD: print("Adding %d bytes of padding" % pad_len)
+        if EXPLAIN_FLASH_BUILD: print("Adding %d bytes of padding at end" % pad_len)
         flash += "\xFF" * pad_len
     assert len(flash) == build_flash_size, \
         "Flash should be %d bytes long but it's actually %d" % (build_flash_size, len(flash))
