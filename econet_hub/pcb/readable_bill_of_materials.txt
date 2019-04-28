@@ -1,0 +1,98 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+AVR
+- Value: ATTINY85-20SU
+- Description: ATTINY85 in 8S2 package (0.208 inch / 5.3 mm wide SOIC-8)
+- KiCad package: Housings_SOIC:SOIJ-8_5.3x5.3mm_Pitch1.27mm
+
+C1
+- Value: 100n
+- Description: 100n capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+C2
+- Value: 10u
+- Description: 10u capacitor in 0805 package
+- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+
+E0
+- Value: Econet
+- Description: 5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.
+- KiCad package: myelin-kicad:din_5_econet_pcb_mount
+
+E1
+- Value: Econet
+- Description: 5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.
+- KiCad package: myelin-kicad:din_5_econet_pcb_mount
+
+E2
+- Value: Econet
+- Description: 5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.
+- KiCad package: myelin-kicad:din_5_econet_pcb_mount
+
+E3
+- Value: Econet
+- Description: 5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.
+- KiCad package: myelin-kicad:din_5_econet_pcb_mount
+
+E4
+- Value: Econet
+- Description: 5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.
+- KiCad package: myelin-kicad:din_5_econet_pcb_mount
+
+EXTPWR
+- Value: ext pwr
+- Description: 1x3 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
+
+H0
+- Value: Econet
+- Description: 1x5 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm
+
+H1
+- Value: Econet
+- Description: 1x5 0.1 inch male header
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm
+
+ISP
+- Value: avr isp
+- Description: 2x3 0.1 inch header for AVR programming (OPTIONAL)
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
+
+R1
+- Value: 10k
+- Description: 10k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R2
+- Value: 1k
+- Description: 1k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R3
+- Value: 220R
+- Description: 220R resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R4
+- Value: 1k
+- Description: 1k resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R5
+- Value: 56R
+- Description: 56R resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+R6
+- Value: 56R
+- Description: 56R resistor in 0805 package
+- KiCad package: Resistors_SMD:R_0805_HandSoldering
+
+USB
+- Value: usb
+- Description: Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.
+- KiCad package: myelin-kicad:micro_usb_b_smd_molex
+

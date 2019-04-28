@@ -36,6 +36,7 @@ micro_usb = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:micro_usb_b_smd_molex",
     identifier="USB",
     value="usb",
+    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
     pins=[
         Pin(1, "V", ["5V"]),
         Pin(5, "G", ["GND"]),
@@ -46,6 +47,7 @@ ext_power = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm",
     identifier="EXTPWR",
     value="ext pwr",
+	desc="1x3 0.1 inch male header",
     pins=[
         Pin(1, "", ["GND"]),
         Pin(2, "", ["5V"]),
@@ -79,11 +81,13 @@ termination_r5 = myelin_kicad_pcb.R0805(
 
 # This is based on Simon Inns' AVR clock: http://www.waitingforfriday.com/?p=19
 
-# ATTINY85 in SOIC-8 with 3.9mm x 4.9mm body
 avr = myelin_kicad_pcb.Component(
-    footprint="Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm",
+    # r1 got this wrong; the SO attiny85 is a wide-body version, which KiCad
+    # calls SOIJ-8.
+    footprint="Housings_SOIC:SOIJ-8_5.3x5.3mm_Pitch1.27mm",
     identifier="AVR",
-    value="ATTINY85",
+    value="ATTINY85-20SU",
+    desc="ATTINY85 in 8S2 package (0.208 inch / 5.3 mm wide SOIC-8)",
     pins=[
         Pin( 1, "/RESET", "avr_nRESET"),
         Pin( 2, "PB3", "econet_clock_line_P"),
@@ -103,6 +107,7 @@ avr_isp = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm",
     identifier="ISP",
     value="avr isp",
+	desc="2x3 0.1 inch header for AVR programming (OPTIONAL)",
     pins=[
         Pin(1, "MISO", "avr_MISO"),
         Pin(2, "VCC", "5V"),
@@ -121,6 +126,7 @@ econet_headers = [myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm",
     identifier="H%d" % header_id,
     value="Econet",
+	desc="1x5 0.1 inch male header",
     pins=[
         Pin( 5, "D+", ["econet_data_line_P"]),
         Pin( 4, "D-", ["econet_data_line_M"]),
@@ -134,6 +140,8 @@ econet_sockets = [myelin_kicad_pcb.Component(
     footprint="myelin-kicad:din_5_econet_pcb_mount",
     identifier="E%d" % socket_id,
     value="Econet",
+    desc=("5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  "
+          "Compare pinout against PCB because several variants exist."),
     pins=[
         # DIN-5 pins are numbered weirdly -- 1, 4, 2, 5, 3 around the circle
         Pin( 1, "D+", ["econet_data_line_P"]),
@@ -160,3 +168,7 @@ for n in range(5):
     )
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
+
+myelin_kicad_pcb.dump_netlist("cpu_socket_expansion.net")
+myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
+                          "readable_bill_of_materials.txt")

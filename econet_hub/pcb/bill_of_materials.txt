@@ -1,0 +1,20 @@
+Identifier	Value	Description	KiCad package
+AVR	ATTINY85-20SU	ATTINY85 in 8S2 package (0.208 inch / 5.3 mm wide SOIC-8)	Housings_SOIC:SOIJ-8_5.3x5.3mm_Pitch1.27mm
+C1	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+C2	10u	10u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+E0	Econet	5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.	myelin-kicad:din_5_econet_pcb_mount
+E1	Econet	5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.	myelin-kicad:din_5_econet_pcb_mount
+E2	Econet	5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.	myelin-kicad:din_5_econet_pcb_mount
+E3	Econet	5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.	myelin-kicad:din_5_econet_pcb_mount
+E4	Econet	5-pin DIN socket, as for a MIDI cable, with zig-zag pin layout.  Compare pinout against PCB because several variants exist.	myelin-kicad:din_5_econet_pcb_mount
+EXTPWR	ext pwr	1x3 0.1 inch male header	Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
+H0	Econet	1x5 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm
+H1	Econet	1x5 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm
+ISP	avr isp	2x3 0.1 inch header for AVR programming (OPTIONAL)	Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
+R1	10k	10k resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+R2	1k	1k resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+R3	220R	220R resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+R4	1k	1k resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+R5	56R	56R resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+R6	56R	56R resistor in 0805 package	Resistors_SMD:R_0805_HandSoldering
+USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
