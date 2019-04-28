@@ -21,6 +21,11 @@ C3
 - Description: 15p capacitor in 0805 package
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+C4
+- Value: DGH255Q5R5
+- Description: Supercapacitor
+- KiCad package: myelin-kicad:dgh255q5r5
+
 D1
 - Value: S1ATR
 - Description: Rectifier diode
@@ -37,18 +42,28 @@ HDR
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
 
 NVRAM
-- Value: PCF8583P
+- Value: PCF8583
 - Description: 
 - KiCad package: Package_DIP:DIP-8_W7.62mm
 
+NVSMD
+- Value: PCF8583
+- Description: 
+- KiCad package: myelin-kicad:so8_pcf8583t_7.5x7.5mm
+
 R1
-- Value: 100R
-- Description: 100R resistor in 0805 package
+- Value: 47R
+- Description: 47R resistor in 0805 package
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 R2
-- Value: 100R
-- Description: 100R resistor in 0805 package
+- Value: 47R
+- Description: 47R resistor in 0805 package
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R3
+- Value: 180R
+- Description: 180R resistor in 0805 package
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 XTAL

@@ -29,9 +29,9 @@
 
 # The standard Acorn circuit looks like this:
 
-#   5V --|>-- 180R - batt - GND
-#           |
-#           47R - NVR_POWER
+#   5V --|>--+-- 180R -- batt -- GND
+#            |
+#            +-- 47R -- NVR_POWER
 
 # This circuit is designed not to be rechargeable, however, so we do this
 # instead:
@@ -42,6 +42,19 @@
 
 # We could just connect the two cathodes together, but this provides a little
 # extra protection against short circuits.
+
+# v2 adds a supercapacitor (or a rechargeable battery if you prefer), so the
+# circuit ends up as:
+
+#   5V --|>--+-- 180R (R3) -- supercap (C4) -- GND
+#            |
+#            +-- 47R (R1)--+-- NVR_POWER
+#                          |
+#   BATT --|>-- 47R (R2) --+
+
+# This lets us use the same board with either a supercap or rechargeable
+# battery in the C4 position, or an off-board nonrechargeable battery
+# connected to the BATT header.
 
 
 PROJECT_NAME = "pcf8583_daughterboard"
@@ -68,8 +81,9 @@ diodes = [
 ]
 
 resistors = [
-    myelin_kicad_pcb.R0805("100R", "5VD_cat", "NVR_POWER", ref="R1"),
-    myelin_kicad_pcb.R0805("100R", "BATTD_cat", "NVR_POWER", ref="R2"),
+    myelin_kicad_pcb.R0805("47R", "5VD_cat", "NVR_POWER", ref="R1"),
+    myelin_kicad_pcb.R0805("47R", "BATTD_cat", "NVR_POWER", ref="R2"),
+    myelin_kicad_pcb.R0805("180R", "5VD_cat", "supercap_P", ref="R3"),
 ]
 
 power_caps = [
@@ -77,21 +91,38 @@ power_caps = [
     myelin_kicad_pcb.C0805("100n", "GND", "NVR_POWER", ref="C2"),
 ]
 
-pcf8583 = myelin_kicad_pcb.Component(
-    footprint="Package_DIP:DIP-8_W7.62mm",
-    identifier="NVRAM",
-    value="PCF8583P",
+supercap = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:dgh255q5r5",
+    identifier="C4",
+    value="DGH255Q5R5",
+    desc="Supercapacitor",
     pins=[
-        Pin( 1, "OSCI", "OSCI"),
-        Pin( 2, "OSCO", "OSCO"),
-        Pin( 3, "A0",   "GND"),
-        Pin( 4, "VSS",  "GND"),
-        Pin( 5, "SDA",  "SDA"),
-        Pin( 6, "SCL",  "SCL"),
-        Pin( 7, "nINT"),
-        Pin( 8, "VDD",  "NVR_POWER"),  # TODO battery, not 5V
+        Pin(1, "1", "supercap_P"),  # positive terminal
+        Pin(2, "2", "GND"),  # negative terminal
     ],
 )
+
+pcf8583 = [
+    myelin_kicad_pcb.Component(
+        footprint=fp,
+        identifier=ident,
+        value="PCF8583",
+        pins=[
+            Pin( 1, "OSCI", "OSCI"),
+            Pin( 2, "OSCO", "OSCO"),
+            Pin( 3, "A0",   "GND"),
+            Pin( 4, "VSS",  "GND"),
+            Pin( 5, "SDA",  "SDA"),
+            Pin( 6, "SCL",  "SCL"),
+            Pin( 7, "nINT"),
+            Pin( 8, "VDD",  "NVR_POWER"),  # TODO battery, not 5V
+        ],
+    )
+    for ident, fp in [
+        ("NVRAM", "Package_DIP:DIP-8_W7.62mm"),
+        ("NVSMD", "myelin-kicad:so8_pcf8583t_7.5x7.5mm"),
+    ]
+]
 
 crystal = myelin_kicad_pcb.Component(
     footprint="Crystal:Crystal_AT310_D3.0mm_L10.0mm_Horizontal_1EP_style2",
