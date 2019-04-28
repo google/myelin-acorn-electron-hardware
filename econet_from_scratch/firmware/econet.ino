@@ -57,7 +57,8 @@ extern "C" {
 #define PIN_SERIAL_CPLD_TO_MCU 35
 // PA09 - D23 - serial_buffer_empty
 #define PIN_SERIAL_BUFFER_EMPTY 23
-// PA10 - D34
+// PA10 - D34 - outputting_frame
+#define PIN_OUTPUTTING_FRAME 34
 // PA11 - D22 - mcu_is_transmitting
 #define PIN_MCU_IS_TRANSMITTING 22
 // PA14 - D5 - serial_mcu_to_cpld (TX2)
@@ -248,8 +249,6 @@ void loop() {
     }
   }
 
-// DEBUG: Output a bunch of frames full of 0x42
-#if 0
   // static uint8_t econet_clock_state = 0;
   // digitalWrite(PIN_ECONET_CLOCK_FROM_MCU, econet_clock_state ? HIGH : LOW);
   // econet_clock_state = !econet_clock_state;
@@ -260,15 +259,17 @@ void loop() {
   static unsigned long last_char_write = 0;
 
   // wait 50ms between frames
-  if (!chars_to_write && (last_char_write - millis()) > 50) {
-    chars_to_write = 20;
-    is_first_char = 1;
-  }
+  // if (!chars_to_write && (last_char_write - millis()) > 50) {
+  //   chars_to_write = 20;
+  //   is_first_char = 1;
+  // }
 
   if (sercom2.isDataRegisterEmptyUART()
       && digitalRead(PIN_SERIAL_BUFFER_EMPTY) == HIGH
       && chars_to_write > 0
   ) {
+    // TODO drop PIN_MCU_IS_TRANSMITTING once we're done writing the packet
+    // -- probably have to wait for PIN_OUTPUTTING_FRAME to go low
     digitalWrite(PIN_MCU_IS_TRANSMITTING, HIGH);
   //   serial_state = 1;
   //   serial_state_time = millis();
@@ -290,7 +291,6 @@ void loop() {
   // if (serial_state == 3 && millis() > serial_state_time + 21) {
   //   serial_state = 0;
   // }
-#endif
 
 #ifdef ENABLE_USB_SERIAL
   static uint8_t serial_active = 0;
