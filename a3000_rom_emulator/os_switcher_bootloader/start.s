@@ -193,13 +193,10 @@ display_y .req r13  @ y position for plotting text
     @bl plot_character
     @add display_y, display_y, #8
 
-    cmp r11, #0  @ DEBUG - eq if on Arc, ne for IOMD
-    adreq r0, banner
-    adrne r0, iomd_banner
+    adr r0, banner
     bl print_string
     b print_banner_done
 banner: .asciz "Arcflash - http://myelin.nz/arcflash"
-iomd_banner: .asciz "Arcflash - http://myelin.nz/arcflash - IOMD"
     .align
 print_banner_done:
 
