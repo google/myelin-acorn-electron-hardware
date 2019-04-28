@@ -16,10 +16,22 @@
 # VHDL and Verilog code for a Xilinx CPLD into .jed and .svf files.  It will not
 # run by itself.
 
+# See https://www.xilinx.com/support/documentation/sw_manuals/xilinx14_5/devref.pdf
+# for command line option details.
+
 UCF ?= constraints.ucf
-OPTIMIZE ?= density
-SLEW ?= slow
 REMOTE_MAKEFILE ?= Makefile
+
+# cpldfit options:
+
+# Optimize: density, speed
+OPTIMIZE ?= density
+# Slew: fast, slow, auto
+SLEW ?= slow
+# Power: std, low, auto
+POWER ?= std
+
+##########
 
 default: all
 
@@ -45,7 +57,7 @@ local: clean build-local show-results
 build-local:
 	xst -intstyle ise -ifn $$(pwd)/${MODULE}.xst -ofn $$(pwd)/${MODULE}.syr
 	ngdbuild -intstyle ise -dd _ngo -uc ${UCF} -p ${PART} ${MODULE}.ngc ${MODULE}.ngd
-	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize ${OPTIMIZE} -htmlrpt -loc on -slew ${SLEW} -init low -inputs 54 -pterms 25 -unused float -power std -terminate keeper ${MODULE}.ngd
+	cpldfit -intstyle ise -p ${PART} -ofmt vhdl -optimize ${OPTIMIZE} -htmlrpt -loc on -slew ${SLEW} -init low -inputs 54 -pterms 25 -unused float -power ${POWER} -terminate keeper ${MODULE}.ngd
 	XSLTProcess ${MODULE}_build.xml
 	tsim -intstyle ise ${MODULE} ${MODULE}.nga
 	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
