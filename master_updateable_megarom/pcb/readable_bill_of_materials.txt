@@ -4,37 +4,37 @@ See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 C1
 - Value: 100n
 - Description: 100n capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C2
 - Value: 100n
 - Description: 100n capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C3
 - Value: 100n
 - Description: 100n capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C4
 - Value: 100n
 - Description: 100n capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C5
 - Value: 100n
 - Description: 100n capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C6
 - Value: 1u
 - Description: 1u capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C7
 - Value: 1u
 - Description: 1u capacitor in 0805 package
-- KiCad package: Capacitors_SMD:C_0805_HandSoldering
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 CPLD
 - Value: XC9572XL-64VQG

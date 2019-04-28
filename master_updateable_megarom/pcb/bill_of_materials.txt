@@ -1,11 +1,11 @@
 Identifier	Value	Description	KiCad package
-C1	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C2	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C3	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C4	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C5	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C6	1u	1u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C7	1u	1u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
+C1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C6	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C7	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 CPLD	XC9572XL-64VQG	Xilinx XC9572XL in 64-pin 0.5mm TQFP package.  Any speed or temperature grade is OK.	myelin-kicad:xilinx_vqg64
 EXTPWR	ext pwr	1x3 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm
 JP	jumpers	1x4 0.1 inch male header	Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
