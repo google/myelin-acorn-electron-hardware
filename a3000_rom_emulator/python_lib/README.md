@@ -1,6 +1,12 @@
-Python support libraries for the Arcflash flash ROM board for Acorn computers.
+# Arcflash
 
-Included:
+Arcflash is a flash ROM board for the Acorn Archimedes and Risc PC computers.
 
-- Download tool, to program ROM images into the flash banks on an
-  Arcflash board connected by USB.
+Project homepage: http://myelin.nz/arcflash
+
+This is the Python support library, which lets you build your own flash
+images, and program them into the memory on an Arcflash board connected over
+USB.
+
+## Usage
+

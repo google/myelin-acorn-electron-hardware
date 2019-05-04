@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="arcflash",
-    version="0.1.2",
+    version="0.1.3",
     author="Phillip Pearson",
     author_email="pp@myelin.nz",
     description="Python support libraries for Arcflash flash ROM board for Acorn computers",
@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/google/myelin-acorn-electron-hardware/tree/master/a3000_rom_emulator/python_lib",
     packages=setuptools.find_packages(),
+    include_package_data=True,
     install_requires=[
         "protobuf",
         "PySerial",
