@@ -7,8 +7,8 @@ import pkg_resources
 import struct
 import sys
 
-import arcflash_pb2
-import uploader
+from arcflash import arcflash_pb2
+from arcflash import uploader
 
 __all__ = ["_1M", "_2M", "_4M", "ROM", "FlashImage"]
 
@@ -52,10 +52,15 @@ class ROM:
         return desc
 
 def read_rom_file(fn, byte_order):
-    bytes = open(fn).read()
+    bytes = open(fn, "rb").read()
 
     if len(bytes) % 4:
-        raise Exception("Size of file %s (%d) is not a multiple of 4" % (fn, len(bytes)))
+        # special case for arthur 1.20 image
+        if len(bytes) == 524289 and bytes[-1] == '\\':
+            print("Dropping the last byte of known Arthur image")
+            bytes = bytes[:512*1024]
+        else:
+            bytes += b"\xFF" * (4 - (len(bytes) % 4))
 
     if byte_order == "0123":
         return bytes
@@ -65,14 +70,14 @@ def read_rom_file(fn, byte_order):
         output = []
         for idx in xrange(0, len(bytes), 4):
             output.append(bytes[idx+2] + bytes[idx+3] + bytes[idx] + bytes[idx+1])
-        return "".join(output)
+        return b"".join(output)
 
     if byte_order == "3210":
         # reverse bytes in each word (A5000 adapter)
         output = []
         for idx in xrange(0, len(bytes), 4):
             output.append(bytes[idx+3] + bytes[idx+2] + bytes[idx+1] + bytes[idx])
-        return "".join(output)
+        return b"".join(output)
 
     raise ValueError("Invalid byte_order value: %s" % byte_order)
 
@@ -144,7 +149,7 @@ def FlashImage(roms,
     # Time to build the flash image!
     # Start by collecting all images aside from the bootloader.
     EXPLAIN_FLASH_BUILD = 0
-    flash = ""
+    flash = b""
     ptr = bootloader_bank_size
     for _, rom in sorted((rom.ptr, rom) for rom in roms):
         if EXPLAIN_FLASH_BUILD: print("Adding %s at %d (currently %d)" % (rom, rom.ptr, ptr))
@@ -152,7 +157,7 @@ def FlashImage(roms,
         if rom.ptr > ptr:
             pad_len = (rom.ptr - ptr)
             if EXPLAIN_FLASH_BUILD: print("- Adding padding of %d bytes first" % pad_len)
-            flash += "\xFF" * pad_len
+            flash += b"\xFF" * pad_len
             ptr += pad_len
         data = []
         size = 0
@@ -163,8 +168,8 @@ def FlashImage(roms,
         assert size <= rom.size, \
             "Read %d bytes for ROM %s, but it's specified to only have %d" % (size, rom, rom.size)
         if size < rom.size:
-            data.append("\xFF" * (rom.size - size))
-        data = "".join(data)
+            data.append(b"\xFF" * (rom.size - size))
+        data = b"".join(data)
         assert len(data) == rom.size
         if EXPLAIN_FLASH_BUILD: print("- Adding %d bytes (ROM %s)" % (len(data), rom))
         flash += data
@@ -173,7 +178,7 @@ def FlashImage(roms,
     if len(flash) < build_flash_size:
         pad_len = build_flash_size - len(flash)
         if EXPLAIN_FLASH_BUILD: print("Adding %d bytes of padding at end" % pad_len)
-        flash += "\xFF" * pad_len
+        flash += b"\xFF" * pad_len
     assert len(flash) == build_flash_size, \
         "Flash should be %d bytes long but it's actually %d" % (build_flash_size, len(flash))
 
@@ -198,11 +203,11 @@ def FlashImage(roms,
             # Start with the binary
             bootloader_binary +
             # Then padding to make binary + padding + descriptor + length == 384k
-            ("\xff" * (bootloader_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
+            (b"\xff" * (bootloader_size - len(bootloader_binary) - len(descriptor_binary) - 4)) +
             descriptor_binary +
             struct.pack("<i", len(descriptor_binary)) +
             # Then padding to 1M (which in future will also contain CMOS data)
-            ("\xff" * (bootloader_bank_size - bootloader_size))
+            (b"\xff" * (bootloader_bank_size - bootloader_size))
         )
         if bootloader_image_override:
             # Bootloader image overridden -- ignore descriptor etc

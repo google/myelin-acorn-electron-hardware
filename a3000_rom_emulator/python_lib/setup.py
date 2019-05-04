@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="arcflash",
-    version="0.1",
+    version="0.1.2",
     author="Phillip Pearson",
     author_email="pp@myelin.nz",
     description="Python support libraries for Arcflash flash ROM board for Acorn computers",

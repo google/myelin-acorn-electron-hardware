@@ -21,9 +21,10 @@ from __future__ import print_function
 # its ATSAMD21.
 
 import re
-import afserial
 import sys
 import time
+
+from . import afserial
 
 def read_until(ser, match):
     resp = ''
