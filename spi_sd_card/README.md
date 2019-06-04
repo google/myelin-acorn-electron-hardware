@@ -1,21 +1,20 @@
 spi_sd_card
 ===========
 
-This folder contains VHDL for an experimental SD card interface, that
-implements the simple parallel port interface used by MMC_ElkPlus1.asm
-in [MMFS](https://github.com/hoglet67/MMFS/).
-
-[Discussion on the Stardot forums](http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=12737&start=30#p170599).
-
-
-For a multi-purpose design which implements a fast serial port as well as the
-parallel port SD card interface used here, see
-the [serial_sd_adapter](../serial_sd_adapter) project.
-
-![Picture of the prototype in action](2017-05-elk_pi_tube_direct_sd_mmfs.jpeg)
+This folder contains VHDL for an experimental SD card interface for the Electron.  It
+implements the Plus 1 printer port interface used by MMC_ElkPlus1.asm
+in [MMFS](https://github.com/hoglet67/MMFS/) at &FCC1 (data) and &FCC2 (status), and the bit-banged serial port used by EUP/EUPURS, at &FCB1.
 
 It also contains an experimental version of the memory-mapped SPI port
 as seen in MMC_MemoryMapped.asm, except at &FCD0 rather than &FE18.
+
+[Discussion on the Stardot forums](http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=12737&start=30#p170599).
+
+*For a related design which implements a USB serial port as well as the
+bit-banged printer port SD card interface used here, and connects to the BBC Micro's 1MHz Bus, see
+the [serial_sd_adapter](../serial_sd_adapter) project.*
+
+![Picture of the prototype in action](2017-05-elk_pi_tube_direct_sd_mmfs.jpeg)
 
 The first prototype (pictured above) was an [elk_pi_tube_direct](../elk_pi_tube_direct) cartridge with an
 SD socket taped to the top, and jumper wires everywhere, drawing
@@ -23,24 +22,54 @@ power from the minus_one's 3.3V pin.
 
 The second prototype is an elk_pi_tube_direct cartridge hooked up to an Arduino SD card adapter from eBay, which provides the 3.3V power.
 
-Connections (with wire colours for my convenience):
+How to build one
+----------------
 
-- tube_D<5> - blue, nSS
-- tube_D<6> - green, MOSI
-- tube_D<7> - yellow, SCK
-- tube_D<0> - orange, MISO
+You'll need the following:
 
-On SD card:
+- A way to load the MMFS ROM on your machine: a flash or EPROM cartridge, an ABR, or some sideways RAM and a way to load it.  I use one of my [32k flash cartridges](../32kb_flash_cartridge), programmed using the [USB cartridge interface](../standalone_cartridge_programmer).
 
-- 9 (notch) - DAT2
-- 1 - DAT3/nSS (blue)
-- 2 - CMD/MOSI (green)
-- 3 - GND (brown)
-- 4 - 3.3V (red)
-- 5 - CLK/SCK (yellow)
-- 6 - GND (brown)
-- 7 - DAT0/MISO (orange)
-- 8 - DAT1
+- One of my [elk_pi_tube_direct](../elk_pi_tube_direct) boards.
+
+- A suitable SD card adapter that includes a 3.3V regulator and connections for both 5V and 3.3V, for example [Adafruit's microSD breakout board](https://www.adafruit.com/product/254), or [this Arduino SD module from eBay](https://www.ebay.com/itm/2PCS-Read-And-Write-For-Arduino-ARM-MCU-SD-Card-Module-Slot-Socket-Reader-N150/401299905512).
+
+Assembly instructions:
+
+- Double check that your SD card adapter has connections for both 5V and 3.3V.  The 3.3V line will power the CPLD on the cartridge board, so adapters which only have a 5V input will not work.
+
+- Solder the board up as described in the link above, except solder 0.1" male header to the Raspberry Pi socket instead of the female header that you would use to connect to a Raspberry Pi.
+
+![Render of an elk_pi_tube_direct board with pins labelled](2019-elk_pi_tube_direct_annotated.png)
+
+- Connect the board to the SD adapter using jumper ("Dupont") wires as follows.  Note that different SD adapters label their pins differently; the Adafruit board uses CS/DI/CLK/DO, whereas the eBay one uses CS/MOSI/SCK/MISO.
+
+  - GND - GND
+  - 3V3 - 3V3
+  - 5V - 5V
+  - D5 - DAT3 / CS
+  - D6 - CMD / MOSI / DI
+  - D7 - CLK / SCK
+  - D0 - DAT0 / MISO / DO
+
+Programming the CPLD
+--------------------
+
+TODO
+
+TODO add svf/jed files to git
+
+Building MMFS
+-------------
+
+The standard Electron MMFS build uses &FC71 for data and &FC72 for status, except those are owned by the Plus 1, so this board uses a different pair of addresses (&FCC1/&FCC2). This means you need a modified MMFS ROM.
+
+Using the serial port and EUPURS
+--------------------------------
+
+TODO
+
+Development notes
+=================
 
 Serial port
 -----------

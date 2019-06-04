@@ -93,8 +93,8 @@ architecture Behavioural of spi_sd_card is
     ---- Plus 1 workalike registers ----
 
     -- chip selects
-    signal nDATA : std_logic; -- '0' when A = &FC71
-    signal nSTATUS : std_logic; -- '0' when A = &FC72
+    signal nDATA : std_logic; -- '0' when A = &FC71/FCC1
+    signal nSTATUS : std_logic; -- '0' when A = &FC72/FCC2
 
 begin
 
@@ -125,8 +125,12 @@ begin
 
     ---- Plus 1 parallel port emulation ----
 
-    nDATA <= '0' when (elk_nINFC = '0' and A_lower = x"71") else '1';
-    nSTATUS <= '0' when (elk_nINFC = '0' and A_lower = x"72") else '1';
+    -- Uncomment to use the Plus 1 registers; this will conflict if you
+    -- are using this with a real Plus 1 though.
+    -- nDATA <= '0' when (elk_nINFC = '0' and A_lower = x"71") else '1';
+    -- nSTATUS <= '0' when (elk_nINFC = '0' and A_lower = x"72") else '1';
+    nDATA <= '0' when (elk_nINFC = '0' and A_lower = x"C1") else '1';
+    nSTATUS <= '0' when (elk_nINFC = '0' and A_lower = x"C2") else '1';
 
     ---- Data bus ----
 
@@ -182,7 +186,7 @@ begin
                 bit_count <= "0000";
                 SCK <= '1';
             elsif nDATA = '0' and elk_RnW = '0' then
-                -- handle write to &FC71
+                -- the electron is writing to the data register (&FC71/&FCC1)
                 MOSI <= elk_D(0);
                 SCK <= elk_D(1);
             end if;
