@@ -54,19 +54,23 @@ Assembly instructions:
 Programming the CPLD
 --------------------
 
-TODO
+There are two CPLD builds (spi_sd_card-xc9536xl-10-VQ44.svf and spi_sd_card-xc9572xl-10-VQ44.svf); pick the correct one for the chip you have soldered onto your board.
 
-TODO add svf/jed files to git
+[Here are some notes on how to program a Xilinx CPLD](../notes/pld_programming_and_jtag.md).
+
+TODO document this better.
 
 Building MMFS
 -------------
 
 The standard Electron MMFS build uses &FC71 for data and &FC72 for status, except those are owned by the Plus 1, so this board uses a different pair of addresses (&FCC1/&FCC2). This means you need a modified MMFS ROM.
 
+TODO document this.
+
 Using the serial port and EUPURS
 --------------------------------
 
-TODO
+TODO document this.
 
 Development notes
 =================

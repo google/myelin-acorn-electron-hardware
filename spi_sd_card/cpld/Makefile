@@ -13,7 +13,7 @@
 # limitations under the License.
 
 MODULE=spi_sd_card
-PART=xc9572xl-10-VQ44
+PART=xc9536xl-10-VQ44
 
 SHARED_PATH ?= ../../common
 include ${SHARED_PATH}/Makefile.xilinx

@@ -62,9 +62,12 @@ build-local:
 	tsim -intstyle ise ${MODULE} ${MODULE}.nga
 	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
 	impact -batch impact.cmd
+	mv ${MODULE}.jed ${MODULE}-${PART}.jed
+	mv ${MODULE}.svf ${MODULE}-${PART}.svf
+	mv ${MODULE}.xsvf ${MODULE}-${PART}.xsvf
 
 clean:
-	rm -rf *.mfd *.nga *.ngc *.ngd *.xrpt *.ngr *.pad *.csv *.svf *.pnx *.rpt *.vm6 *.xml *.jed *.lso *.gyd *.bld *.err _xmsgs xlnx* _ngo *.syr *_html *_xdb xst *.log *.cmd_log *~ *.html *.stx *.tim *.tspec *.xsvf *.gise *.ise out
+	rm -rf *.mfd *.nga *.ngc *.ngd *.xrpt *.ngr *.pad *.csv ${MODULE}-${PART}.svf *.pnx *.rpt *.vm6 *.xml ${MODULE}-${PART}.jed *.lso *.gyd *.bld *.err _xmsgs xlnx* _ngo *.syr *_html *_xdb xst *.log *.cmd_log *~ *.html *.stx *.tim *.tspec ${MODULE}-${PART}.xsvf *.gise *.ise out
 	mkdir xst xst/projnav.tmp xst/work
 
 show-results:
