@@ -64,6 +64,30 @@ sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
+# TODO(v3) use a comparator to detect good power on the host side.  We really
+# need to verify that the host 5V line is more than 3.3V, as it'll probably be
+# around 2.6V when propped up from 3.3V through a protection diode.  A
+# comparator powered from 5V should be able to do this.
+
+# done(v2) Change wiring for 74lvc125 to make it easier to retrofit reset sensing to v1 board
+# using a schottky diode and resistor.
+
+# done(v2) verify 74lvt125 pinout
+
+# done(v2) add nOE pulldown or nearby ground pin for A3xx compatibility
+# done(v2) update jumper silkscreen to make docs easier to write
+# let's do it like this:
+#     eOE e21 e20 e19 e18
+# GND nOE A21 A20 A19 A18 eOE <-- skipped the right hand eOE because it's easy enough to jumper across
+# that way A310 can link GND-NOE and A18-eOE
+# pretty much everything else can use 4 jumpers vertically
+# and everything is readable / easy to describe in the docs.
+
+
+# TODO(later) maybe move the A21/A20/A19/A18 pins all the way to the bottom of the board,
+# and make it slightly larger, because the current connector on the RHS probably
+# conflicts with the backplane header (and any installed podules) in an A310.
+
 # done(v2) add a diode and resistor so mcu can sense reset -- superseded by 74lvt125
 
 # done(v2) (maybe just leave things as-is, or...) tie GCLK_IO[0] pin high so
@@ -75,7 +99,10 @@ Pin = myelin_kicad_pcb.Pin
 # done(v2) add a transistor so we can pull POR low, just in case IOC_IRQA
 # really does clear POR on read. -- superseded by 74lvt125 + 100R.
 
-# TODO(v2) Add two holes which are also on the paste layer, so I can pin the paste mask to the board for perfect alignment
+# TODO(later) Add two holes which are also on the paste layer, so I can pin the
+# paste mask to the board for perfect alignment
+# -- google stencil8 for what seems to be the popular way to do this.
+# probably only relevant when i'm panelling.
 
 # done(v2) Connect pin 1 of rom1 to A19_ext and add a jumper (for A5000)
 
@@ -528,6 +555,21 @@ address_jumpers = myelin_kicad_pcb.Component(
     ],
 )
 
+ground_pin_for_nOE = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+    identifier="AEXTGND",
+    value="Ground",
+    pins=[Pin( 1, "", "GND")],
+)
+
+another_a19 = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+    identifier="A21",
+    value="rom_A19",
+    pins=[Pin( 1, "", "rom_A19")],
+)
+
+
 # done(v2) add 74lvt125 for power detect, reset detect, reset control, and POR control.
 # - reset control: This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
 # - POR connection: can go to capacitor or resistor that connect to IOC POR pin
@@ -536,20 +578,30 @@ power_reset_por_buffer = myelin_kicad_pcb.Component(
     footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm",
     identifier="BUF",
     value="74LVT125PW",
+    desc="https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND",
     pins=[
+        # always enabled: buffer rom_5V to rom_5V_buffered
         Pin( 1, "1nOE", "GND"),
         Pin( 2, "1A",   "rom_5V"),
         Pin( 3, "1Y",   "rom_5V_buffered"),
-        Pin( 4, "2nOE", "GND"),
-        Pin( 5, "2A",   "arc_RESET"),
-        Pin( 6, "2Y",   "arc_RESET_buffered"),
-        Pin( 7, "GND",  "GND"),
-        Pin( 8, "3Y",   "arc_RESET"),
-        Pin( 9, "3A",   "GND"),
-        Pin(10, "3nOE", "ndrive_arc_RESET"),
-        Pin(11, "4Y",   "arc_POR_R"),
+
+        # ground arc_POR_R when ndrive_arc_POR==0
+        Pin( 4, "2nOE", "ndrive_arc_POR"),
+        Pin( 5, "2A",   "GND"),
+        Pin( 6, "2Y",   "arc_POR_R"),
+
+        # always enabled: buffer arc_RESET to arc_RESET_buffered
+        Pin(10, "3nOE", "GND"),
+        Pin( 9, "3A",   "arc_RESET"),
+        Pin( 8, "3Y",   "arc_RESET_buffered"),
+
+        # ground arc_RESET when ndrive_arc_RESET==0
+        Pin(13, "4nOE", "ndrive_arc_RESET"),
         Pin(12, "4A",   "GND"),
-        Pin(13, "4nOE", "ndrive_arc_POR"),
+        Pin(11, "4Y",   "arc_RESET"),
+
+        # power
+        Pin( 7, "GND",  "GND"),
         Pin(14, "VCC",  "3V3"),
     ],
 )
@@ -559,8 +611,8 @@ buffer_resistors = [
     # series resistor to avoid overloading BUF output during POR
     myelin_kicad_pcb.R0805("100R", "arc_POR_R", "arc_POR", ref="R3"),
     # optional pullups for ndrive_arc_RESET and ndrive_ARC_POR
-    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_POR", "3V3", ref="R6"),
-    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_RESET", "3V3", ref="R7"),
+    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_RESET", "3V3", ref="R6"),
+    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_POR", "3V3", ref="R7"),
     # pulldown to ensure we don't get a fake rom_5V high when unplugged
     myelin_kicad_pcb.R0805("10k", "rom_5V", "GND", ref="R8")
 ]
@@ -622,7 +674,7 @@ mcu = myelin_kicad_pcb.Component(
 
         Pin(1, "PA00/XIN32/SERCOM1.0", "mcu_debug_TXD"),
         Pin(2, "PA01/XOUT32/SERCOM1.1", "mcu_debug_RXD"),
-        Pin(3, "PA02/AIN0/DAC_OUT",   "arc_RESET_buffered"),
+        Pin(3, "PA02/AIN0/DAC_OUT",   "ndrive_arc_POR"),
         Pin(4, "PA03/ADC_VREFA/AIN1", "rom_5V_buffered"),
         Pin(5, "PA04/SERCOM0.0/AIN4", "cpld_TDO"),
         Pin(6, "PA05/SERCOM0.1/AIN5", "cpld_TCK"),
@@ -636,8 +688,8 @@ mcu = myelin_kicad_pcb.Component(
         Pin(14, "PA11/SERCOM2.3/0.3/AIN19", "cpld_MISO"), # XCK0/2 -> cpld
         Pin(15, "PA14/XIN/SERCOM4.2/2.2", "flash_nRESET"), # TXRX2/4 -> cpld GCK
         Pin(16, "PA15/XOUT/SERCOM4.3/2.3", "flash_READY"), # XCK2/4 -> cpld GCK
-        Pin(17, "PA16/SERCOM1.0/3.0", "ndrive_arc_RESET"), # TXRX1/3
-        Pin(18, "PA17/SERCOM1.1/3.1", "ndrive_arc_POR"), # XCK1/3 -> cpld GCK
+        Pin(17, "PA16/SERCOM1.0/3.0", "arc_RESET_buffered"), # TXRX1/3 -- mcu_GPIO5 in v1
+        Pin(18, "PA17/SERCOM1.1/3.1", "ndrive_arc_RESET"), # XCK1/3 -> cpld GCK -- mcu_GPIO4 in v1
         Pin(19, "PA18/SERCOM1.2/3.2", "mcu_GPIO3"), # TXRX1/3.  Not connected to an Arduino pin.
         Pin(20, "PA19/SERCOM1.3/3.3", "mcu_GPIO2"), # XCK1/3.  Not connected to an Arduino pin.
         Pin(21, "PA22/SERCOM3.0/5.0", "mcu_GPIO1"), # TXRX3/5
