@@ -35,6 +35,7 @@ micro_usb = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:micro_usb_b_smd_molex",
     identifier="USB",
     value="usb",
+    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
     pins=[
         Pin(1, "V", ["5V"]),
         Pin(2, "-", ["USBDM"]),
@@ -74,6 +75,7 @@ mcu = myelin_kicad_pcb.Component(
     footprint="Housings_SOIC:SOIC-14_3.9x8.7mm_Pitch1.27mm",
     identifier="MCU",
     value="atsamd11c",
+    desc="IC ARM MCU; https://www.digikey.com/product-detail/en/microchip-technology/ATSAMD11C14A-SSUT/ATSAMD11C14A-SSUTCT-ND",
     pins=[
         # 14 pins: 2 for power, 3 for reset/swd, 2 for USB, leaving 7 GPIO.
 
@@ -140,6 +142,7 @@ regulator = myelin_kicad_pcb.Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
     identifier="U?",
     value="MCP1700T-3302E/MB",
+    desc="IC LDO 3.3V regulator; https://www.digikey.com/products/en?keywords=MCP1700T3302EMBCT-ND",
     pins=[
         Pin(2, "VIN", ["5V"]),
         Pin(3, "VOUT", ["3V3"]),

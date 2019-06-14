@@ -42,8 +42,8 @@ archive](https://www.mattairtech.com/software/arduino/SAM-BA-bootloaders-zero-ma
 programmed using my J-Link like this:
 
 ~~~~
-JLinkExe
-device atsamd11c14a
+JLinkExe -device atsamd11c14 -if swd -speed 4000
+connect
 erase
 loadbin sam_ba_Generic_D11C14A_SAMD11C14A.bin, 0
 r
