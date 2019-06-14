@@ -1,313 +1,253 @@
 This is the human-readable bill of materials.
 See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 
-mech_pin1
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin2
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin3
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin4
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin5
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin6
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin7
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-mech_pin8
-- Value: 
-- Description: 
-- KiCad package: myelin-kicad:dip_rom_single_pin
-
-R3
-- Value: 100R
-- Description: 100R resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
 CC2
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC3
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC4
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC5
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC6
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC7
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC8
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 CC9
 - Value: 100n
-- Description: 100n capacitor in 0402 package
+- Description: Capacitor 0402: 100n
 - KiCad package: Capacitor_SMD:C_0402_1005Metric
 
 C10
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C11
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C13
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 CC0
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 CC1
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC0
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC1
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC2
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC3
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC4
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC5
 - Value: 100n
-- Description: 100n capacitor in 0805 package
+- Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R1
-- Value: 10k
-- Description: 10k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R8
-- Value: 10k
-- Description: 10k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C1
 - Value: 10u
-- Description: 10u capacitor in 0805 package
+- Description: Capacitor 0805: 10u
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R2
-- Value: 1k
-- Description: 1k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C12
 - Value: 1u
-- Description: 1u capacitor in 0805 package
+- Description: Capacitor 0805: 1u
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C6
 - Value: 1u
-- Description: 1u capacitor in 0805 package
+- Description: Capacitor 0805: 1u
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C7
 - Value: 1u
-- Description: 1u capacitor in 0805 package
+- Description: Capacitor 0805: 1u
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-BUF
-- Value: 74LVT125PW
-- Description: https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND
-- KiCad package: Package_SO:TSSOP-14_4.4x5mm_P0.65mm
-
-REG
-- Value: AP7365-33YG-XX
-- Description: 3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.
-- KiCad package: Package_TO_SOT_SMD:SOT-89-3
-
-MCU
-- Value: ATSAMD21E18A
-- Description: 
-- KiCad package: Package_QFP:TQFP-32_7x7mm_P0.8mm
-
-AEXT2
-- Value: Addresses
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
-
-AEXT
-- Value: Extras
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
-
-FID1
-- Value: FIDUCIAL
-- Description: 
-- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
-
-FID2
-- Value: FIDUCIAL
-- Description: 
-- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
-
-FID3
-- Value: FIDUCIAL
-- Description: 
-- KiCad package: Fiducial:Fiducial_1mm_Dia_2mm_Outer
-
-AEXTGND
-- Value: Ground
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
-
-R6
-- Value: NF 10k
-- Description: NF 10k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R7
-- Value: NF 10k
-- Description: NF 10k resistor in 0805 package
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-ROM1
-- Value: ROM header
-- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
-- KiCad package: myelin-kicad:dip32_rom
-
-ROM2
-- Value: ROM header
-- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
-- KiCad package: myelin-kicad:dip32_rom_data_only
-
-ROM3
-- Value: ROM header
-- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
-- KiCad package: myelin-kicad:dip32_rom_data_only
-
-ROM4
-- Value: ROM header
-- Description: Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???
-- KiCad package: myelin-kicad:dip32_rom_data_only
 
 D1
 - Value: S1ATR
-- Description: Rectifier diode
+- Description: Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND
 - KiCad package: Diode_SMD:D_SMA
 
 D2
-- Value: S1ATR
-- Description: Rectifier diode
+- Value: S1ATR NF
+- Description: Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND
 - KiCad package: Diode_SMD:D_SMA
+
+MCU
+- Value: ATSAMD21E18A-AU
+- Description: IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND
+- KiCad package: Package_QFP:TQFP-32_7x7mm_P0.8mm
+
+CPLD
+- Value: XC95144XL-10CSG144
+- Description: IC CPLD Xilinx 144MC; https://www.avnet.com/shop/us/search/xc95144xl-10csg
+- KiCad package: myelin-kicad:xilinx_csg144
+
+REG
+- Value: AP7365-33YG-XX
+- Description: IC LDO 3.3V regulator; https://www.digikey.com/products/en?keywords=AP7365-33YG-13DICT-ND
+- KiCad package: Package_TO_SOT_SMD:SOT-89-3
+
+BUF
+- Value: 74LVT125PW
+- Description: IC buffer 4-bit OC LVT; https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND
+- KiCad package: Package_SO:TSSOP-14_4.4x5mm_P0.65mm
 
 FLASH0
 - Value: S29GL064S70DHI010
-- Description: 
+- Description: IC flash 64Mbit; https://www.digikey.com/products/en?keywords=2015-S29GL064S70DHI010-ND
 - KiCad package: myelin-kicad:cypress_lae064_fbga
 
 FLASH1
 - Value: S29GL064S70DHI010
-- Description: 
+- Description: IC flash 64Mbit; https://www.digikey.com/products/en?keywords=2015-S29GL064S70DHI010-ND
 - KiCad package: myelin-kicad:cypress_lae064_fbga
 
-CPLD
-- Value: XC95144XL-10CSG144
-- Description: 
-- KiCad package: myelin-kicad:xilinx_csg144
+ROM1
+- Value: ROM header
+- Description: Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress
+- KiCad package: myelin-kicad:dip32_rom
 
-EXTPWR
-- Value: ext pwr
-- Description: 1x3 0.1 inch male header
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+ROM2
+- Value: ROM header
+- Description: Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress
+- KiCad package: myelin-kicad:dip32_rom_data_only
 
-GPIO
-- Value: gpio
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
+ROM3
+- Value: ROM header
+- Description: Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress
+- KiCad package: myelin-kicad:dip32_rom_data_only
 
-RESET
-- Value: reset/POR
-- Description: 1x2 0.1 inch male header
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
+ROM4
+- Value: ROM header
+- Description: Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress
+- KiCad package: myelin-kicad:dip32_rom_data_only
+
+AEXT2
+- Value: Addresses
+- Description: Pin header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+
+AEXT
+- Value: Extras
+- Description: Pin header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
+
+AEXTGND
+- Value: Ground
+- Description: Pin header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
 
 A21
 - Value: rom_A19
-- Description: 
+- Description: Pin header
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
 
-SWD
-- Value: swd
-- Description: 
-- KiCad package: Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical
+RESET
+- Value: reset/POR
+- Description: Pin header - 1x2 0.1 inch male
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
+
+GPIO
+- Value: gpio
+- Description: Pin header NF
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
 
 SWD2
 - Value: swd
-- Description: 
+- Description: Pin header NF
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+
+EXTPWR
+- Value: ext pwr
+- Description: Pin header NF - 1x3 0.1 inch male
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+
+R3
+- Value: 100R
+- Description: Resistor 0805: 100R
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R1
+- Value: 10k
+- Description: Resistor 0805: 10k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R6
+- Value: 10k
+- Description: Resistor 0805: 10k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R7
+- Value: 10k
+- Description: Resistor 0805: 10k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R8
+- Value: 10k
+- Description: Resistor 0805: 10k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R2
+- Value: 1k
+- Description: Resistor 0805: 1k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 USB
 - Value: usb
-- Description: Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.
+- Description: Socket Micro USB, Molex 1050170001; https://www.digikey.com/products/en?keywords=WM1399CT-ND
 - KiCad package: myelin-kicad:micro_usb_b_smd_molex
 

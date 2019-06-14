@@ -1,63 +1,51 @@
 Identifier	Value	Description	KiCad package
-mech_pin1			myelin-kicad:dip_rom_single_pin
-mech_pin2			myelin-kicad:dip_rom_single_pin
-mech_pin3			myelin-kicad:dip_rom_single_pin
-mech_pin4			myelin-kicad:dip_rom_single_pin
-mech_pin5			myelin-kicad:dip_rom_single_pin
-mech_pin6			myelin-kicad:dip_rom_single_pin
-mech_pin7			myelin-kicad:dip_rom_single_pin
-mech_pin8			myelin-kicad:dip_rom_single_pin
-R3	100R	100R resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-CC2	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC3	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC4	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC5	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC6	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC7	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC8	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-CC9	100n	100n capacitor in 0402 package	Capacitor_SMD:C_0402_1005Metric
-C10	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C11	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C13	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-CC0	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-CC1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC0	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC1	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC2	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC3	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC4	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC5	100n	100n capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R1	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R8	10k	10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C1	10u	10u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R2	1k	1k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C12	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C6	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-C7	1u	1u capacitor in 0805 package	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-BUF	74LVT125PW	https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND	Package_SO:TSSOP-14_4.4x5mm_P0.65mm
-REG	AP7365-33YG-XX	3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.	Package_TO_SOT_SMD:SOT-89-3
-MCU	ATSAMD21E18A		Package_QFP:TQFP-32_7x7mm_P0.8mm
-AEXT2	Addresses		Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
-AEXT	Extras		Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
-FID1	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
-FID2	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
-FID3	FIDUCIAL		Fiducial:Fiducial_1mm_Dia_2mm_Outer
-AEXTGND	Ground		Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
-R6	NF 10k	NF 10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R7	NF 10k	NF 10k resistor in 0805 package	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-ROM1	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom
-ROM2	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
-ROM3	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
-ROM4	ROM header	Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???	myelin-kicad:dip32_rom_data_only
-D1	S1ATR	Rectifier diode	Diode_SMD:D_SMA
-D2	S1ATR	Rectifier diode	Diode_SMD:D_SMA
-FLASH0	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-FLASH1	S29GL064S70DHI010		myelin-kicad:cypress_lae064_fbga
-CPLD	XC95144XL-10CSG144		myelin-kicad:xilinx_csg144
-EXTPWR	ext pwr	1x3 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
-GPIO	gpio		Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
-RESET	reset/POR	1x2 0.1 inch male header	Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
-A21	rom_A19		Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
-SWD	swd		Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical
-SWD2	swd		Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
-USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
+CC2	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC3	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC4	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC5	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC6	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC7	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC8	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+CC9	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
+C10	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C11	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C13	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC0	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC0	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC2	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC3	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC4	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC5	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C1	10u	Capacitor 0805: 10u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C12	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C6	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C7	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+D1	S1ATR	Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND	Diode_SMD:D_SMA
+D2	S1ATR NF	Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND	Diode_SMD:D_SMA
+MCU	ATSAMD21E18A-AU	IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND	Package_QFP:TQFP-32_7x7mm_P0.8mm
+CPLD	XC95144XL-10CSG144	IC CPLD Xilinx 144MC; https://www.avnet.com/shop/us/search/xc95144xl-10csg	myelin-kicad:xilinx_csg144
+REG	AP7365-33YG-XX	IC LDO 3.3V regulator; https://www.digikey.com/products/en?keywords=AP7365-33YG-13DICT-ND	Package_TO_SOT_SMD:SOT-89-3
+BUF	74LVT125PW	IC buffer 4-bit OC LVT; https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND	Package_SO:TSSOP-14_4.4x5mm_P0.65mm
+FLASH0	S29GL064S70DHI010	IC flash 64Mbit; https://www.digikey.com/products/en?keywords=2015-S29GL064S70DHI010-ND	myelin-kicad:cypress_lae064_fbga
+FLASH1	S29GL064S70DHI010	IC flash 64Mbit; https://www.digikey.com/products/en?keywords=2015-S29GL064S70DHI010-ND	myelin-kicad:cypress_lae064_fbga
+ROM1	ROM header	Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress	myelin-kicad:dip32_rom
+ROM2	ROM header	Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress	myelin-kicad:dip32_rom_data_only
+ROM3	ROM header	Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress	myelin-kicad:dip32_rom_data_only
+ROM4	ROM header	Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress	myelin-kicad:dip32_rom_data_only
+AEXT2	Addresses	Pin header	Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
+AEXT	Extras	Pin header	Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical
+AEXTGND	Ground	Pin header	Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
+A21	rom_A19	Pin header	Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
+RESET	reset/POR	Pin header - 1x2 0.1 inch male	Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
+GPIO	gpio	Pin header NF	Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical
+SWD2	swd	Pin header NF	Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical
+EXTPWR	ext pwr	Pin header NF - 1x3 0.1 inch male	Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+R3	100R	Resistor 0805: 100R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R1	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R6	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R7	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R8	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R2	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+USB	usb	Socket Micro USB, Molex 1050170001; https://www.digikey.com/products/en?keywords=WM1399CT-ND	myelin-kicad:micro_usb_b_smd_molex

@@ -172,6 +172,7 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
     value="XC95144XL-10CSG144",
+    desc="IC CPLD Xilinx 144MC; https://www.avnet.com/shop/us/search/xc95144xl-10csg",
     buses=["rom_A", "rom_D", "flash_A", "flash0_DQ", "flash1_DQ"],
     pins=[
         # cpld has 28 signals out N, 29 out E, 32-4=28 S, 31 W = 116 -- approx correct :)
@@ -351,15 +352,24 @@ myelin_kicad_pcb.check_xc9500xl_pinout(cpld, os.path.join(here, PATH_TO_CPLD), P
 diodes = [
     myelin_kicad_pcb.Component(
         footprint="Diode_SMD:D_SMA",
-        identifier="D?",
+        identifier="D1",
         value="S1ATR",
-        desc="Rectifier diode",
+        desc="Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND",
         pins=[
             Pin(1, "1", "5V"),
-            Pin(2, "2", src),
+            Pin(2, "2", "rom_5V"),
         ],
-    )
-    for src in ("rom_5V", "VUSB")
+    ),
+    myelin_kicad_pcb.Component(
+        footprint="Diode_SMD:D_SMA",
+        identifier="D2",
+        value="S1ATR NF",  # to avoid powering host machine from USB supply
+        desc="Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND",
+        pins=[
+            Pin(1, "1", "5V"),
+            Pin(2, "2", "VUSB"),
+        ],
+    ),
 ]
 
 # 10uf capacitor on 5V input
@@ -380,7 +390,7 @@ regulator = myelin_kicad_pcb.Component(
     footprint="Package_TO_SOT_SMD:SOT-89-3",
     identifier="REG",
     value="AP7365-33YG-XX",  # 600 mA, 0.3V dropout
-    desc="3.3V LDO regulator, e.g. Digikey AP7365-33YG-13DICT-ND.  Search for the exact part number because there are many variants.",
+    desc="IC LDO 3.3V regulator; https://www.digikey.com/products/en?keywords=AP7365-33YG-13DICT-ND",
     # (done) verify pinout on PCB against datasheet
     pins=[
         # MCP1700 and AP7365-YR: GND VIN VOUT
@@ -401,7 +411,7 @@ ext_power = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
     identifier="EXTPWR",
     value="ext pwr",
-    desc="1x3 0.1 inch male header",
+    desc="Pin header NF - 1x3 0.1 inch male",
     pins=[
         Pin(1, "A", ["GND"]),
         Pin(2, "B", ["3V3"]),
@@ -416,6 +426,7 @@ flash = [
         footprint="myelin-kicad:cypress_lae064_fbga",
         identifier="FLASH%d" % flash_id,
         value="S29GL064S70DHI010",  # 64-ball FBGA, 1mm pitch, 9x9mm (c.f. 20x14 in TQFP)
+        desc="IC flash 64Mbit; https://www.digikey.com/products/en?keywords=2015-S29GL064S70DHI010-ND",
         buses=[""],
         pins=[
             Pin("F1", "Vio",     "3V3"),
@@ -486,7 +497,7 @@ rom_headers = [
         footprint=("myelin-kicad:dip32_rom" if rom_id == 0 else "myelin-kicad:dip32_rom_data_only"),
         identifier="ROM%d" % (rom_id + 1),
         value="ROM header",
-        desc="Adapter to emulate a 600mil 32-pin DIP, e.g. Digikey ???",
+        desc="Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress",
         pins=[
             Pin("13", "D0", "rom_D%d" % (rom_id * 8 + 0)),
             Pin("14", "D1", "rom_D%d" % (rom_id * 8 + 1)),
@@ -534,6 +545,7 @@ address_jumpers = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x05_P2.54mm_Vertical",
     identifier="AEXT",
     value="Extras",
+    desc="Pin header",
     pins=[
         # ARM LA18 / ROM A16
         Pin( 1, "arc_A16_LA18",   "rom_A16_ext"),
@@ -559,6 +571,7 @@ ground_pin_for_nOE = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
     identifier="AEXTGND",
     value="Ground",
+    desc="Pin header",
     pins=[Pin( 1, "", "GND")],
 )
 
@@ -566,6 +579,7 @@ another_a19 = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
     identifier="A21",
     value="rom_A19",
+    desc="Pin header",
     pins=[Pin( 1, "", "rom_A19")],
 )
 
@@ -578,7 +592,7 @@ power_reset_por_buffer = myelin_kicad_pcb.Component(
     footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm",
     identifier="BUF",
     value="74LVT125PW",
-    desc="https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND",
+    desc="IC buffer 4-bit OC LVT; https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND",
     pins=[
         # always enabled: buffer rom_5V to rom_5V_buffered
         Pin( 1, "1nOE", "GND"),
@@ -610,9 +624,9 @@ buffer_cap = myelin_kicad_pcb.C0805("100n", "GND", "3V3", ref="C13")
 buffer_resistors = [
     # series resistor to avoid overloading BUF output during POR
     myelin_kicad_pcb.R0805("100R", "arc_POR_R", "arc_POR", ref="R3"),
-    # optional pullups for ndrive_arc_RESET and ndrive_ARC_POR
-    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_RESET", "3V3", ref="R6"),
-    myelin_kicad_pcb.R0805("NF 10k", "ndrive_arc_POR", "3V3", ref="R7"),
+    # pullups for ndrive_arc_RESET and ndrive_ARC_POR
+    myelin_kicad_pcb.R0805("10k", "ndrive_arc_RESET", "3V3", ref="R6"),
+    myelin_kicad_pcb.R0805("10k", "ndrive_arc_POR", "3V3", ref="R7"),
     # pulldown to ensure we don't get a fake rom_5V high when unplugged
     myelin_kicad_pcb.R0805("10k", "rom_5V", "GND", ref="R8")
 ]
@@ -621,7 +635,7 @@ reset_por_header = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
     identifier="RESET",
     value="reset/POR",
-    desc="1x2 0.1 inch male header",
+    desc="Pin header - 1x2 0.1 inch male",
     pins=[
         Pin(1, "A", ["arc_RESET"]),
         Pin(2, "B", ["arc_POR"]),
@@ -635,6 +649,7 @@ address_hookup_2 = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     identifier="AEXT2",
     value="Addresses",
+    desc="Pin header",
     pins=[
         # ARM LA18 / ROM A16
         Pin(1, "cpld_A16_LA18",  "rom_A16"),
@@ -653,7 +668,7 @@ micro_usb = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:micro_usb_b_smd_molex",
     identifier="USB",
     value="usb",
-    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
+    desc="Socket Micro USB, Molex 1050170001; https://www.digikey.com/products/en?keywords=WM1399CT-ND",
     pins=[
         Pin(1, "V", "VUSB"),
         Pin(2, "-", "USBDM"),
@@ -667,7 +682,8 @@ micro_usb = myelin_kicad_pcb.Component(
 mcu = myelin_kicad_pcb.Component(
     footprint="Package_QFP:TQFP-32_7x7mm_P0.8mm",
     identifier="MCU",
-    value="ATSAMD21E18A",  # 256k flash, 32k sram, 32 pins
+    value="ATSAMD21E18A-AU",  # 256k flash, 32k sram, 32 pins
+    desc="IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND",
     pins=[
         # It looks like SECOM4 and SERCOM5 don't exist on the D21E, so we only
         # have SERCOM0-3.
@@ -719,6 +735,7 @@ swd = myelin_kicad_pcb.Component(
     footprint="Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical",
     identifier="SWD",
     value="swd",
+    exclude_from_bom=True,
     pins=[
         # Tag-Connect SWD layout: http://www.tag-connect.com/Materials/TC2030-CTX.pdf
         Pin(1, "VCC",       "3V3"),
@@ -735,6 +752,7 @@ swd_alt = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical",
     identifier="SWD2",
     value="swd",
+    desc="Pin header NF",
     pins=[
         Pin(1, "SWDIO/TMS", "mcu_SWDIO"),
         Pin(2, "VCC",       "3V3"),
@@ -752,6 +770,7 @@ mcu_gpio = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical",
     identifier="GPIO",
     value="gpio",
+    desc="Pin header NF",
     pins=[
         Pin(1, "GND",    "GND"),
         Pin(2, "VCC",    "3V3"),
@@ -770,6 +789,7 @@ mechanical_holes = [
         footprint="myelin-kicad:dip_rom_single_pin",
         identifier="mech_pin%d" % (n+1),
         value="",
+        exclude_from_bom=True,
         pins=[Pin(1, "")],
     )
     for n in range(8)
@@ -780,6 +800,7 @@ staples = [
         footprint="myelin-kicad:via_single",
         identifier="staple_single%d" % (n+1),
         value="",
+        exclude_from_bom=True,
         pins=[Pin(1, "GND", ["GND"])],
     )
     for n in range(36)
@@ -790,6 +811,7 @@ fiducials = [
         footprint="Fiducial:Fiducial_1mm_Dia_2mm_Outer",
         identifier="FID%d" % (n+1),
         value="FIDUCIAL",
+        exclude_from_bom=True,
         pins=[],
     )
     for n in range(3)
