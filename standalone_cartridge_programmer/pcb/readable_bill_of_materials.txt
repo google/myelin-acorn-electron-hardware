@@ -1,0 +1,58 @@
+This is the human-readable bill of materials.
+See bill_of_materials.txt for a terser version suitable for spreadsheet import.
+
+CON2
+- Value: AVR ISP
+- Description: 2x3 0.1 inch header for AVR programming (OPTIONAL)
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
+
+CON3
+- Value: jtag
+- Description: 2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.
+- KiCad package: Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
+
+U3
+- Value: MCP1700T-3302E/MB
+- Description: 3.3V LDO regulator.  Search for the exact part number because there are many variants.
+- KiCad package: TO_SOT_Packages_SMD:SOT-89-3
+
+C1
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C2
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C5
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C3
+- Value: 1u
+- Description: Capacitor 0805: 1u
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C4
+- Value: 1u
+- Description: Capacitor 0805: 1u
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+U2
+- Value: XC9572XL-10VQG44C
+- Description: IC CPLD Xilinx 72MC 44-pin; https://www.digikey.com/products/en?keywords=122-1448-ND
+- KiCad package: myelin-kicad:xilinx_vqg44
+
+CON1
+- Value: cartridge port
+- Description: Socket to match the 44-pin edge connector in an Electron cartridge, e.g. TE 5530843-4 / Digikey A31717-ND
+- KiCad package: myelin-kicad:acorn_electron_cartridge_socket
+
+U1
+- Value: Pro Micro 5V
+- Description: Sparkfun Pro Micro or eBay/Aliexpress clone, with ATMEGA32U4 MCU and micro USB socket (NOT ATMEGA328 or mini USB)
+- KiCad package: myelin-kicad:pro_micro
+

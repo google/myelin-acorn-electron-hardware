@@ -1,11 +1,12 @@
-C1	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C2	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C3	1u	1u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C4	1u	1u capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-C5	100n	100n capacitor in 0805 package	Capacitors_SMD:C_0805_HandSoldering
-CON1	cartridge port	Socket to match the 44-pin edge connector in an Electron cartridge, e.g. TE 5530843-4 / Digikey A31717-ND	myelin-kicad:acorn_electron_cartridge_socket
+Identifier	Value	Description	KiCad package
 CON2	AVR ISP	2x3 0.1 inch header for AVR programming (OPTIONAL)	Pin_Headers:Pin_Header_Straight_2x03_Pitch2.54mm
 CON3	jtag	2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.	Pin_Headers:Pin_Header_Straight_2x05_Pitch2.54mm
-U1	Pro Micro 5V	Sparkfun Pro Micro or eBay/Aliexpress clone, with ATMEGA32U4 MCU and micro USB socket (NOT ATMEGA328 or mini USB)	myelin-kicad:pro_micro
-U2	XC9572XL-10VQG44C	Xilinx XC9572XL in 44-pin 0.8mm TQFP package.  Any speed or temperature grade is OK.	myelin-kicad:xilinx_vqg44
 U3	MCP1700T-3302E/MB	3.3V LDO regulator.  Search for the exact part number because there are many variants.	TO_SOT_Packages_SMD:SOT-89-3
+C1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C2	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C5	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C3	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C4	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+U2	XC9572XL-10VQG44C	IC CPLD Xilinx 72MC 44-pin; https://www.digikey.com/products/en?keywords=122-1448-ND	myelin-kicad:xilinx_vqg44
+CON1	cartridge port	Socket to match the 44-pin edge connector in an Electron cartridge, e.g. TE 5530843-4 / Digikey A31717-ND	myelin-kicad:acorn_electron_cartridge_socket
+U1	Pro Micro 5V	Sparkfun Pro Micro or eBay/Aliexpress clone, with ATMEGA32U4 MCU and micro USB socket (NOT ATMEGA328 or mini USB)	myelin-kicad:pro_micro

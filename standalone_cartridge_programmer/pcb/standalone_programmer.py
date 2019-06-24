@@ -204,7 +204,7 @@ cpld = Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="U2",
     value="XC9572XL-10VQG44C",
-	desc="Xilinx XC9572XL in 44-pin 0.8mm TQFP package.  Any speed or temperature grade is OK.",
+    desc="IC CPLD Xilinx 72MC 44-pin; https://www.digikey.com/products/en?keywords=122-1448-ND",
     pins=[
         # change ../cpld/constraints.ucf if any pinouts change
         Pin(39, "P1.2", ["cart_A7"]),
@@ -295,4 +295,4 @@ reg_in_cap = C0805("1u", "5V", "GND", ref="C3")
 reg_out_cap = C0805("1u", "3V3", "GND", ref="C4")
 
 dump_netlist("standalone_programmer.net")
-dump_bom("bill_of_materials.txt")
+dump_bom("bill_of_materials.txt", "readable_bill_of_materials.txt")
