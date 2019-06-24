@@ -1,0 +1,52 @@
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Left pins
+NET p34 LOC = P34;
+NET p35 LOC = P35;
+NET p36 LOC = P36;
+NET p37 LOC = P37;
+NET p38 LOC = P38;
+NET p39 LOC = P39;
+NET p40 LOC = P40;
+NET p41 LOC = P41;
+NET p42 LOC = P42;
+NET p43 LOC = P43;
+NET p44 LOC = P44;
+NET p1  LOC = P1;
+NET p2  LOC = P2;
+NET p3  LOC = P3;
+NET p5  LOC = P5;
+NET p6  LOC = P6;
+NET p7  LOC = P7;
+NET p8  LOC = P8;
+
+# Right pins
+NET p12 LOC = P12;
+NET p13 LOC = P13;
+NET p14 LOC = P14;
+NET p16 LOC = P16;
+NET p18 LOC = P18;
+NET p19 LOC = P19;
+NET p20 LOC = P20;
+NET p21 LOC = P21;
+NET p22 LOC = P22;
+NET p23 LOC = P23;
+NET p27 LOC = P27;
+NET p28 LOC = P28;
+NET p29 LOC = P29;
+NET p30 LOC = P30;
+NET p31 LOC = P31;
+NET p32 LOC = P32;
+NET p33 LOC = P33;
