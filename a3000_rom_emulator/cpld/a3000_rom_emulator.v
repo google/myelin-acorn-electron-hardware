@@ -52,10 +52,15 @@ module a3000_rom_emulator(
   output wire flash_nOE,
   output wire flash_nWE,
 
-  // possible clocks (unused)
+  // 48MHz clock
   input wire cpld_clock_from_mcu,
+
+  // 5V line from ROM socket, used to attempt to detect if the host machine is
+  // powered. Unreliable, so it's safest to just not fit D2, which ensures
+  // that the CPLD is only ever powered from rom_5V and prevents the board
+  // from attempting to power the host system if something goes wrong.
   input wire rom_5V,
-  
+
   // SPI connection to MCU
   input wire cpld_MOSI,  // doubles as serial RXD when cpld_SS=1
   input wire cpld_SS,
