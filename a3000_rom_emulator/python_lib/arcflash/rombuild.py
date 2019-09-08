@@ -40,6 +40,34 @@ class ROM:
             p.cmos_tag = self.cmos
         return p
 
+    def read_files(self):
+        data = []
+        size = 0
+        for fn in self.files:
+            fdata = open(fn, "rb").read()
+            data.append(fdata)
+            size += len(fdata)
+        assert size <= self.size, \
+            "Read %d bytes for ROM %s, but it's specified to only have %d" % (size, self, self.size)
+        data = b"".join(data)
+        return (data, size)
+
+    def as_source_proto(self):
+        data, size = self.read_files()
+        p = arcflash_pb2.SourceRomImage(
+            data=data,
+            size=size,
+            hash_sha1=hashlib.sha1(data).hexdigest(),
+            local_path=self.files,
+            name=self.name,
+            bank_size=self.size,
+            )
+        if self.tag:
+            p.tag = self.tag
+        if self.cmos:
+            p.cmos_tag = self.cmos
+        return p
+
     def __repr__(self):
         if self.tag:
             if self.name:
@@ -51,16 +79,17 @@ class ROM:
         desc += " [%s]" % self.readable_size()
         return desc
 
-def read_rom_file(fn, byte_order):
-    bytes = open(fn, "rb").read()
-
+def switch_byte_order(bytes, byte_order):
     if len(bytes) % 4:
-        # special case for arthur 1.20 image
+        # Pad to a multiple of 4 bytes
         if len(bytes) == 524289 and bytes[-1] == '\\':
+            # Special case for Arthur 1.20 image with extra byte
             print("Dropping the last byte of known Arthur image")
             bytes = bytes[:512*1024]
         else:
-            bytes += b"\xFF" * (4 - (len(bytes) % 4))
+            n_pad = 4 - (len(bytes) % 4)
+            print("Padding %d-byte image with %d 0xFF bytes" % (len(bytes), n_pad))
+            bytes += b"\xFF" * n_pad
 
     if byte_order == "0123":
         return bytes
@@ -159,18 +188,11 @@ def FlashImage(roms,
             if EXPLAIN_FLASH_BUILD: print("- Adding padding of %d bytes first" % pad_len)
             flash += b"\xFF" * pad_len
             ptr += pad_len
-        data = []
-        size = 0
-        for fn in rom.files:
-            fdata = read_rom_file(fn, byte_order)
-            data.append(fdata)
-            size += len(fdata)
-        assert size <= rom.size, \
-            "Read %d bytes for ROM %s, but it's specified to only have %d" % (size, rom, rom.size)
+        data, size = rom.read_files()
         if size < rom.size:
-            data.append(b"\xFF" * (rom.size - size))
-        data = b"".join(data)
-        assert len(data) == rom.size
+            data += (b"\xFF" * (rom.size - size))
+        data = switch_byte_order(data, byte_order)
+        assert len(data) == rom.size, "data is %d bytes long, expected %d" % (len(data), rom.size)
         if EXPLAIN_FLASH_BUILD: print("- Adding %d bytes (ROM %s)" % (len(data), rom))
         flash += data
         ptr += rom.size
@@ -211,7 +233,8 @@ def FlashImage(roms,
         )
         if bootloader_image_override:
             # Bootloader image overridden -- ignore descriptor etc
-            bootloader_binary = read_rom_file(bootloader_image_override, byte_order)
+            bootloader_binary = open(bootloader_image_override, "rb").read()
+            bootloader_binary = switch_byte_order(bootloader_binary, byte_order)
             bootloader_bank = (
                 bootloader_binary +
                 ("\xff" * (bootloader_bank_size - len(bootloader_binary)))
@@ -239,8 +262,21 @@ def FlashImage(roms,
             raise Exception("Syntax: %s save <filename>" % sys.argv[0])
         fn = args.pop(0)
         print("Saving flash image to %s" % fn)
-        open(fn, "wb").write(flash)
+        with open(fn, "wb") as f:
+            f.write(flash)
         return
+
+    if cmd == 'savesrc':
+        # Save source proto, for editing with arcflash_image_editor app
+        if not len(args):
+            raise Exception("Syntax: %s savesrc <filename>" % sys.argv[0])
+        fn = args.pop(0)
+        ext = '.arcflashsrcimage'
+        assert fn.endswith(ext), "Filename must end with %s" % ext
+        print("Saving flash source data to %s" % fn)
+        src = arcflash_pb2.SourceImageFile(rom=[rom.as_source_proto() for rom in roms])
+        with open(fn, "wb") as f:
+            f.write(src.SerializeToString())
 
     if cmd == 'upload':
         print("Uploading to flash")

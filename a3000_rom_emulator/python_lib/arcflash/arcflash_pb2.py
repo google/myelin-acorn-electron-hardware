@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='arcflash',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0e\x61rcflash.proto\x12\x08\x61rcflash\"g\n\tFlashBank\x12\x10\n\x08\x62\x61nk_ptr\x18\x01 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x02 \x01(\t\x12\x11\n\tbank_size\x18\x03 \x01(\x05\x12\x11\n\tbank_name\x18\x04 \x01(\t\x12\x10\n\x08\x63mos_tag\x18\x05 \x01(\t\"o\n\x0f\x46lashDescriptor\x12!\n\x04\x62\x61nk\x18\x01 \x03(\x0b\x32\x13.arcflash.FlashBank\x12\x11\n\thash_sha1\x18\x02 \x01(\t\x12\x12\n\nflash_size\x18\x03 \x01(\x05\x12\x12\n\nfree_space\x18\x04 \x01(\x05\"O\n\x04\x43MOS\x12\x10\n\x08\x63mos_tag\x18\x01 \x01(\t\x12\x10\n\x08\x62\x61nk_ptr\x18\x02 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x03 \x01(\t\x12\x11\n\tcmos_data\x18\x04 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\x0e\x61rcflash.proto\x12\x08\x61rcflash\"g\n\tFlashBank\x12\x10\n\x08\x62\x61nk_ptr\x18\x01 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x02 \x01(\t\x12\x11\n\tbank_size\x18\x03 \x01(\x05\x12\x11\n\tbank_name\x18\x04 \x01(\t\x12\x10\n\x08\x63mos_tag\x18\x05 \x01(\t\"o\n\x0f\x46lashDescriptor\x12!\n\x04\x62\x61nk\x18\x01 \x03(\x0b\x32\x13.arcflash.FlashBank\x12\x11\n\thash_sha1\x18\x02 \x01(\t\x12\x12\n\nflash_size\x18\x03 \x01(\x05\x12\x12\n\nfree_space\x18\x04 \x01(\x05\"O\n\x04\x43MOS\x12\x10\n\x08\x63mos_tag\x18\x01 \x01(\t\x12\x10\n\x08\x62\x61nk_ptr\x18\x02 \x01(\x05\x12\x10\n\x08\x62\x61nk_tag\x18\x03 \x01(\t\x12\x11\n\tcmos_data\x18\x04 \x01(\x0c\"L\n\x0fSourceImageFile\x12%\n\x03rom\x18\x01 \x03(\x0b\x32\x18.arcflash.SourceRomImage\x12\x12\n\nbyte_order\x18\x02 \x01(\t\"\x93\x01\n\x0eSourceRomImage\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\x0c\n\x04size\x18\x02 \x01(\x05\x12\x11\n\thash_sha1\x18\x03 \x01(\t\x12\x12\n\nlocal_path\x18\x04 \x03(\t\x12\x0b\n\x03tag\x18\x05 \x01(\t\x12\x0c\n\x04name\x18\x06 \x01(\t\x12\x10\n\x08\x63mos_tag\x18\x07 \x01(\t\x12\x11\n\tbank_size\x18\x08 \x01(\x05\x62\x06proto3')
 )
 
 
@@ -188,10 +188,131 @@ _CMOS = _descriptor.Descriptor(
   serialized_end=325,
 )
 
+
+_SOURCEIMAGEFILE = _descriptor.Descriptor(
+  name='SourceImageFile',
+  full_name='arcflash.SourceImageFile',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='rom', full_name='arcflash.SourceImageFile.rom', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='byte_order', full_name='arcflash.SourceImageFile.byte_order', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=327,
+  serialized_end=403,
+)
+
+
+_SOURCEROMIMAGE = _descriptor.Descriptor(
+  name='SourceRomImage',
+  full_name='arcflash.SourceRomImage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='data', full_name='arcflash.SourceRomImage.data', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='size', full_name='arcflash.SourceRomImage.size', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='hash_sha1', full_name='arcflash.SourceRomImage.hash_sha1', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='local_path', full_name='arcflash.SourceRomImage.local_path', index=3,
+      number=4, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tag', full_name='arcflash.SourceRomImage.tag', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='arcflash.SourceRomImage.name', index=5,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cmos_tag', full_name='arcflash.SourceRomImage.cmos_tag', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='bank_size', full_name='arcflash.SourceRomImage.bank_size', index=7,
+      number=8, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=406,
+  serialized_end=553,
+)
+
 _FLASHDESCRIPTOR.fields_by_name['bank'].message_type = _FLASHBANK
+_SOURCEIMAGEFILE.fields_by_name['rom'].message_type = _SOURCEROMIMAGE
 DESCRIPTOR.message_types_by_name['FlashBank'] = _FLASHBANK
 DESCRIPTOR.message_types_by_name['FlashDescriptor'] = _FLASHDESCRIPTOR
 DESCRIPTOR.message_types_by_name['CMOS'] = _CMOS
+DESCRIPTOR.message_types_by_name['SourceImageFile'] = _SOURCEIMAGEFILE
+DESCRIPTOR.message_types_by_name['SourceRomImage'] = _SOURCEROMIMAGE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 FlashBank = _reflection.GeneratedProtocolMessageType('FlashBank', (_message.Message,), dict(
@@ -214,6 +335,20 @@ CMOS = _reflection.GeneratedProtocolMessageType('CMOS', (_message.Message,), dic
   # @@protoc_insertion_point(class_scope:arcflash.CMOS)
   ))
 _sym_db.RegisterMessage(CMOS)
+
+SourceImageFile = _reflection.GeneratedProtocolMessageType('SourceImageFile', (_message.Message,), dict(
+  DESCRIPTOR = _SOURCEIMAGEFILE,
+  __module__ = 'arcflash_pb2'
+  # @@protoc_insertion_point(class_scope:arcflash.SourceImageFile)
+  ))
+_sym_db.RegisterMessage(SourceImageFile)
+
+SourceRomImage = _reflection.GeneratedProtocolMessageType('SourceRomImage', (_message.Message,), dict(
+  DESCRIPTOR = _SOURCEROMIMAGE,
+  __module__ = 'arcflash_pb2'
+  # @@protoc_insertion_point(class_scope:arcflash.SourceRomImage)
+  ))
+_sym_db.RegisterMessage(SourceRomImage)
 
 
 # @@protoc_insertion_point(module_scope)
