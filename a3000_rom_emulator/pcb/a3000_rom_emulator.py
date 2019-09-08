@@ -584,14 +584,14 @@ another_a19 = myelin_kicad_pcb.Component(
 )
 
 
-# done(v2) add 74lvt125 for power detect, reset detect, reset control, and POR control.
+# done(v2) add 74lvc125 for power detect, reset detect, reset control, and POR control.
 # - reset control: This can go to LK3 pin 1 (reset from ext keyboard), or IC35 pin 2, or IC47 pin 13.
 # - POR connection: can go to capacitor or resistor that connect to IOC POR pin
 
 power_reset_por_buffer = myelin_kicad_pcb.Component(
     footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm",
     identifier="BUF",
-    value="74LVT125PW",
+    value="74LVC125PW",  # Originally this was a 74LVT125, but this has undesirable bus hold behaviour
     desc="IC buffer 4-bit OC LVT; https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND",
     pins=[
         # always enabled: buffer rom_5V to rom_5V_buffered
