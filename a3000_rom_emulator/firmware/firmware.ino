@@ -18,7 +18,7 @@
 #include "wiring_private.h"
 
 // For libxsvf, so we can program the CPLD
-#include "libxsvf.h"
+#include "src/libxsvf/libxsvf.h"
 
 // This code is for the ATSAMD21E18A onboard an a3000_rom_emulator PCB.
 // Functions provided:
@@ -70,14 +70,14 @@
 // PA28 - D4 - cpld_clock_from_mcu (clock output)
 #define CPLD_CLOCK_FROM_MCU_PIN 4
 
-// PA16
-#define ndrive_arc_RESET_PIN 11
-// PA17
-#define ndrive_arc_POR_PIN 13
-// PA03
+// PA16 - 3v3 version of /RESET
+#define arc_RESET_buffered_PIN 11
+// PA17 - pull low to drive /RESET
+#define ndrive_arc_RESET_PIN 13
+// PA03 - 3v3 version of rom_5V
 #define rom_5V_buffered_PIN 42
-// PA02
-#define arc_RESET_buffered_PIN 14
+// PA02 - pull low to drive /POR (hold low for a while as it has to discharge 10u via 133R)
+#define ndrive_arc_POR_PIN 14
 
 
 // Uncomment this to show every byte sent and received over SPI
@@ -208,11 +208,17 @@ uint32_t flash_read(uint32_t A) {
 }
 
 // 7 bits: unused, previously reset_arm (0x40), use_la21 (0x20), use_la20 (0x10), bank:4
-// TODO see if we can add in a use_la19 for 512k banks
-static uint8_t flash_bank_select_command = 0;  // initial: bootloader bank, 1M
 #define BANK_4M   0x30
 #define BANK_2M   0x10
 #define BANK_1M   0x00
+// TODO see if we can add in a use_la19 for 512k banks
+static uint8_t flash_bank_select_command =
+    0;  // initial for Arc/RPC: bootloader bank, 1M
+//  0 | BANK_2M;  // A310 with RO3 and no bootloader
+//  0 | BANK_4M;  // Risc PC @ 0
+//  4 | BANK_4M;  // Risc PC @ 4M
+//  8 | BANK_4M;  // Risc PC @ 8M
+//  12 | BANK_4M;  // Risc PC @ 12M
 
 // Tell the CPLD to return control of the flash to the host machine
 void flash_unlock() {
@@ -250,7 +256,7 @@ void setup() {
   // On a v1 board this is NC so we'll be able to pull it.  On v2 it'll remain
   // driven.
   pinMode(rom_5V_buffered_PIN, INPUT);
-  pinMode(arc_RESET_buffered_PIN, INPUT);
+  pinMode(arc_RESET_buffered_PIN, INPUT_PULLUP);
 
   // On v2 boards we want to leave RESET and POR undriven by default
   pinMode(ndrive_arc_RESET_PIN, OUTPUT);
@@ -671,6 +677,8 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
 
 void loop() {
 
+  // TODO monitor RESET line for double clicks (which tells us to reset/POR into the bootloader)
+
   // Switch to serial mode if we're in SPI mode.  This will do nothing
   // if we're already in serial mode.
   select_uart();
@@ -836,6 +844,30 @@ void loop() {
         // restart
         Serial.println("Reset to bootloader");
         select_flash_bank(0);
+        break;
+      }
+      case 'Y': {
+        Serial.println("Enter bank start (MB, 0-9), then bank size (1, 2, 4).");
+        while (!Serial.available()) {
+          if (check_disconnect()) break;
+        }
+	uint8_t bank_c = Serial.read();
+        while (!Serial.available()) {
+          if (check_disconnect()) break;
+        }
+	uint8_t size_c = Serial.read();
+
+	uint8_t bank = bank_c - '0';
+	if (bank > 9) bank = 0;
+
+	switch (size_c) {
+	case '2': bank |= BANK_2M; break;
+	case '4': bank |= BANK_4M; break;
+	default: bank |= BANK_1M;
+	}
+
+	select_flash_bank(bank);
+        reset();
         break;
       }
       case 'Z': {

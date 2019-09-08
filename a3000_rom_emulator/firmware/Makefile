@@ -1,6 +1,6 @@
 BOARD_TAG = adafruit_circuitplayground_m0
 ARDUINO_LIBS = libxsvf SPI
-USER_LIB_PATH = ./libraries
+USER_LIB_PATH = ./src
 
 # OPTIMIZATION_LEVEL = 2
 

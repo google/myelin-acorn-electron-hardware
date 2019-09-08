@@ -5,10 +5,10 @@ set -e
 cd $(dirname $0)
 
 # Copy various files from //third_party/libxsvf into
-# ./libraries/libxsvf, to make it buildable as an Arduino library.
+# ./src/libxsvf, to make it buildable as an Arduino library.
 
 SRC=../../third_party/libxsvf
-DEST=libraries/libxsvf
+DEST=src/libxsvf
 
 rm -rf $DEST
 mkdir -p $DEST
