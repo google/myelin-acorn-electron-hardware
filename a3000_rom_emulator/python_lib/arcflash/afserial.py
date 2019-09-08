@@ -21,7 +21,7 @@ def guess_port():
     port = os.environ.get('ROM_PORT')
     if port:
         return port
-    for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*".split():
+    for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbmodem* /dev/tty.usbserial* /dev/tty.wchusbserial*".split():
         matches = glob.glob(pattern)
         if matches:
             return matches[0]
