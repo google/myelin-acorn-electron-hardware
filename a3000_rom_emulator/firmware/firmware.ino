@@ -70,13 +70,16 @@
 // PA28 - D4 - cpld_clock_from_mcu (clock output)
 #define CPLD_CLOCK_FROM_MCU_PIN 4
 
-// PA16 - 3v3 version of /RESET
-#define arc_RESET_buffered_PIN 11
-// PA17 - pull low to drive /RESET
+// PA16 (MCU pin 17) - 3v3 version of /RESET
+// This is shown as pin 11 in the comment at the top of circuitplay/variant.cpp,
+// but is pin 30 in g_APinDescription.  TODO fix this in arduino
+#define arc_RESET_buffered_PIN 30
+// PA17 (MCU pin 18) - pull low to drive /RESET
+// Unfortunately this is also the LED pin, so the bootloader causes interesting reset patterns.
 #define ndrive_arc_RESET_PIN 13
-// PA03 - 3v3 version of rom_5V
-#define rom_5V_buffered_PIN 42
-// PA02 - pull low to drive /POR (hold low for a while as it has to discharge 10u via 133R)
+// PA03 (MCU pin 4) - 3v3 version of rom_5V, NC on v1 board
+#define rom_5V_buffered_PIN rom_5V_needs_arduino_pin_assignment_TODO
+// PA02 (MCU pin 3) - pull low to drive /POR (hold low for a while as it has to discharge 10u via 133R), NC on v1 board
 #define ndrive_arc_POR_PIN 14
 
 
@@ -212,8 +215,9 @@ uint32_t flash_read(uint32_t A) {
 #define BANK_2M   0x10
 #define BANK_1M   0x00
 // TODO see if we can add in a use_la19 for 512k banks
+#define SELECT_BOOTLOADER 0
 static uint8_t flash_bank_select_command =
-    0;  // initial for Arc/RPC: bootloader bank, 1M
+    SELECT_BOOTLOADER;  // initial for Arc/RPC: bootloader bank, 1M
 //  0 | BANK_2M;  // A310 with RO3 and no bootloader
 //  0 | BANK_4M;  // Risc PC @ 0
 //  4 | BANK_4M;  // Risc PC @ 4M
@@ -255,7 +259,7 @@ void setup() {
   // TODO detect v1 or v2 board by attempting to pull rom_5V_buffered up/down.
   // On a v1 board this is NC so we'll be able to pull it.  On v2 it'll remain
   // driven.
-  pinMode(rom_5V_buffered_PIN, INPUT);
+  // pinMode(rom_5V_buffered_PIN, INPUT_PULLDOWN);  // TODO figure out how to access PA03
   pinMode(arc_RESET_buffered_PIN, INPUT_PULLUP);
 
   // On v2 boards we want to leave RESET and POR undriven by default
@@ -675,9 +679,63 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
   }
 }
 
+// last known value on /RESET
+int stable_reset_value = HIGH;
+// when reset transitioned into the new state (allowing dead time for debouncing)
+long stable_reset_transition_at = 0;
+// how long to ignore reset transitions after one is registered
+#define RESET_DEBOUNCE_DELAY 50
+// double click counter
+int clicks_seen = 0;
+// when the first click was registered
+long first_click_timestamp = 0;
+// how long you have to double click reset
+#define DOUBLE_CLICK_WINDOW 1000
+// double click detected and not yet handled
+bool double_click_detected = false;
+
+// valid transition spotted on /RESET
+static void reset_changed() {
+  // if we see two clicks within DOUBLE_CLICK_WINDOW ms, reset into the bootloader
+  if (!stable_reset_value) {
+    long now = millis();
+    // reset click counter and timestamp if we haven't seen a click for a while
+    if (now - first_click_timestamp > DOUBLE_CLICK_WINDOW) {
+      first_click_timestamp = now;
+      clicks_seen = 0;
+    }
+    ++ clicks_seen;
+    // detect double click
+    if (now - first_click_timestamp < DOUBLE_CLICK_WINDOW && clicks_seen == 2) {
+      // double click detected!
+      double_click_detected = true;
+    }
+  }
+}
+
 void loop() {
 
-  // TODO monitor RESET line for double clicks (which tells us to reset/POR into the bootloader)
+  // monitor RESET line for double clicks (which tells us to reset/POR into the bootloader)
+  int current_reset_value = digitalRead(arc_RESET_buffered_PIN);
+  if (current_reset_value != stable_reset_value) {
+    long now = millis();
+    if (now - stable_reset_transition_at > RESET_DEBOUNCE_DELAY) {
+      stable_reset_value = current_reset_value;
+      stable_reset_transition_at = now;
+      if (!stable_reset_value) {
+        Serial.println("RESET active");
+      } else {
+        Serial.println("RESET inactive");
+      }
+      reset_changed();
+    }
+  }
+
+  if (double_click_detected) {
+    Serial.println("Double click detected!  Selecting bootloader.");
+    double_click_detected = false;
+    select_flash_bank(SELECT_BOOTLOADER);
+  }
 
   // Switch to serial mode if we're in SPI mode.  This will do nothing
   // if we're already in serial mode.
@@ -715,9 +773,13 @@ void loop() {
 
       static int bitbang_serial_have_star = 0;
       if (bitbang_serial_have_star) {
+        bitbang_serial_have_star = 0;
         // Byte is a flash bank select command
         select_flash_bank(c);
-        bitbang_serial_have_star = 0;
+        // Now reset the machine
+        digitalWrite(ndrive_arc_RESET_PIN, LOW);
+        delay(100);
+        digitalWrite(ndrive_arc_RESET_PIN, HIGH);
       } else if (c == '*') {
         bitbang_serial_have_star = 1;
       }
