@@ -679,6 +679,17 @@ void program_range(uint32_t start_addr, uint32_t end_addr) {
   }
 }
 
+static void power_on_reset() {
+  Serial.println("Power on reset");
+  digitalWrite(ndrive_arc_POR_PIN, LOW);
+  // Discharging 10u through 133R; should take at least 1.33 ms
+  // delay(1) doesn't cause a POR, delay(2) does.
+  // Plus a huge margin, so...
+  delay(100);
+  digitalWrite(ndrive_arc_POR_PIN, HIGH);
+  Serial.println("Released POR");
+}
+
 // last known value on /RESET
 int stable_reset_value = HIGH;
 // when reset transitioned into the new state (allowing dead time for debouncing)
@@ -735,6 +746,8 @@ void loop() {
     Serial.println("Double click detected!  Selecting bootloader.");
     double_click_detected = false;
     select_flash_bank(SELECT_BOOTLOADER);
+    // And do a hard reset
+    power_on_reset();
   }
 
   // Switch to serial mode if we're in SPI mode.  This will do nothing
@@ -869,6 +882,10 @@ void loop() {
         Serial.println(chip_end);
         program_range(0, chip_end / 4);  // Program chip_end/4 words
         reset();
+        break;
+      }
+      case 'O': {
+        power_on_reset();
         break;
       }
       case 'R': {
