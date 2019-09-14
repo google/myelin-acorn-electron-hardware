@@ -303,11 +303,11 @@ void setup() {
   // Set pin directions for CPLD JTAG.
   pinMode(TDO_PIN, INPUT);
   pinMode(TDI_PIN, OUTPUT);
-	digitalWrite(TDI_PIN, HIGH);
+        digitalWrite(TDI_PIN, HIGH);
   pinMode(TMS_PIN, OUTPUT);
-	digitalWrite(TMS_PIN, HIGH);
+        digitalWrite(TMS_PIN, HIGH);
   pinMode(TCK_PIN, OUTPUT);
-	digitalWrite(TCK_PIN, LOW);
+        digitalWrite(TCK_PIN, LOW);
 
   // Set up pullups for flash pins
   flash_reset();
@@ -913,22 +913,22 @@ void loop() {
         while (!Serial.available()) {
           if (check_disconnect()) break;
         }
-	uint8_t bank_c = Serial.read();
+        uint8_t bank_c = Serial.read();
         while (!Serial.available()) {
           if (check_disconnect()) break;
         }
-	uint8_t size_c = Serial.read();
+        uint8_t size_c = Serial.read();
 
-	uint8_t bank = bank_c - '0';
-	if (bank > 9) bank = 0;
+        uint8_t bank = bank_c - '0';
+        if (bank > 9) bank = 0;
 
-	switch (size_c) {
-	case '2': bank |= BANK_2M; break;
-	case '4': bank |= BANK_4M; break;
-	default: bank |= BANK_1M;
-	}
+        switch (size_c) {
+        case '2': bank |= BANK_2M; break;
+        case '4': bank |= BANK_4M; break;
+        default: bank |= BANK_1M;
+        }
 
-	select_flash_bank(bank);
+        select_flash_bank(bank);
         reset();
         break;
       }
