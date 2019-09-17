@@ -48,7 +48,7 @@
 #include "arcflash.h"
 
 void cmos_wait() {
-	// TODO
+	IOC_DELAY_US(10);
 }
 
 // Set C<1> (SCL) and C<0> (SDA)
