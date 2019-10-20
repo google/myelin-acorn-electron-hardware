@@ -2,7 +2,7 @@
 
   (general
     (thickness 1.6)
-    (drawings 18)
+    (drawings 19)
     (tracks 67)
     (zones 0)
     (modules 18)
@@ -735,6 +735,9 @@
       (net 3 NVR_POWER))
   )
 
+  (gr_text v2 (at 168.41 93.34) (layer F.SilkS)
+    (effects (font (size 1 1) (thickness 0.2)))
+  )
   (gr_text 1 (at 152.01 103.38) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.2)))
   )
