@@ -38,4 +38,4 @@ out
 iseconfig
 xst
 *.xwbt
-*.cmd
+Makefile.xilinx

@@ -1,0 +1,58 @@
+# Copyright 2019 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# 16 MHz clock
+NET "CLK16MHz" TNM_NET = CLK16MHz;
+TIMESPEC TS_CLK16MHz = PERIOD "CLK16MHz" 16 MHz HIGH 50%;
+
+# 6502 clock
+NET "PHI" TNM_NET = PHI;
+TIMESPEC TS_PHI = PERIOD "PHI" 2 MHz HIGH 50%;
+
+# Net to pin mappings
+NET RR_nOE LOC = P40;
+NET RR_nWE LOC = P41;
+NET PHI LOC = P43;
+NET A(6) LOC = P42;
+NET CLK16MHz LOC = P44;  # double up with SD_CS2
+NET SD_CS2 LOC = P44;  # double up with CLK16MHz
+NET ROM_nCE LOC = P2;
+NET A(7) LOC = P1;
+NET ERnW_MCS LOC = P3;
+NET D(4) LOC = P5;
+NET nMASDET LOC = P6;
+NET ERDY_MRnW LOC = P7;
+NET nOE LOC = P8;
+NET A(5) LOC = P12;
+NET A(4) LOC = P13;
+NET nPGFC LOC = P14;
+NET A(3) LOC = P16;
+NET nRESET LOC = P18;
+NET SD_CS1 LOC = P19;
+NET SD_SCK LOC = P20;
+NET SD_MOSI LOC = P21;
+NET SD_MISO LOC = P22;
+NET QA LOC = P23;
+NET A(2) LOC = P27;
+NET A(1) LOC = P28;
+NET A(0) LOC = P29;
+NET D(0) LOC = P30;
+NET D(1) LOC = P31;
+NET D(2) LOC = P32;
+NET nPWRRST LOC = P33;
+NET RAM_nCE LOC = P34;
+NET D(5) LOC = P37;
+NET D(3) LOC = P36;
+NET D(6) LOC = P38;
+NET D(7) LOC = P39;
