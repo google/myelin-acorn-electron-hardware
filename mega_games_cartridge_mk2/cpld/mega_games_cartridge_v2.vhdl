@@ -155,7 +155,7 @@ begin
         else spi_shift_register_phi when nPGFC = '0' and A = x"D4" and IncludeSPIShifter and not UseFastClockForSPI
         else spi_shift_register_16 when nPGFC = '0' and A = x"D4" and IncludeSPIShifter and UseFastClockForSPI
         -- Read MISO
-        else "0000000" & SD_MISO when nPGFC = '0' and A = x"D8"
+        else SD_MISO & "0000000" when nPGFC = '0' and A = x"D8"
         -- Catchall
         else "ZZZZZZZZ";
 
