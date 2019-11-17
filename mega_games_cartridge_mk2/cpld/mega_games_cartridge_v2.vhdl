@@ -115,10 +115,10 @@ begin
     -- DEBUG
     -- SD_CS2 <= spi_bit_bang_MOSI;
     -- SD_CS2 <= temp;
-    -- SD_CS2 <= RnW;
+    -- SD_CS2 <= spi_bit_bang_SCK;
     -- SD_CS2 <= nPGFC;
     -- SD_CS2 <= '1' when nPGFC = '0' and PHI = '1' and RnW = '0' else '0';  -- writing to &FCxx
-    -- SD_MOSI <= D(1);  -- SCK output
+    -- SD_CS2 <= D(1);
 
     -- Derive RnW signal
     RnW <= ERnW_MCS when nMASDET = '1' else ERDY_MRnW;
