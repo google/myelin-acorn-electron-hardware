@@ -22,7 +22,7 @@ entity MGC is
 
         -- Include shift-register based (as well as bit banged) SPI (adds ~20MC)
         -- = 8 bit shifter, 4 bit counter, 1 bit spi_start, 1 bit spi_bit_bang_mode
-        IncludeSPIShifter : boolean := false;
+        IncludeSPIShifter : boolean := true;
         -- Clock the SPI port with CLK16MHz (adds ~8 MC)
         UseFastClockForSPI : boolean := false
     );
@@ -108,13 +108,10 @@ architecture rtl of MGC is
 
     signal RnW : std_logic;
 
-    signal temp : std_logic := '1';
-
 begin
 
     -- DEBUG
     -- SD_CS2 <= spi_bit_bang_MOSI;
-    -- SD_CS2 <= temp;
     -- SD_CS2 <= spi_bit_bang_SCK;
     -- SD_CS2 <= nPGFC;
     -- SD_CS2 <= '1' when nPGFC = '0' and PHI = '1' and RnW = '0' else '0';  -- writing to &FCxx
@@ -212,11 +209,10 @@ begin
                 if nPGFC = '0' and A = x"D8" then
                     spi_bit_bang_MOSI <= D(0);
                     spi_bit_bang_SCK <= D(1);
-                    temp <= not temp;
                 end if;
                 if nPGFC = '0' and A = x"D9" then
                     SD_CS1 <= D(0);
-                    SD_CS2 <= D(0);
+                    -- SD_CS2 <= D(1);
                     spi_bit_bang_mode <= '1';
                 end if;
                 if nPGFC = '0' and A = x"DC" then
