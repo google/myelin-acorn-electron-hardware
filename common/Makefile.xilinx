@@ -61,7 +61,7 @@ build-local:
 	XSLTProcess ${MODULE}_build.xml
 	tsim -intstyle ise ${MODULE} ${MODULE}.nga
 	hprep6 -s IEEE1149 -n ${MODULE} -i ${MODULE}
-	impact -batch impact.cmd
+	impact -batch impact_gen_svf.cmd
 	mv ${MODULE}.jed ${MODULE}-${PART}.jed
 	mv ${MODULE}.svf ${MODULE}-${PART}.svf
 	mv ${MODULE}.xsvf ${MODULE}-${PART}.xsvf

@@ -22,7 +22,7 @@ entity MGC is
 
         -- Include shift-register based (as well as bit banged) SPI (adds ~20MC)
         -- = 8 bit shifter, 4 bit counter, 1 bit spi_start, 1 bit spi_bit_bang_mode
-        IncludeSPIShifter : boolean := true;
+        IncludeSPIShifter : boolean := false;
         -- Clock the SPI port with CLK16MHz (adds ~8 MC)
         UseFastClockForSPI : boolean := false
     );
@@ -71,8 +71,8 @@ entity MGC is
 
         -- SPI port
         SD_CS1 : out std_logic := '1';
-        -- SD_CS2 : out std_logic := '1';
-        SD_CS2 : in std_logic;  -- Disabled as cartridge has CLK16MHz linked in there
+        SD_CS2 : out std_logic := '1';
+        -- SD_CS2 : in std_logic;  -- Disabled as cartridge has CLK16MHz linked in there
         SD_SCK : out std_logic;
         SD_MOSI : out std_logic;
         SD_MISO : in std_logic
@@ -108,7 +108,17 @@ architecture rtl of MGC is
 
     signal RnW : std_logic;
 
+    signal temp : std_logic := '1';
+
 begin
+
+    -- DEBUG
+    -- SD_CS2 <= spi_bit_bang_MOSI;
+    -- SD_CS2 <= temp;
+    -- SD_CS2 <= RnW;
+    -- SD_CS2 <= nPGFC;
+    -- SD_CS2 <= '1' when nPGFC = '0' and PHI = '1' and RnW = '0' else '0';  -- writing to &FCxx
+    -- SD_MOSI <= D(1);  -- SCK output
 
     -- Derive RnW signal
     RnW <= ERnW_MCS when nMASDET = '1' else ERDY_MRnW;
@@ -155,7 +165,7 @@ begin
         else spi_shift_register_phi when nPGFC = '0' and A = x"D4" and IncludeSPIShifter and not UseFastClockForSPI
         else spi_shift_register_16 when nPGFC = '0' and A = x"D4" and IncludeSPIShifter and UseFastClockForSPI
         -- Read MISO
-        else SD_MISO & "0000000" when nPGFC = '0' and A = x"D8"
+        else SD_MISO & "00000" & spi_bit_bang_SCK & spi_bit_bang_MOSI when nPGFC = '0' and A = x"D8"
         -- Catchall
         else "ZZZZZZZZ";
 
@@ -174,13 +184,13 @@ begin
             spi_start <= '0';
 
             -- Handle writes to registers
+            if nPGFC = '0' and A = x"D0" then
+                lower_bank_rom_nram <= not RnW;  -- TODO did I get this right?  reading sets it to ram?
+            end if;
+            if nPGFC = '0' and A = x"D1" then
+                upper_bank_rom_nram <= not RnW;  -- TODO did I get this right?  reading sets it to ram?
+            end if;
             if RnW = '0' then
-                if nPGFC = '0' and A = x"D0" then
-                    lower_bank_rom_nram <= D(0);
-                end if;
-                if nPGFC = '0' and A = x"D1" then
-                    upper_bank_rom_nram <= D(0);
-                end if;
                 if nPGFC = '0' and A = x"D3" then
                     inhibit_reset <= '1';
                 end if;
@@ -196,30 +206,30 @@ begin
                         spi_counter_phi <= "0000";
                         -- initialize MOSI with the MSB right now, and update it on the falling
                         -- edge of spi_fast_SCK.
-                        spi_fast_MOSI <= spi_shift_register_phi(7);
+                        spi_bit_bang_MOSI <= spi_shift_register_phi(7);
                     end if;
                 end if;
                 if nPGFC = '0' and A = x"D8" then
-                    -- TODO figure out the best bits to use for MMFS
-                    SD_CS1 <= D(0);
-                    -- SD_CS2 <= D(1);
-                    spi_bit_bang_mode <= D(2);
-                    spi_bit_bang_MOSI <= D(3);
-                    spi_bit_bang_SCK <= D(4);
+                    spi_bit_bang_MOSI <= D(0);
+                    spi_bit_bang_SCK <= D(1);
+                    temp <= not temp;
                 end if;
-                --if nPGFC = '0' and A = x"D9" then
-                --    spi_bit_bang_SCK <= D(0);  -- TODO consolidate with FCD8
-                --    spi_bit_bang_mode <= '1';
-                --end if;
-                --if nPGFC = '0' and A = x"DA" then
-                --    spi_bit_bang_MOSI <= D(0);  -- TODO consolidate with FCD8
-                --    spi_bit_bang_mode <= '1';
-                --end if;
+                if nPGFC = '0' and A = x"D9" then
+                    SD_CS1 <= D(0);
+                    SD_CS2 <= D(0);
+                    spi_bit_bang_mode <= '1';
+                end if;
                 if nPGFC = '0' and A = x"DC" then
-                    lower_rom_unlocked <= D(0);
+                    lower_rom_unlocked <= '1';
+                end if;
+                if nPGFC = '0' and A = x"DD" then
+                    lower_rom_unlocked <= '0';
                 end if;
                 if nPGFC = '0' and A = x"DE" then
-                    upper_rom_unlocked <= D(0);
+                    upper_rom_unlocked <= '1';
+                end if;
+                if nPGFC = '0' and A = x"DF" then
+                    upper_rom_unlocked <= '0';
                 end if;
             end if;
             if nRESET_sync = '0' then
