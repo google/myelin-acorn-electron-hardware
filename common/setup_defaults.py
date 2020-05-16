@@ -30,8 +30,9 @@ for pattern in ("gerber_tmp", zip):
         ignore.append(pattern)
 open(".gitignore", "w").writelines("%s\n" % x for x in sorted(ignore))
 
-# Create/replace fp-lib-table
-print>>open("fp-lib-table", "w"), """(fp_lib_table
+# Create fp-lib-table
+if not os.path.exists("fp-lib-table"):
+  print>>open("fp-lib-table", "w"), """(fp_lib_table
   (lib (name myelin-kicad)(type Github)(uri https://github.com/myelin/myelin-kicad.pretty)(options allow_pretty_writing_to_this_dir=${KIPRJMOD}/../../third_party/myelin-kicad.pretty)(descr ""))
 )"""
 
