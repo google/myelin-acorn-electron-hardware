@@ -21,6 +21,7 @@
 
 UCF ?= constraints.ucf
 REMOTE_MAKEFILE ?= Makefile
+REMOTE_HOST ?= xilinx
 
 # cpldfit options:
 
@@ -33,6 +34,9 @@ POWER ?= std
 
 ##########
 
+REMOTE_PARENT_DIR=remote-xilinx-builds
+REMOTE_PATH=${REMOTE_PARENT_DIR}/${MODULE}
+
 default: all
 
 all: local program
@@ -44,9 +48,10 @@ remote: clean build-remote show-results
 
 build-remote:
 	cp -v ${SHARED_PATH}/Makefile.xilinx .
-	rsync -arz --progress --delete --delete-excluded --exclude=.git . xilinx:${MODULE}/
-	ssh xilinx ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${MODULE} && make -f${REMOTE_MAKEFILE} clean build-local SHARED_PATH=." 2>&1 | tee build.log
-	rsync -arz xilinx:"${MODULE}/*.jed ${MODULE}/*.svf ${MODULE}/*.xsvf ${MODULE}/*_html" ./
+	ssh ${REMOTE_HOST} "mkdir -p ${REMOTE_PARENT_DIR}"
+	rsync -arz --progress --delete --delete-excluded --exclude=.git . ${REMOTE_HOST}:${REMOTE_PATH}/
+	ssh ${REMOTE_HOST} ". /opt/Xilinx/14.7/ISE_DS/settings64.sh && cd ${REMOTE_PATH} && make -f${REMOTE_MAKEFILE} clean build-local SHARED_PATH=." 2>&1 | tee build.log
+	rsync -arz ${REMOTE_HOST}:"${REMOTE_PATH}/*.jed ${REMOTE_PATH}/*.svf ${REMOTE_PATH}/*.xsvf ${REMOTE_PATH}/*_html" ./
 	rm Makefile.xilinx
 
 # The local build process assumes you have the Xilinx tools installed locally,
@@ -76,17 +81,17 @@ show-results:
 # Program using a simple_cpld_programmer board
 
 program:
-	python ../../simple_cpld_programmer/tools/program_cpld.py ${MODULE}.svf
+	python ${SHARED_PATH}/../simple_cpld_programmer/tools/program_cpld.py ${MODULE}-${PART}.svf
 
 # Program using xc3sprog and an FTDI board
 
 program-xc3sprog:
-	xc3sprog -v -c ftdi ${MODULE}.jed
+	xc3sprog -v -c ftdi ${MODULE}-${PART}.jed
 
 # Program using xc3sprog and a J-Link
 
 program-xc3sprog-jlink:
-	xc3sprog -v -c jlink ${MODULE}.jed
+	xc3sprog -v -c jlink ${MODULE}-${PART}.jed
 
 # Test using Icarus Verilog (only works on Verilog projects)
 
