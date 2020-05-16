@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # Copyright 2018 Google Inc.
 #
@@ -172,7 +172,9 @@ cpld = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:xilinx_csg144",
     identifier="CPLD",
     value="XC95144XL-10CSG144",
-    desc="IC CPLD Xilinx 144MC; https://www.avnet.com/shop/us/search/xc95144xl-10csg",
+    partno="XC95144XL-10CSG144",
+    desc="IC CPLD Xilinx 144MC",
+    link="https://www.avnet.com/shop/us/search/xc95144xl-10csg",
     buses=["rom_A", "rom_D", "flash_A", "flash0_DQ", "flash1_DQ"],
     pins=[
         # cpld has 28 signals out N, 29 out E, 32-4=28 S, 31 W = 116 -- approx correct :)
@@ -820,7 +822,8 @@ fiducials = [
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
-                          "readable_bill_of_materials.txt")
+                          "readable_bill_of_materials.txt",
+                          "seeed_bill_of_materials.csv")
 
 
 

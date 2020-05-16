@@ -133,7 +133,7 @@ MCU
 
 CPLD
 - Value: XC95144XL-10CSG144
-- Description: IC CPLD Xilinx 144MC; https://www.avnet.com/shop/us/search/xc95144xl-10csg
+- Description: IC CPLD Xilinx 144MC
 - KiCad package: myelin-kicad:xilinx_csg144
 
 REG
@@ -142,7 +142,7 @@ REG
 - KiCad package: Package_TO_SOT_SMD:SOT-89-3
 
 BUF
-- Value: 74LVT125PW
+- Value: 74LVC125PW
 - Description: IC buffer 4-bit OC LVT; https://www.digikey.com/product-detail/en/74LVT125PW%2c118/1727-3115-1-ND
 - KiCad package: Package_SO:TSSOP-14_4.4x5mm_P0.65mm
 
