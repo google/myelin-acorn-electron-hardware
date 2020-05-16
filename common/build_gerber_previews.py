@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+# This will be run under Python 3, by Makefile.pcb.
+
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +16,9 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from gerber import load_layer
-from gerber.render import GerberCairoContext, RenderSettings, theme
+import gerber
+from gerber.render.cairo_backend import GerberCairoContext
+from gerber.render import RenderSettings, theme
 from glob import glob
 import os
 import sys
@@ -26,7 +30,7 @@ def generate_previews(fab_output_path, preview_output_path):
         if not files:
             print("WARNING: Nothing found matching %s" % pattern)
             return None
-        return load_layer(files[0])
+        return gerber.load_layer(files[0])
 
     def save(name):
         path = os.path.join(preview_output_path, "%s.png" % name)
@@ -38,7 +42,7 @@ def generate_previews(fab_output_path, preview_output_path):
         if layer is None:
             print("Not rendering %s" % pattern)
             return
-        ctx.render_layer(layer, **kw)
+        ctx.render_layer(layer, verbose=True, **kw)
 
     # Rendering context
     ctx = GerberCairoContext(scale=10)
@@ -66,7 +70,11 @@ def generate_previews(fab_output_path, preview_output_path):
     # Mask
     render("*.gbs")
     # Silk
-    render("*.gbo", settings=RenderSettings(color=theme.COLORS['white'], alpha=0.85))
+    render("*.gbo", settings=RenderSettings(
+        color=theme.COLORS['white'],
+        alpha=0.85,
+        mirror=True,  # for some reason this, but not the other bottom layer files, needs to be flipped horizontally
+    ))
     # Drills
     render("*.drl")
 

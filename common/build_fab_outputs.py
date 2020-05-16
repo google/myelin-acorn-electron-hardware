@@ -1,4 +1,8 @@
 from __future__ import print_function
+
+# This will be run under the Python interpreter shipped with KiCad, which, as
+# of version 5.1.0 in May 2020, is 2.7.16.
+
 # Copyright 2017 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
