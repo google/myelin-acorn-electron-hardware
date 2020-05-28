@@ -38,13 +38,20 @@
 # cable, and prevents the target machine from taking power from the output
 # buffer.
 
+# (done) Verify 74HCT125 and 74LCX125 pinout and wiring
+# (done) Verify that 1k series resistor and 10k pullup are sensible.
+# TODO move the pull resistors to testack_noe_buf and target_reset_noe_buf so we don't get a resistor divider at all
+# TODO connect all /OE pins on the 74LCX125 to an FPGA output and add a 10k pull resistor to 3V3
 # TODO add a couple of LEDs driven by microcontroller GPIOs
+# TODO add lots of staples
 
 import sys, os
 here = os.path.dirname(sys.argv[0])
 sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
+
+PROJECT_NAME = 'post_box_usb'
 
 
 mcu = myelin_kicad_pcb.Component(
@@ -61,20 +68,20 @@ mcu = myelin_kicad_pcb.Component(
         Pin(2, "PA01/XOUT32", ["XTAL_OUT"]),
         Pin(3, "PA02/AIN0", ["last_transaction_was_input"]),
         Pin(4, "PA03/ADC_VREFA/AIN1", ["PA03"]),
-        Pin(5, "PA04/SERCOM0.0/AIN4", ["PA04"]),
-        Pin(6, "PA05/SERCOM0.1/AIN5", ["PA05"]),
-        Pin(7, "PA06/SERCOM0.2/AIN6", ["PA06"]),
-        Pin(8, "PA07/SERCOM0.3/AIN7", ["PA07"]),
+        Pin(5, "PA04/SERCOM0.0/AIN4", ["fpga_TDO"]),
+        Pin(6, "PA05/SERCOM0.1/AIN5", ["fpga_TCK"]),
+        Pin(7, "PA06/SERCOM0.2/AIN6", ["fpga_TMS"]),
+        Pin(8, "PA07/SERCOM0.3/AIN7", ["fpga_TDI"]),
         Pin(9, "VDDANA", ["3V3"]),  # decouple to GND
         Pin(10, "GND", ["GND"]),
-        Pin(11, "PA08/NMI/SERCOM2.0/AIN16", ["fpga_MOSI"]),
-        Pin(12, "PA09/SERCOM2.1/AIN17", ["fpga_SCK"]),
+        Pin(11, "PA08/NMI/SERCOM2.0/AIN16", ["fpga_spi_mosi"]),
+        Pin(12, "PA09/SERCOM2.1/AIN17", ["fpga_spi_sck"]),
         Pin(13, "PA10/SERCOM2.2/AIN18", ["fpga_clock_48mhz"]),  # GCLK_IO[4] - clock output for FPGA
         Pin(14, "PA11/SERCOM2.3/AIN19", ["rx_ready"]),  # also GCLK_IO[5] if we want a second clock output
-        Pin(15, "PA14/XIN/SERCOM4.2", ["fpga_SS"]),
-        Pin(16, "PA15/XOUT/SERCOM4.3", ["fpga_MISO"]),
+        Pin(15, "PA14/XIN/SERCOM4.2", ["fpga_spi_cs"]),
+        Pin(16, "PA15/XOUT/SERCOM4.3", ["fpga_spi_miso"]),
         Pin(17, "PA16/SERCOM1.0", ["tx_pending"]),
-        Pin(18, "PA17/SERCOM1.1", ["want_tx"]),
+        Pin(18, "PA17/SERCOM1.1", ["target_power_out"]),
         Pin(19, "PA18/SERCOM1.2", ["PA18"]),
         Pin(20, "PA19/SERCOM1.3", ["PA19"]),
         Pin(21, "PA22/SERCOM3.0", ["mcu_TXD"]),
@@ -115,6 +122,33 @@ swd = myelin_kicad_pcb.Component(
         Pin(6, "SWO/TDO"),  # NC because Cortex-M0 doesn't use these
     ],
 )
+
+
+# SWD header for programming and debug
+swd2 = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD",
+    identifier="SWD2",
+    value="swd",
+    pins=[
+        # Pin numbers zig-zag:
+        # 1 VCC  2 SWDIO
+        # 3 GND  4 SWCLK
+        # 5 GND  6 NC
+        # 7 NC   8 NC
+        # 9 NC  10 /RESET
+        Pin(1, "VTref", "3V3"),
+        Pin(2, "SWDIO", "mcu_SWDIO"),
+        Pin(3, "GND",   "GND"),
+        Pin(4, "SWCLK", "mcu_SWCLK"),
+        Pin(5, "GND",   "GND"),
+        Pin(6, "NC"),
+        Pin(7, "NC"),
+        Pin(8, "NC"),
+        Pin(9, "GND",   "GND"),
+        Pin(10, "RESET", "mcu_RESET"),
+    ],
+)
+
 
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
 power_led = myelin_kicad_pcb.DSOD323("led", "GND", "power_led_anode", ref="L1")
@@ -191,23 +225,23 @@ pin_header = myelin_kicad_pcb.Component(
     identifier="CON",
     value="pins",
     pins=[
-        Pin(1, "", ["GND"]),
+        Pin(1, "", ["3V3"]),
         Pin(2, "", ["GND"]),
-        Pin(3, "", ["PA04"]),
+        Pin(3, "", ["fpga_TDO"]),
         Pin(4, "", ["PA03"]),
-        Pin(5, "", ["PA06"]),
-        Pin(6, "", ["PA05"]),
+        Pin(5, "", ["fpga_TMS"]),
+        Pin(6, "", ["fpga_TCK"]),
         Pin(7, "", ["last_transaction_was_input"]),
-        Pin(8, "", ["PA07"]),
-        Pin(9, "", ["fpga_SCK"]),
-        Pin(10, "", ["fpga_MOSI"]),
+        Pin(8, "", ["fpga_TDI"]),
+        Pin(9, "", ["fpga_spi_sck"]),
+        Pin(10, "", ["fpga_spi_mosi"]),
         Pin(11, "", ["rx_ready"]),
         Pin(12, "", ["fpga_clock_48mhz"]),
-        Pin(13, "", ["fpga_MISO"]),
-        Pin(14, "", ["fpga_SS"]),
+        Pin(13, "", ["fpga_spi_miso"]),
+        Pin(14, "", ["fpga_spi_cs"]),
         Pin(15, "", ["PA27"]),
         Pin(16, "", ["reset_in"]),
-        Pin(17, "", ["want_tx"]),
+        Pin(17, "", ["target_power_out"]),
         Pin(18, "", ["tx_pending"]),
         Pin(19, "", ["PA19"]),
         Pin(20, "", ["PA18"]),
@@ -247,22 +281,22 @@ fpga = myelin_kicad_pcb.Component(
     identifier="FPGA",
     value="LCMXO256",
     pins=[
-        Pin(  1, "PL2A",         ""),
-        Pin(  2, "PL2B",         ""),
-        Pin(  3, "PL3A",         ""),
-        Pin(  4, "PL3B",         ""),
-        Pin(  5, "PL3C",         ""),
-        Pin(  6, "PL3D",         ""),
-        Pin(  7, "PL4A",         ""),
-        Pin(  8, "PL4B",         ""),
-        Pin(  9, "PL5A",         ""),
+        Pin(  1, "PL2A",         "fpga_GPIO47"),
+        Pin(  2, "PL2B",         "fpga_GPIO44"),
+        Pin(  3, "PL3A",         "fpga_GPIO45"),
+        Pin(  4, "PL3B",         "fpga_GPIO42"),
+        Pin(  5, "PL3C",         "fpga_GPIO43"),
+        Pin(  6, "PL3D",         "fpga_GPIO40"),
+        Pin(  7, "PL4A",         "fpga_GPIO41"),
+        Pin(  8, "PL4B",         "fpga_GPIO38"),
+        Pin(  9, "PL5A",         "fpga_GPIO39"),
         Pin( 10, "VCCIO1",       ["3V3"]),
-        Pin( 11, "PL5B",         ""),
+        Pin( 11, "PL5B",         "fpga_GPIO36"),
         Pin( 12, "GNDIO1",       ["GND"]),
         Pin( 13, "PL5C",         ""),
-        Pin( 14, "PL5D_GSRN",    ""),
-        Pin( 15, "PL6A",         ""),
-        Pin( 16, "PL6B_TSALL",   ""),
+        Pin( 14, "PL5D_GSRN",    "fpga_GPIO37"),
+        Pin( 15, "PL6A",         "fpga_GPIO34"),
+        Pin( 16, "PL6B_TSALL",   "fpga_GPIO35"),
         Pin( 17, "PL7A",         ""),
         Pin( 18, "PL7B",         ""),
         Pin( 19, "PL7C",         ""),
@@ -280,77 +314,87 @@ fpga = myelin_kicad_pcb.Component(
         Pin( 31, "TDO",          ["fpga_TDO"]),  # has an internal pull-up resistor
         Pin( 32, "PB2C",         "testreq_3v"),
         Pin( 33, "TDI",          ["fpga_TDI"]),  # has an internal pull-up resistor
-        Pin( 34, "PB2D",         ""),
+        Pin( 34, "PB2D",         "fpga_GPIO0"),
         Pin( 35, "VCC",          ["3V3"]),
-        Pin( 36, "PB3A_PCLK1_1", ""),
-        Pin( 37, "PB3B",         ""),
-        Pin( 38, "PB3C_PCLK1_0", ""),
-        Pin( 39, "PB3D",         ""),
+        Pin( 36, "PB3A_PCLK1_1", "fpga_GPIO1"),
+        Pin( 37, "PB3B",         "fpga_GPIO2"),
+        Pin( 38, "PB3C_PCLK1_0", "fpga_OSC_in"),
+        Pin( 39, "PB3D",         "fpga_GPIO3"),
         Pin( 40, "GND",          ["GND"]),
         Pin( 41, "VCCIO1",       ["3V3"]),
         Pin( 42, "GNDIO1",       ["GND"]),
-        Pin( 43, "PB4A",         ""),
-        Pin( 44, "PB4B",         ""),
-        Pin( 45, "PB4C",         ""),
-        Pin( 46, "PB4D",         ""),
-        Pin( 47, "PB5A",         "fpga_GPIO0"),
+        Pin( 43, "PB4A",         "fpga_GPIO4"),
+        Pin( 44, "PB4B",         "fpga_GPIO5"),
+        Pin( 45, "PB4C",         "fpga_GPIO6"),
+        Pin( 46, "PB4D",         "fpga_GPIO7"),
+        Pin( 47, "PB5A",         "fpga_GPIO8"),
         Pin( 48, "SLEEPN",       ["SLEEPN"]),  # needs external 4k7 pull-up resistor
-        Pin( 49, "PB5C",         "fpga_GPIO1"),
-        Pin( 50, "PB5D",         "fpga_GPIO2"),
-        Pin( 51, "PR9B",         "fpga_GPIO3"),
-        Pin( 52, "PR9A",         "fpga_GPIO4"),
-        Pin( 53, "PR8B",         "fpga_GPIO5"),
-        Pin( 54, "PR8A",         "fpga_GPIO6"),
-        Pin( 55, "PR7D",         "fpga_GPIO7"),
-        Pin( 56, "PR7C",         "fpga_GPIO8"),
-        Pin( 57, "PR7B",         "fpga_GPIO9"),
-        Pin( 58, "PR7A",         "fpga_GPIO10"),
-        Pin( 59, "PR6B",         "fpga_GPIO11"),
+        Pin( 49, "PB5C",         "fpga_GPIO9"),
+        Pin( 50, "PB5D",         "fpga_GPIO10"),
+        Pin( 51, "PR9B",         "fpga_GPIO11"),
+        Pin( 52, "PR9A",         "fpga_GPIO12"),
+        Pin( 53, "PR8B",         "fpga_GPIO13"),
+        Pin( 54, "PR8A",         "fpga_GPIO14"),
+        Pin( 55, "PR7D",         "fpga_GPIO15"),
+        Pin( 56, "PR7C",         "fpga_GPIO16"),
+        Pin( 57, "PR7B",         "fpga_GPIO17"),
+        Pin( 58, "PR7A",         "fpga_GPIO18"),
+        Pin( 59, "PR6B",         "fpga_GPIO19"),
         Pin( 60, "VCCIO0",       ["3V3"]),
-        Pin( 61, "PR6A",         "fpga_GPIO12"),
+        Pin( 61, "PR6A",         "fpga_GPIO20"),
         Pin( 62, "GNDIO0",       ["GND"]),
-        Pin( 63, "PR5D",         "fpga_GPIO13"),
-        Pin( 64, "PR5C",         "fpga_GPIO14"),
-        Pin( 65, "PR5B",         "fpga_GPIO15"),
-        Pin( 66, "PR5A",         "fpga_GPIO16"),
-        Pin( 67, "PR4B",         "fpga_GPIO17"),
-        Pin( 68, "PR4A",         "fpga_GPIO18"),
-        Pin( 69, "PR3D",         "fpga_GPIO19"),
-        Pin( 70, "PR3C",         "fpga_GPIO20"),
-        Pin( 71, "PR3B",         "fpga_GPIO21"),
-        Pin( 72, "PR3A",         "fpga_GPIO22"),
-        Pin( 73, "PR2B",         "fpga_GPIO23"),
+        Pin( 63, "PR5D",         "fpga_GPIO21"),
+        Pin( 64, "PR5C",         "fpga_GPIO22"),
+        Pin( 65, "PR5B",         "fpga_GPIO23"),
+        Pin( 66, "PR5A",         "fpga_GPIO24"),
+        Pin( 67, "PR4B",         "fpga_GPIO25"),
+        Pin( 68, "PR4A",         "fpga_GPIO26"),
+        Pin( 69, "PR3D",         "fpga_GPIO27"),
+        Pin( 70, "PR3C",         "fpga_GPIO28"),
+        Pin( 71, "PR3B",         "fpga_GPIO29"),
+        Pin( 72, "PR3A",         "fpga_GPIO30"),
+        Pin( 73, "PR2B",         "fpga_GPIO31"),
         Pin( 74, "VCCIO0",       ["3V3"]),
         Pin( 75, "GNDIO0",       ["GND"]),
-        Pin( 76, "PR2A",         "fpga_GPIO24"),
-        Pin( 77, "PT5C",         "fpga_GPIO25"),
-        Pin( 78, "PT5B",         "fpga_GPIO26"),
-        Pin( 79, "PT5A",         "fpga_GPIO27"),
-        Pin( 80, "PT4F",         "fpga_GPIO28"),
-        Pin( 81, "PT4E",         "fpga_GPIO29"),
-        Pin( 82, "PT4D",         "fpga_GPIO30"),
-        Pin( 83, "PT4C",         "fpga_GPIO31"),
+        Pin( 76, "PR2A",         "fpga_GPIO32"),
+        Pin( 77, "PT5C",         "fpga_GPIO33"),
+        Pin( 78, "PT5B",         "mcu_RXD"),
+        Pin( 79, "PT5A",         "mcu_TXD"),
+        Pin( 80, "PT4F",         "PA19"),
+        Pin( 81, "PT4E",         "PA18"),
+        Pin( 82, "PT4D",         "target_power_out"),
+        Pin( 83, "PT4C",         "tx_pending"),
         Pin( 84, "GND",          ["GND"]),
         Pin( 85, "PT4B_PCLK0_1", ["rx_ready"]),
         Pin( 86, "PT4A_PCLK0_0", ["fpga_clock_48mhz"]),
-        Pin( 87, "PT3D",         "fpga_GPIO32"),
+        Pin( 87, "PT3D",         "PA27"),
         Pin( 88, "VCCAUX",       ["3V3"]),
-        Pin( 89, "PT3C",         "fpga_GPIO33"),
+        Pin( 89, "PT3C",         "reset_in"),
         Pin( 90, "VCC",          ["3V3"]),
-        Pin( 91, "PT3B",         ""),
+        Pin( 91, "PT3B",         "fpga_spi_miso"),
         Pin( 92, "VCCIO0",       ["3V3"]),
         Pin( 93, "GNDIO0",       ["GND"]),
-        Pin( 94, "PT3A",         ""),
-        Pin( 95, "PT2F",         ""),
-        Pin( 96, "PT2E",         ""),
-        Pin( 97, "PT2D",         ""),
-        Pin( 98, "PT2C",         ""),
+        Pin( 94, "PT3A",         "fpga_spi_cs"),
+        Pin( 95, "PT2F",         "fpga_spi_sck"),
+        Pin( 96, "PT2E",         "fpga_spi_mosi"),
+        Pin( 97, "PT2D",         "last_transaction_was_input"),
+        Pin( 98, "PT2C",         "PA03"),
         Pin( 99, "PT2B",         ""),
-        Pin(100, "PT2A",         ""),
+        Pin(100, "PT2A",         "fpga_GPIO46"),
     ],
 )
 machxo_sleepn_pullup = myelin_kicad_pcb.R0805("4k7", "SLEEPN", "3V3", ref="R4")
 machxo_tck_pulldown = myelin_kicad_pcb.R0805("4k7", "fpga_TCK", "GND", ref="R5")
+
+lpf_fn = '%s.lpf' % PROJECT_NAME
+with open(lpf_fn, 'w') as fpga_lpf:
+    for pin in fpga.pins:
+        nets = [net for net in pin.nets if net and net not in ('GND', '3V3', 'fpga_TMS', 'fpga_TCK', 'fpga_TDI', 'fpga_TDO', 'SLEEPN')]
+        if not nets: continue
+        net, = nets
+        print('LOCATE COMP "%s" SITE "%d" ;' % (net, pin.number), file=fpga_lpf)
+        print('IOBUF PORT "%s" IO_TYPE=LVCMOS33 PULLMODE=NONE DRIVE=NA SLEWRATE=FAST OPENDRAIN=OFF INF=OFF ;' % (net,), file=fpga_lpf)
+    print("Wrote Lattice-formatted pinout suitable for copying into project .lpf as %s" % lpf_fn)
 
 # The LCMXO256 has a ton of power/gnd pairs!
 fpga_caps = [
@@ -364,7 +408,7 @@ fpga_caps = [
     myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="C15"),
 ]
 
-# TODO MachXO2 JTAG header, Lattice format
+# MachXO/MachXO2 JTAG header, Lattice format
 # See: https://github.com/google/myelin-acorn-electron-hardware/blob/master/notes/pld_programming_and_jtag.md
 fpga_jtag = myelin_kicad_pcb.Component(
     footprint="Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical",
@@ -433,6 +477,30 @@ fpga_gpio = myelin_kicad_pcb.Component(
     ],
 )
 
+fpga_gpio_top = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical",
+    identifier="FPGA_IO2",
+    value="pins",
+    pins=[
+        Pin( 1, "", ["GND"]),
+        Pin( 2, "", ["3V3"]),
+        Pin( 3, "", ["fpga_GPIO34"]),
+        Pin( 4, "", ["fpga_GPIO35"]),
+        Pin( 5, "", ["fpga_GPIO36"]),
+        Pin( 6, "", ["fpga_GPIO37"]),
+        Pin( 7, "", ["fpga_GPIO38"]),
+        Pin( 8, "", ["fpga_GPIO39"]),
+        Pin( 9, "", ["fpga_GPIO40"]),
+        Pin(10, "", ["fpga_GPIO41"]),
+        Pin(11, "", ["fpga_GPIO42"]),
+        Pin(12, "", ["fpga_GPIO43"]),
+        Pin(13, "", ["fpga_GPIO44"]),
+        Pin(14, "", ["fpga_GPIO45"]),
+        Pin(15, "", ["fpga_GPIO46"]),
+        Pin(16, "", ["fpga_GPIO47"]),
+    ],
+)
+
 # 74LCX buffer, powered by the 3V side.  This is here to provide some hot swap
 # tolerance; its inputs and outputs go high impedance when it's unpowered, so
 # the 3V side won't end up parasitically powered if the unit is connected to a
@@ -450,7 +518,7 @@ fpga_gpio = myelin_kicad_pcb.Component(
 hotswap_buf = [
     [
         myelin_kicad_pcb.Component(
-            footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",  # TODO double check pinout
+            footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
             identifier=ident,
             value="74LCX125M",
             # https://www.onsemi.com/products/standard-logic/buffers/74lcx125
@@ -503,7 +571,7 @@ target_reset_pullup = myelin_kicad_pcb.R0805("10k", "target_reset_noe_buf_r", "t
 out_buf = [
     [
         myelin_kicad_pcb.Component(
-            footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",  # TODO double check pinout
+            footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
             identifier=ident,
             value="74HCT125D",
             desc="IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401",
@@ -566,4 +634,4 @@ for n in range(20):
     )
 
 
-myelin_kicad_pcb.dump_netlist("post_box_usb.net")
+myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
