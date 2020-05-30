@@ -40,10 +40,11 @@
 
 # (done) Verify 74HCT125 and 74LCX125 pinout and wiring
 # (done) Verify that 1k series resistor and 10k pullup are sensible.
-# TODO move the pull resistors to testack_noe_buf and target_reset_noe_buf so we don't get a resistor divider at all
-# TODO connect all /OE pins on the 74LCX125 to an FPGA output and add a 10k pull resistor to 3V3
-# TODO add a couple of LEDs driven by microcontroller GPIOs
-# TODO add lots of staples
+# (done) move the pull resistors to testack_noe_buf and target_reset_noe_buf so we don't get resistor dividers
+# (done) connect all /OE pins on the 74LCX125 to an FPGA output and add a 10k pull resistor to 3V3
+# (dont) add a couple of LEDs driven by microcontroller GPIOs
+# (done) verify that the regulator can handle the power draw of the mcu and fpga - yes, it can do 250 mA which wasn't enough for arcflash but should be fine here.
+# (done) add lots of staples
 
 import sys, os
 here = os.path.dirname(sys.argv[0])
@@ -152,6 +153,13 @@ swd2 = myelin_kicad_pcb.Component(
 
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
 power_led = myelin_kicad_pcb.DSOD323("led", "GND", "power_led_anode", ref="L1")
+
+mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R12")
+mcu_txd_led = myelin_kicad_pcb.DSOD323("led", "mcu_RXD", "mcu_txd_led_anode", ref="L2")
+
+mcu_rxd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_rxd_led_anode", ref="R13")
+mcu_rxd_led = myelin_kicad_pcb.DSOD323("led", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
+
 
 # Micro USB socket, mounted on the bottom of the board
 micro_usb = myelin_kicad_pcb.Component(
@@ -303,14 +311,14 @@ fpga = myelin_kicad_pcb.Component(
         Pin( 20, "PL7D",         ""),
         Pin( 21, "PL8A",         ""),
         Pin( 22, "PL8B",         ""),
-        Pin( 23, "PL9A",         ""),
+        Pin( 23, "PL9A",         "testack_noe"),
         Pin( 24, "VCCIO1",       ["3V3"]),
         Pin( 25, "GNDIO1",       ["GND"]),
         Pin( 26, "TMS",          ["fpga_TMS"]),  # has an internal pull-up resistor
         Pin( 27, "PL9B",         "target_power_3v"),
         Pin( 28, "TCK",          ["fpga_TCK"]),  # needs external 4k7 pull-DOWN resistor
         Pin( 29, "PB2A",         "target_reset_noe"),
-        Pin( 30, "PB2B",         "testack_noe"),
+        Pin( 30, "PB2B",         "hotswap_noe"),
         Pin( 31, "TDO",          ["fpga_TDO"]),  # has an internal pull-up resistor
         Pin( 32, "PB2C",         "testreq_3v"),
         Pin( 33, "TDI",          ["fpga_TDI"]),  # has an internal pull-up resistor
@@ -548,14 +556,16 @@ hotswap_buf = [
             "3V3",
             [
                 # [nOE, input, output]
-                ["GND",        "testack_noe",      "testack_noe_buf"],
-                ["GND",        "testreq",          "testreq_3v"],
-                ["GND",        "target_5V",        "target_power_3v"],
-                ["GND",        "target_reset_noe", "target_reset_noe_buf"],
+                ["hotswap_noe", "testack_noe",      "testack_noe_buf"],
+                ["hotswap_noe", "testreq",          "testreq_3v"],
+                ["hotswap_noe", "target_5V",        "target_power_3v"],
+                ["hotswap_noe", "target_reset_noe", "target_reset_noe_buf"],
             ]
         )
     ]
 ]
+
+hotswap_noe_pullup = myelin_kicad_pcb.R0805("10k", "hotswap_noe", "3V3", "R11")
 
 # These resistors prevent the 5V side of things from being powered by the
 # outputs from the 74LCX125.
@@ -563,9 +573,11 @@ testack_inter_buf_r = myelin_kicad_pcb.R0805("1k", "testack_noe_buf", "testack_n
 target_reset_inter_buf_r = myelin_kicad_pcb.R0805("1k", "target_reset_noe_buf", "target_reset_noe_buf_r", ref="R8")
 
 # These resistors prevent the 74HCT125 on the 5V side from driving testack or
-# reset when the 3V side is unpowered.
-testack_noe_pullup = myelin_kicad_pcb.R0805("10k", "testack_noe_buf_r", "target_5V", "R9")
-target_reset_pullup = myelin_kicad_pcb.R0805("10k", "target_reset_noe_buf_r", "target_5V", "R10")
+# reset when the 3V side is unpowered.  (They're connected to the outputs of
+# the 74LCX125 buffer rather than the inputs to the 74HCT125 so we don't
+# accidentally get a voltage divider.)
+testack_noe_pullup = myelin_kicad_pcb.R0805("10k", "testack_noe_buf", "target_5V", "R9")
+target_reset_pullup = myelin_kicad_pcb.R0805("10k", "target_reset_noe_buf", "target_5V", "R10")
 
 # 75HCT125 buffer, powered by the 5V side
 out_buf = [
@@ -625,7 +637,7 @@ post_header = myelin_kicad_pcb.Component(
 
 target_D0_pullup = myelin_kicad_pcb.R0805("2k2", "target_D0", "target_5V", ref="R6")
 
-for n in range(20):
+for n in range(50):
     single_staple = myelin_kicad_pcb.Component(
         footprint="myelin-kicad:via_single",
         identifier="staple_single%d" % (n+1),
