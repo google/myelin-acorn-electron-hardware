@@ -647,3 +647,5 @@ for n in range(50):
 
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
+myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
+                          "readable_bill_of_materials.txt")

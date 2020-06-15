@@ -1,0 +1,50 @@
+Identifier	Value	Description	KiCad package
+FPGA	LCMXO256		myelin-kicad:lattice_tn100
+X1	MC146 32768Hz		Crystals:Crystal_SMD_SeikoEpson_MC146-4pin_6.7x1.5mm_HandSoldering
+U1	MCP1700T-3302E/MB		TO_SOT_Packages_SMD:SOT-89-3
+CON	pins		Connector_PinHeader_2.54mm:PinHeader_2x13_P2.54mm_Vertical
+FPGA_IO	pins		Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical
+FPGA_IO2	pins		Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical
+POST	pins		Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
+PWR	reset		Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+RST	reset		Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+SWD2	swd		Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD
+HOST	usb host		Connectors:USB_A
+FPGA_JTAG	lattice jtag	2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.	Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical
+C10	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C11	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C12	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C13	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric
+C14	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C15	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C3	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C4	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C8	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C9	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+DC1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+DC2	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C6	15p	Capacitor 0805: 15p	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C7	15p	Capacitor 0805: 15p	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C1	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C2	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+C5	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+L1	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
+L2	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
+L3	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
+MCU	ATSAMD21E18A-AU	IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND	Housings_QFP:TQFP-32_7x7mm_Pitch0.8mm
+HSBUF	74LCX125M	IC buffer 4-bit OC hot swap; https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
+OUTBUF	74HCT125D	IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
+USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
+R1	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R10	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R11	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R9	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R2	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R7	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R8	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R6	2k2	Resistor 0805: 2k2	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R12	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R13	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R3	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R4	4k7	Resistor 0805: 4k7	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R5	4k7	Resistor 0805: 4k7	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
