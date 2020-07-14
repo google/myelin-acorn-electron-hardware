@@ -28,7 +28,7 @@
 # - Power LED
 # - Micro USB socket, 3v3 regulator + capacitors
 # - LCMXO256 FPGA
-# - 74LCX125 hot swap buffer
+# - 74LCX125 hot swap buffer (possibly to replaced by a SI8642 isolator one day)
 # - 74HCT125 5V buffer
 
 # The back to back buffers are used to prevent odd things from happening when
@@ -38,13 +38,93 @@
 # cable, and prevents the target machine from taking power from the output
 # buffer.
 
-# (done) Verify 74HCT125 and 74LCX125 pinout and wiring
-# (done) Verify that 1k series resistor and 10k pullup are sensible.
-# (done) move the pull resistors to testack_noe_buf and target_reset_noe_buf so we don't get resistor dividers
-# (done) connect all /OE pins on the 74LCX125 to an FPGA output and add a 10k pull resistor to 3V3
-# (dont) add a couple of LEDs driven by microcontroller GPIOs
-# (done) verify that the regulator can handle the power draw of the mcu and fpga - yes, it can do 250 mA which wasn't enough for arcflash but should be fine here.
-# (done) add lots of staples
+# -----------------------------------------------------------------
+# r1: Brainstorming how to deal with reverse polarity (fixed in r2)
+# -----------------------------------------------------------------
+
+# If the target connector is plugged in backwards, the following happens:
+
+# 1. target 5V    -> GND
+# 2. target D0    -> target_reset output (pulls down) from 74HCT125
+# 3. testreq      -> testack; output (pulls up) from 74HCT125
+# 4. testack      -> testreq; input to 74LCX125
+# 5. target reset -> target_D0; 2k2 to GND
+# 6. target GND   -> target_5V; 74HCT125 power, one input, two output enables
+
+# Two possible scenarios could occur.
+
+# (A) If the host side is floating w.r.t the target.
+
+# From the POV of the 3.3V side of the POST box, target_5V and the 74HCT125's
+# supply are now at -5V.  Its ground protection diodes are still fine, but
+# there is now a diode from every pin to -5V (target GND).
+
+# testack_noe_buf_r: 1k to a 74LCX125 output
+# testack, which is testreq/LA21: pulled low on the target
+# target_reset, which is D0: pulled low on the target
+
+# Another chip to consider is the 74LCX125, which has some target signals
+# (testreq and target_5V) as inputs.  target_5V will receive -5V and short
+# through the protection diode from ground.  testreq (testack / ROMCS) will be
+# at 0V or -5V and be forced high through the diode, which won't hurt anything
+# on the remote side.
+
+# (B) If the host and target share a common ground.
+# In this case, the target's 5V line is shorted to ground :/
+
+# To mitigate this, will a protection diode from target_5V do?
+
+# 1. target 5V    -> GND (bad if host and target share a common ground)
+# 2. target D0    -> target_reset output (pulls down) from 74HCT125
+# 3. testreq      -> testack; output (pulls up) from 74HCT125
+# 4. testack      -> testreq; input to 74LCX125 (will be pulled up by 74LCX125 protection diode, which is OK)
+# 5. target reset -> target_D0; 2k2 to GND (or nowhere if past the protection diode)
+# 6. target GND   -> will appear as -5V and be blocked by the protection diode, so target_5V will float
+
+# This will fix things UNLESS the post box and target share a common ground.
+
+# ------------------
+# Changes made in r2
+# ------------------
+
+# done(r2) clearly indicate POST connector polarity; label signals if they fit
+# done(r2) add protection diode (D1) on 5V input for post_box_usb
+# done(r2) add protection resistor (R15) for testreq input on post_box_usb
+# done(r2) add a weak (1M?) pullup (R23) on testreq to get rid of garbage when disconnected.
+# done(r2) add protection resistors on testack (R16) and reset (R17) outputs
+# done(r2) add diode (D2) to prevent reset from being pulled up in a reverse polarity condition
+# done(r2) separate target_GND and GND, and tie together with a bunch of parallel resistors or a single high power resistor
+# done(r2) add correct/reverse polarity indicator LEDs
+
+# Now, in the reverse polarity case:
+
+# 1. target 5V    -> target_GND (45 mA will flow to GND via resistors if host and target share a common ground)
+# 2. target D0    -> 68R to target_reset output (pulls down) from 74HCT125
+# 3. testreq      -> 68R to target_testack output (pulls up) from 74HCT125
+# 4. testack      -> 1k to target_testreq; input to 74LCX125 (diode to GND / target_5V)
+# 5. target reset -> target_D0; 2k2 to reversed diode to target_GND
+# 6. target GND   -> will appear as -5V and be blocked by the protection diode, so target_5V will float
+
+# If I've worked this through correctly, it should now be safe to leave the
+# adapter plugged in backwards indefinitely without damage.
+
+# -------------------------------------------------
+# Things that have been done, or are still to do...
+# -------------------------------------------------
+
+# TODO(r2) make a test script that can set up a board and validate it by testing the ibx250 or a3000
+# TODO(r2) add disable mode to post_box_usb firmware, so it doesn't cause machines to hang on boot when there's no serial connection.
+# TODO(r2) make post_box_usb board.py better at finding the serial port, because it's terrible on windows
+# TODO(r2) see if i can make the firmware buildable (or at least flashable) without the full arduino system
+# TODO(r2) try programming the FPGA from the MCU
+
+# done(r1) Verify 74HCT125 and 74LCX125 pinout and wiring
+# done(r1) Verify that 1k series resistor and 10k pullup are sensible.
+# done(r1) move the pull resistors to testack_noe_buf and target_reset_noe_buf so we don't get resistor dividers
+# done(r1) connect all /OE pins on the 74LCX125 to an FPGA output and add a 10k pull resistor to 3V3
+# done(r1) add a couple of LEDs driven by microcontroller GPIOs
+# done(r1) verify that the regulator can handle the power draw of the mcu and fpga - yes, it can do 250 mA which wasn't enough for arcflash but should be fine here.
+# done(r1) add lots of staples
 
 import sys, os
 here = os.path.dirname(sys.argv[0])
@@ -150,16 +230,25 @@ swd2 = myelin_kicad_pcb.Component(
     ],
 )
 
-
+# yellow LED that lights when the USB side of the board is powered
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
-power_led = myelin_kicad_pcb.DSOD323("led", "GND", "power_led_anode", ref="L1")
+power_led = myelin_kicad_pcb.DSOD323("power", "GND", "power_led_anode", ref="L1")
 
+# yellow LED that lights when the USB serial port is connected (and flashes on traffic)
 mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R12")
 mcu_txd_led = myelin_kicad_pcb.DSOD323("led", "mcu_RXD", "mcu_txd_led_anode", ref="L2")
 
+# NF
 mcu_rxd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_rxd_led_anode", ref="R13")
-mcu_rxd_led = myelin_kicad_pcb.DSOD323("led", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
+mcu_rxd_led = myelin_kicad_pcb.DSOD323("link/act", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
 
+# green LED to indicate that target is powered
+target_power_led_r = myelin_kicad_pcb.R0805("330R", "target_5V_ext", "target_power_led_anode", ref="R21")
+target_power_led = myelin_kicad_pcb.DSOD323("target pwr", "target_GND", "target_power_led_anode", ref="L4")
+
+# red LED mounted in reverse: this will light when the POST connector is plugged in backwards
+target_power_reversed_led_r = myelin_kicad_pcb.R0805("330R", "target_GND", "target_power_reversed_led_anode", ref="R22")
+target_power_reversed_led = myelin_kicad_pcb.DSOD323("POLARITY", "target_5V_ext", "target_power_reversed_led_anode", ref="L5")
 
 # Micro USB socket, mounted on the bottom of the board
 micro_usb = myelin_kicad_pcb.Component(
@@ -557,14 +646,53 @@ hotswap_buf = [
             [
                 # [nOE, input, output]
                 ["hotswap_noe", "testack_noe",      "testack_noe_buf"],
-                ["hotswap_noe", "testreq",          "testreq_3v"],
-                ["hotswap_noe", "target_5V",        "target_power_3v"],
+                ["hotswap_noe", "target_testreq",   "testreq_3v"],
+                ["hotswap_noe", "target_5V_r",      "target_power_3v"],
                 ["hotswap_noe", "target_reset_noe", "target_reset_noe_buf"],
             ]
         )
     ]
 ]
 
+# Isolator, from an earlier attempt at r2 which completely isolated the USB
+# and target sides of the board, rather than just tying the grounds together
+# with resistors.
+
+# isolator = myelin_kicad_pcb.Component(
+#     footprint="Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",
+#     identifier="ISO",
+#     value="SI8642EC-B-IS1",
+#     desc="https://www.digikey.com/product-detail/en/silicon-labs/SI8642EC-B-IS1/336-2094-5-ND/2623342",
+#     pins=[
+
+#         # SI8642 buffers:
+#         # A1 -> B1
+#         # A2 -> B2
+#         # B3 -> A3
+#         # B4 -> A4
+
+#         Pin( 1, "VDD1",  "target_5V"),
+#         Pin( 2, "GND1",  "target_GND"),
+#         Pin( 3, "A1in",  "target_GND"),
+#         Pin( 4, "A2in",  "target_testreq_protected"),
+#         Pin( 5, "A3out", "target_testack_noe"),
+#         Pin( 6, "A4out", "target_reset_noe"),
+#         Pin( 7, "EN1",   "target_5V"),
+#         Pin( 8, "GND1",  "target_GND"),
+#         Pin( 9, "GND2",  "GND"),
+#         Pin(10, "EN2",   "3V3"),
+#         Pin(11, "B4in",  "target_reset_noe_3V"),
+#         Pin(12, "B3in",  "target_testack_noe_3V"),
+#         Pin(13, "B2out", "target_testreq_3V"),
+#         Pin(14, "B1out", "target_power_3V_n"),
+#         Pin(15, "GND2",  "GND"),
+#         Pin(16, "VDD2",  "3V3"),
+#     ],
+# )
+
+# Not sure if I've gotten this right, but the 74LCX125's datasheet says that
+# all /OE pins need to be pulled to VCC to preserve the high impedance on
+# power off behavior.  This is driven low by the FPGA when it starts up.
 hotswap_noe_pullup = myelin_kicad_pcb.R0805("10k", "hotswap_noe", "3V3", "R11")
 
 # These resistors prevent the 5V side of things from being powered by the
@@ -594,7 +722,7 @@ out_buf = [
                 Pin( 4, "2nOE", conn[1][0]),
                 Pin( 5, "2A",   conn[1][1]),
                 Pin( 6, "2Y",   conn[1][2]),
-                Pin( 7, "GND",  "GND"),
+                Pin( 7, "GND",  "target_GND"),
                 Pin( 8, "3Y",   conn[2][2]),
                 Pin( 9, "3A",   conn[2][1]),
                 Pin(10, "3nOE", conn[2][0]),
@@ -604,7 +732,7 @@ out_buf = [
                 Pin(14, "VCC",  power),
             ],
         ),
-        myelin_kicad_pcb.C0805("100n", "GND", power, ref="DC?"),
+        myelin_kicad_pcb.C0805("100n", "target_GND", power, ref="DC?"),
     ]
     for ident, power, conn in [
         (
@@ -612,10 +740,10 @@ out_buf = [
             "target_5V",
             [
                 # [nOE, input, output]
-                ["testack_noe_buf_r",      "target_5V", "testack"],
-                ["target_reset_noe_buf_r", "GND",       "target_reset"],
-                ["target_5V",              "GND",       ""],
-                ["target_5V",              "GND",       ""],
+                ["testack_noe_buf_r",      "target_5V",  "target_testack"],
+                ["target_reset_noe_buf_r", "target_GND", "target_reset"],
+                ["target_5V",              "target_GND", ""],
+                ["target_5V",              "target_GND", ""],
             ]
         )
     ]
@@ -626,16 +754,70 @@ post_header = myelin_kicad_pcb.Component(
     identifier="POST",
     value="pins",
     pins=[
-        Pin(1, "", "target_5V"),
+        Pin(1, "", "target_5V_ext"),
         Pin(2, "", "target_D0"),
-        Pin(3, "", "testreq"),
-        Pin(4, "", "testack"),
-        Pin(5, "", "target_reset"),
-        Pin(6, "", "GND"),
+        Pin(3, "", "target_testreq_ext"),
+        Pin(4, "", "target_testack_ext"),
+        Pin(5, "", "target_reset_ext"),
+        Pin(6, "", "target_GND"),
     ],
 )
 
+# Fuses, from an earlier attempt at r2 which put fuses on target_5V and
+# target_GND rather than a protection diode and some resistors.
+
+# fuse_blow_diodes = [
+#     myelin_kicad_pcb.Component(
+#         footprint="Diode_SMD:D_SMA",
+#         identifier="D3",  # to blow F2 on reverse connection
+#         value="S1ATR",
+#         desc="Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND",
+#         pins=[
+#             Pin(1, "1", "target_5V"),
+#             Pin(2, "2", "target_GND_unfused"),
+#         ],
+#     ),
+#     myelin_kicad_pcb.Component(
+#         footprint="Diode_SMD:D_SMA",
+#         identifier="D2",  # to blow F1 on reverse connection
+#         value="S1ATR NF",
+#         desc="Diode Rectifier; https://www.digikey.com/products/en?keywords=1655-1502-1-ND",
+#         pins=[
+#             Pin(1, "1", "target_5V_unfused"),
+#             Pin(2, "2", "target_GND"),
+#         ],
+#     ),
+# ]
+
+# What is the footprint for an appropriate polyfuse here?
+# target_5V_fuse = myelin_kicad_pcb.R0805("PTC", "target_5V_unfused", "target_5V_fused", ref="F2")
+# target_GND_fuse = myelin_kicad_pcb.R0805("PTC", "target_GND_unfused", "target_GND", ref="F1")
+
+target_5V_diode = myelin_kicad_pcb.DSOD323("BAT54", "target_5V", "target_5V_ext", ref="D1")  # 5V_ext ->|- 5V
+target_5V_protection = myelin_kicad_pcb.R0805("1k", "target_5V", "target_5V_r", ref="R14")  # for LCX input
+
 target_D0_pullup = myelin_kicad_pcb.R0805("2k2", "target_D0", "target_5V", ref="R6")
+
+# Weak pullup on testreq to prevent garbage when disconnected from a target
+target_testreq_pullup = myelin_kicad_pcb.R0805("100k", "target_testreq", "target_5V", ref="R23")
+
+# Protection resistors and diodes from req/ack/reset lines
+target_testreq_protection = myelin_kicad_pcb.R0805("1k", "target_testreq_ext", "target_testreq", ref="R15")  # for LCX input
+target_testack_protection = myelin_kicad_pcb.R0805("68R", "target_testack_ext", "target_testack", ref="R16")
+target_reset_protection = myelin_kicad_pcb.R0805("68R", "target_reset_ext", "target_reset_prediode", ref="R17")
+target_reset_diode = myelin_kicad_pcb.DSOD323("BAT54", "target_reset", "target_reset_prediode", ref="D2")  # prediode ->|- reset
+
+# If the host machine happens to share a ground with the target and the test
+# connector is plugged in backwards, the target's 5V rail will be connected to
+# target_GND.  These resistors limit the current flowing in this case.
+
+# 0805 resistors are typically rated at 0.1 W, i.e. 5^2/0.1 = 250 ohms is the lowest they can be.
+# Three 330R in parallel is 110R, so 45 mA will flow in a short condition, which will be fine.
+ground_connection = [
+    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R18"),
+    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R19"),
+    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R20"),
+]
 
 for n in range(50):
     single_staple = myelin_kicad_pcb.Component(

@@ -28,23 +28,37 @@ C7	15p	Capacitor 0805: 15p	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSo
 C1	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C2	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C5	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-L1	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
+D1	BAT54	Diode SOD323: BAT54	Diode_SMD:D_SOD-323_HandSoldering
+D2	BAT54	Diode SOD323: BAT54	Diode_SMD:D_SOD-323_HandSoldering
+L5	POLARITY	Diode SOD323: POLARITY	Diode_SMD:D_SOD-323_HandSoldering
 L2	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
-L3	led	Diode SOD323: led	Diode_SMD:D_SOD-323_HandSoldering
+L3	link/act	Diode SOD323: link/act	Diode_SMD:D_SOD-323_HandSoldering
+L1	power	Diode SOD323: power	Diode_SMD:D_SOD-323_HandSoldering
+L4	target pwr	Diode SOD323: target pwr	Diode_SMD:D_SOD-323_HandSoldering
 MCU	ATSAMD21E18A-AU	IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND	Housings_QFP:TQFP-32_7x7mm_Pitch0.8mm
 HSBUF	74LCX125M	IC buffer 4-bit OC hot swap; https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
 OUTBUF	74HCT125D	IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
 USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
+R23	100k	Resistor 0805: 100k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R1	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R10	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R11	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R9	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R14	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R15	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R2	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R7	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R8	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R6	2k2	Resistor 0805: 2k2	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R12	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R13	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R18	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R19	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R20	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R21	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R22	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R3	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R4	4k7	Resistor 0805: 4k7	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R5	4k7	Resistor 0805: 4k7	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R16	68R	Resistor 0805: 68R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R17	68R	Resistor 0805: 68R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
