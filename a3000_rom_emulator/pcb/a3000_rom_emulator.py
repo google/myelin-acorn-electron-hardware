@@ -59,12 +59,17 @@ PATH_TO_CPLD = "../cpld"
 
 
 import sys, os
+assert sys.version_info.major >= 3, "Use Python 3"
 here = os.path.dirname(sys.argv[0])
 sys.path.insert(0, os.path.join(here, "../../third_party/myelin-kicad.pretty"))
 import myelin_kicad_pcb
 Pin = myelin_kicad_pcb.Pin
 
-# TODO(v3) use a comparator to detect good power on the host side.  We really
+# done(v3) add 68R resistor packs so every data output has a resistor in
+# series.  This will hopefully make the board more robust when used in a
+# machine under test.
+
+# TODO(v4) use a comparator to detect good power on the host side.  We really
 # need to verify that the host 5V line is more than 3.3V, as it'll probably be
 # around 2.6V when propped up from 3.3V through a protection diode.  A
 # comparator powered from 5V should be able to do this.
@@ -492,6 +497,25 @@ flash_caps = [
     for n in range(6)
 ]
 
+# 4 x 68R resistor packs, to provide some protection for the data lines
+resistor_packs = [
+    myelin_kicad_pcb.Component(
+        footprint="Resistor_SMD:R_Array_Convex_8x0602",
+        identifier="RP%d" % (rom_id + 1),
+        value="Pack of 8 x isolated 68R resistors",
+        desc="8 x 68R pack; https://www.digikey.com/product-detail/en/panasonic-electronic-components/EXB-2HV680JV/Y1680CT-ND/285367",
+        pins=sum(([
+            Pin("%d" % (dn+1), "D%d" % (dn+1), "rom_D%d" % d_signal),
+            Pin("%d" % (16-dn), "D%d" % (dn+1), "rom_D%d_ext" % d_signal),
+        ] for dn, d_signal in enumerate(dns)), [])
+    ) for rom_id, dns in [
+        (0, (7, 6, 5, 0, 4, 1, 3, 2)),
+        (1, (15, 14, 13, 12, 11, 26, 27, 19)),
+        (2, (8, 10, 25, 18, 17, 20, 9, 28)),
+        (3, (16, 24, 29, 21, 30, 22, 23, 31)),
+    ]
+]
+
 # 4 x 32-pin ROM footprint, to plug into the A3000 motherboard
 # 32 pins = D0-7, A0-18, CS, OE, WE, 5V, GND.
 rom_headers = [
@@ -501,15 +525,15 @@ rom_headers = [
         value="ROM header",
         desc="Pin adapter to emulate a 600mil 32-pin DIP; round pin header strip from Aliexpress",
         pins=[
-            Pin("13", "D0", "rom_D%d" % (rom_id * 8 + 0)),
-            Pin("14", "D1", "rom_D%d" % (rom_id * 8 + 1)),
-            Pin("15", "D2", "rom_D%d" % (rom_id * 8 + 2)),
             Pin("16", "GND",  "GND"),
-            Pin("17", "D3", "rom_D%d" % (rom_id * 8 + 3)),
-            Pin("18", "D4", "rom_D%d" % (rom_id * 8 + 4)),
-            Pin("19", "D5", "rom_D%d" % (rom_id * 8 + 5)),
-            Pin("20", "D6", "rom_D%d" % (rom_id * 8 + 6)),
-            Pin("21", "D7", "rom_D%d" % (rom_id * 8 + 7)),
+            Pin("13", "D0", "rom_D%d_ext" % (rom_id * 8 + 0)),
+            Pin("14", "D1", "rom_D%d_ext" % (rom_id * 8 + 1)),
+            Pin("15", "D2", "rom_D%d_ext" % (rom_id * 8 + 2)),
+            Pin("17", "D3", "rom_D%d_ext" % (rom_id * 8 + 3)),
+            Pin("18", "D4", "rom_D%d_ext" % (rom_id * 8 + 4)),
+            Pin("19", "D5", "rom_D%d_ext" % (rom_id * 8 + 5)),
+            Pin("20", "D6", "rom_D%d_ext" % (rom_id * 8 + 6)),
+            Pin("21", "D7", "rom_D%d_ext" % (rom_id * 8 + 7)),
         ] + ([
             Pin( "1", "A19",    "rom_A19_ext"),  # 5V everywhere except A5000, where this is A21.  In v1 this was NC.
             Pin( "2", "A16",    "rom_A16_ext"),
@@ -583,6 +607,14 @@ another_a19 = myelin_kicad_pcb.Component(
     value="rom_A19",
     desc="Pin header",
     pins=[Pin( 1, "", "rom_A19")],
+)
+
+cpld_K2_TP = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical",
+    identifier="T1",
+    value="rom_5V",
+    desc="Pin header",
+    pins=[Pin( 1, "", "rom_5V")],
 )
 
 
@@ -805,7 +837,7 @@ staples = [
         exclude_from_bom=True,
         pins=[Pin(1, "GND", ["GND"])],
     )
-    for n in range(36)
+    for n in range(45)
 ]
 
 fiducials = [

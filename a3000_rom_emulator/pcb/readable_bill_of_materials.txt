@@ -1,6 +1,26 @@
 This is the human-readable bill of materials.
 See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 
+RP1
+- Value: Pack of 8 x isolated 68R resistors
+- Description: 8 x 68R pack; https://www.digikey.com/product-detail/en/panasonic-electronic-components/EXB-2HV680JV/Y1680CT-ND/285367
+- KiCad package: Resistor_SMD:R_Array_Convex_8x0602
+
+RP2
+- Value: Pack of 8 x isolated 68R resistors
+- Description: 8 x 68R pack; https://www.digikey.com/product-detail/en/panasonic-electronic-components/EXB-2HV680JV/Y1680CT-ND/285367
+- KiCad package: Resistor_SMD:R_Array_Convex_8x0602
+
+RP3
+- Value: Pack of 8 x isolated 68R resistors
+- Description: 8 x 68R pack; https://www.digikey.com/product-detail/en/panasonic-electronic-components/EXB-2HV680JV/Y1680CT-ND/285367
+- KiCad package: Resistor_SMD:R_Array_Convex_8x0602
+
+RP4
+- Value: Pack of 8 x isolated 68R resistors
+- Description: 8 x 68R pack; https://www.digikey.com/product-detail/en/panasonic-electronic-components/EXB-2HV680JV/Y1680CT-ND/285367
+- KiCad package: Resistor_SMD:R_Array_Convex_8x0602
+
 CC2
 - Value: 100n
 - Description: Capacitor 0402: 100n
@@ -188,6 +208,11 @@ AEXT
 
 AEXTGND
 - Value: Ground
+- Description: Pin header
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
+
+T1
+- Value: rom_5V
 - Description: Pin header
 - KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical
 
