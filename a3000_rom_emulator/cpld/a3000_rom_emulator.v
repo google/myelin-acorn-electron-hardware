@@ -156,7 +156,7 @@ reg reset_arm = 1'b0;
 // 1 when rom_A is pointing at the top 16 bytes (4 words) of ROM
 wire accessing_signal_ROM;
 assign accessing_signal_ROM = (
-    rom_A[18:3] == 16'b1111111111111111
+    rom_A[18:2] == 17'b11111111111111111
     && (use_la21 == 1'b0 || rom_A[19] == 1'b1)
   ) ? 1'b1 : 1'b0;  // TODO this can prob be 18:2==17'b1...1 because we only need 2 bits
 
