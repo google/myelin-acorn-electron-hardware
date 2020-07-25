@@ -172,13 +172,23 @@ always @(negedge rom_nCS) begin
 end
 
 // synchronizer for romcs*
-reg [1:0] romcs_sync = 2'b0;
+`define DOUBLE_SYNC_ROMCS
+reg romcs_sync = 0;
+`ifdef DOUBLE_SYNC_ROMCS
+  reg romcs_pre_sync = 0;
+`endif
 // pulse length measurement for romcs*
 reg [2:0] romcs_pulse_length = 3'b0;
 
 always @(posedge cpld_clock_from_mcu) begin
-  romcs_sync <= {romcs_sync[0], rom_nCS};
-  if (romcs_sync[1] == 1'b1) begin
+
+  // Synchronize Romcs*
+  `ifdef DOUBLE_SYNC_ROMCS
+    {romcs_sync, romcs_pre_sync} <= {romcs_pre_sync, rom_nCS};
+  `else
+    romcs_sync <= rom_nCS;
+  `endif
+  if (romcs_sync == 1'b1) begin
     romcs_pulse_length <= 3'b0;
   end else begin
     if (romcs_pulse_length != 3'b111) begin
