@@ -79,33 +79,33 @@ class ROM:
         desc += " [%s]" % self.readable_size()
         return desc
 
-def switch_byte_order(bytes, byte_order):
-    if len(bytes) % 4:
+def switch_byte_order(data, byte_order):
+    if len(data) % 4:
         # Pad to a multiple of 4 bytes
-        if len(bytes) == 524289 and bytes[-1] == '\\':
+        if len(data) == 524289 and data[-1] == '\\':
             # Special case for Arthur 1.20 image with extra byte
             print("Dropping the last byte of known Arthur image")
-            bytes = bytes[:512*1024]
+            data = data[:512*1024]
         else:
-            n_pad = 4 - (len(bytes) % 4)
-            print("Padding %d-byte image with %d 0xFF bytes" % (len(bytes), n_pad))
-            bytes += b"\xFF" * n_pad
+            n_pad = 4 - (len(data) % 4)
+            print("Padding %d-byte image with %d 0xFF bytes" % (len(data), n_pad))
+            data += b"\xFF" * n_pad
 
     if byte_order == "0123":
-        return bytes
+        return data
 
     if byte_order == "2301":
         # swap pairs of bytes (Risc PC adapter)
         output = []
-        for idx in xrange(0, len(bytes), 4):
-            output.append(bytes[idx+2] + bytes[idx+3] + bytes[idx] + bytes[idx+1])
+        for idx in range(0, len(data), 4):
+            output.append(data[idx+2:idx+3] + data[idx+3:idx+4] + data[idx:idx+1] + data[idx+1:idx+2])
         return b"".join(output)
 
     if byte_order == "3210":
         # reverse bytes in each word (A5000 adapter)
         output = []
-        for idx in xrange(0, len(bytes), 4):
-            output.append(bytes[idx+3] + bytes[idx+2] + bytes[idx+1] + bytes[idx])
+        for idx in range(0, len(data), 4):
+            output.append(data[idx+3:idx+4] + data[idx+2:idx+3] + data[idx+1:idx+2] + data[idx:idx+1])
         return b"".join(output)
 
     raise ValueError("Invalid byte_order value: %s" % byte_order)
@@ -237,7 +237,7 @@ def FlashImage(roms,
             bootloader_binary = switch_byte_order(bootloader_binary, byte_order)
             bootloader_bank = (
                 bootloader_binary +
-                ("\xff" * (bootloader_bank_size - len(bootloader_binary)))
+                (b"\xff" * (bootloader_bank_size - len(bootloader_binary)))
             )
         if bootloader_512k:
             # Hack to allow running the bootloader on an A310 and Arcflash v1 without modifying LK12.

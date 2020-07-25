@@ -27,7 +27,7 @@ import time
 from . import afserial
 
 def read_until(ser, match):
-    resp = ''
+    resp = b''
     while True:
         r = ser.read(1024)
         if r:
@@ -42,13 +42,13 @@ def read_until(ser, match):
 def upload(rom):
     with afserial.Port() as ser:
         print("\n* Port open.  Giving it a kick, and waiting for OK.")
-        ser.write("\n")
-        r = read_until(ser, "OK")
+        ser.write(b"\n")
+        r = read_until(ser, b"OK")
 
         print("\n* Requesting chip ID and locking chip")
-        ser.write("I\n")  # identify chip
-        r = read_until(ser, "OK")
-        m = re.search(r"Size = (\d+)", r)
+        ser.write(b"I\n")  # identify chip
+        r = read_until(ser, b"OK")
+        m = re.search(br"Size = (\d+)", r)
         if not m:
             raise Exception("Chip identification failed")
         chip_size = int(m.group(1))
@@ -59,22 +59,22 @@ def upload(rom):
             raise Exception("%s is %d bytes long, which does not match the flash capacity of %d bytes" % (rom_fn, len(rom), chip_size))
 
         print("\n* Start programming process")
-        ser.write("P\n")  # program chip
+        ser.write(b"P\n")  # program chip
 
-        input_buf = ''
+        input_buf = b''
         done = 0
         while not done:
-            input_buf += read_until(ser, "\n")
-            while input_buf.find("\n") != -1:
-                p = input_buf.find("\n") + 1
+            input_buf += read_until(ser, b"\n")
+            while input_buf.find(b"\n") != -1:
+                p = input_buf.find(b"\n") + 1
                 line, input_buf = input_buf[:p], input_buf[p:]
                 line = line.strip()
                 print("parse",repr(line))
-                if line == "OK":
+                if line == b"OK":
                     print("All done!")
                     done = 1
                     break
-                m = re.search(r"^(\d+)\+(\d+)$", line)
+                m = re.search(br"^(\d+)\+(\d+)$", line)
                 if not m: continue
 
                 start, size = int(m.group(1)), int(m.group(2))

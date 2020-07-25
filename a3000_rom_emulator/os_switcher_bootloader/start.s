@@ -48,6 +48,18 @@ in_rom_now:
     str r1, [r0, #0x28]  @ IOC mask B
     str r1, [r0, #0x38]  @ IOC FIRQ mask
 
+@    @ Debug: read IOEB present register
+@    ldr r3, =0x3350000
+@    ldr r2, [r3, #0x50]
+@    @ Debug: set IOC BAUD pin to output a square wave
+@    ldr r2, =0x01
+@    strb r2, [r0, #0x60]  @ latch low
+@    strb r2, [r0, #0x64]  @ latch high
+@    strb r2, [r0, #0x68]  @ go
+@    b in_rom_now  @ repeat so we can see this on the bus
+@hang_now:
+@    b hang_now
+
     @ Init MEMC
     @ RISC OS 3 writes the following for a 4MB machine:
     @ 036E000C: os mode off, sound off, video off, no refresh, slow roms, 32kB

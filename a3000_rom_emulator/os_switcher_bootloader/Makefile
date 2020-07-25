@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-AS = arm-none-eabi-as
-CCC = arm-none-eabi-g++
-CC = arm-none-eabi-gcc
-LD = arm-none-eabi-g++
-OBJCOPY = arm-none-eabi-objcopy
+TOOLCHAIN_ROOT=/opt/gcc-arm-none-eabi-4_9-2014q4/bin
+
+AS = $(TOOLCHAIN_ROOT)/arm-none-eabi-as
+CCC = $(TOOLCHAIN_ROOT)/arm-none-eabi-g++
+CC = $(TOOLCHAIN_ROOT)/arm-none-eabi-gcc
+LD = $(TOOLCHAIN_ROOT)/arm-none-eabi-g++
+OBJCOPY = $(TOOLCHAIN_ROOT)/arm-none-eabi-objcopy
 
 # assembler: generate PIC code
 ASFLAGS = -k
@@ -84,6 +86,10 @@ RPC_BOOT_OBJS=$(SHARED_OBJS) rpc_main.o rpc_start.o
 arc_boot.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,arc_boot.map -o $@ $(SWITCHER_OBJS)
 	arm-none-eabi-objdump -S --disassemble arc_boot.elf > arc_boot.list
+
+arc_boot_standalone.elf: $(SWITCHER_OBJS)
+	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher-at-zero.ld -Wl,-Map,arc_boot_standalone.map -o $@ $(SWITCHER_OBJS)
+	arm-none-eabi-objdump -S --disassemble arc_boot_standalone.elf > arc_boot_standalone.list
 
 rpc_boot.elf: $(RPC_BOOT_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=rpc_boot.ld -Wl,-Map,rpc_boot.map -o $@ $(RPC_BOOT_OBJS)
