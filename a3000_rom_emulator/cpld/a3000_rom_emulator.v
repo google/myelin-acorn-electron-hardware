@@ -103,10 +103,10 @@ reg arm_to_mcu_read_state_sync = 1'b0;  // synchronized to cpld_clock_from_mcu (
 // ----- Hacky bit-banged serial comms; actually works but requires more work on ARM side -----
 
 // enable/disable hacky bit banged serial comms
-parameter enable_bitbang_serial = 1;
+parameter enable_bitbang_serial = !enable_comms;
 
 // for bit-banged serial comms
-reg cpld_MOSI_sync = 1'b1;  // synchronized to rom_nCS falling edge
+reg cpld_TXD_sync = 1'b1;  // synchronized to rom_nCS falling edge
 reg cpld_MISO_TXD = 1'b1;  // value to assign to cpld_MISO when cpld_SS==1
 
 
@@ -166,7 +166,8 @@ always @(negedge rom_nCS) begin
   mcu_to_arm_write_state_sync <= mcu_to_arm_write_state;
   arm_to_mcu_read_state_sync <= arm_to_mcu_read_state;
   if (enable_bitbang_serial) begin
-    cpld_MOSI_sync <= cpld_MOSI;
+    // synchronize MOSI / TXD
+    cpld_TXD_sync <= cpld_MOSI;
   end
 end
 
@@ -218,7 +219,7 @@ end
 // latched nR/W (Lionrw) on a Risc PC, debug everywhere else
 // (see use_output_enable_signal_from_host above)
 // assign rom_nOE = 1'bZ;
-// assign rom_nOE = cpld_MOSI_sync;  // DEBUG: bit-banged serial
+// assign rom_nOE = cpld_TXD_sync;  // DEBUG: bit-banged serial
 // assign rom_nOE = cpld_MOSI;  // DEBUG: bit-banged serial
 // assign rom_nOE = cpld_MISO_TXD;  // DEBUG: bit-banged serial
 // assign rom_nOE = romcs_sync[1]; // DEBUG: synchronized romcs
@@ -235,8 +236,8 @@ assign rom_D = n_selected == 1'b1 ? 32'bZ : (
   allowing_arm_access == 1'b1 ? (
     // Pass flash output through to rom_D
     // DEBUG actually should be mcu_to_arm_buffer, but this lets us loopback
-    (accessing_signal_ROM == 1'b1) ? {
-      enable_bitbang_serial ? {flash1_DQ, flash0_DQ[15:1], cpld_MOSI_sync}
+    (accessing_signal_ROM == 1'b1 && rom_A[1] == 1'b1) ? {
+      enable_bitbang_serial ? {flash1_DQ, flash0_DQ[15:1], cpld_TXD_sync}
       : (enable_comms ? {flash1_DQ, flash0_DQ[15:3], mcu_to_arm_write_state_sync, arm_to_mcu_read_state_sync, mcu_to_arm_buffer}
                       : {flash1_DQ, flash0_DQ})
     } :
