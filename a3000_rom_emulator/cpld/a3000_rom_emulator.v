@@ -177,7 +177,17 @@ reg romcs_sync = 0;
 // pulse length measurement for romcs*
 reg [2:0] romcs_pulse_length = 3'b0;
 
+// synchronization for SPI signals
+reg sck_sync, sck_last;
+reg ss_sync;
+reg mosi_sync;
+
 always @(posedge cpld_clock_from_mcu) begin
+
+  // Synchronize SPI signals so we can do everything with one clock
+  {sck_last, sck_sync} <= {sck_sync, cpld_SCK};
+  ss_sync <= cpld_SS;
+  mosi_sync <= cpld_MOSI;
 
   // Synchronize Romcs*
   `ifdef DOUBLE_SYNC_ROMCS
@@ -285,13 +295,27 @@ assign flash_nCE = allowing_arm_access == 1'b1 ? n_selected : (accessing_flash =
 assign flash_nOE = allowing_arm_access == 1'b1 ? n_selected : (accessing_flash == 1'b1 && spi_rnw == 1'b1 ? 1'b0 : 1'b1);
 assign flash_nWE = allowing_arm_access == 1'b1 ? 1'b1 : (writing_flash == 1'b1 ? 1'b0 : 1'b1);
 
+// Uncomment to use the 48MHz clock for everything including SPI
+// `define SYNC_SPI_AGAINST_GLOBAL_CLOCK
 
+`ifdef SYNC_SPI_AGAINST_GLOBAL_CLOCK
+always @(posedge cpld_clock_from_mcu) begin
+`else
 always @(posedge cpld_SCK or posedge cpld_SS) begin
+`endif
 
+  `ifdef SYNC_SPI_AGAINST_GLOBAL_CLOCK
+  if (ss_sync == 1'b1) begin
+  `else
   if (cpld_SS == 1'b1) begin
+  `endif
     accessing_flash <= 1'b0;
     spi_bit_count <= 6'b0;
-  end else begin
+  end else
+  `ifdef SYNC_SPI_AGAINST_GLOBAL_CLOCK
+    if (sck_sync == 1'b1 && sck_last == 1'b0)
+  `endif
+  begin
     // $display("\nSPI tick!  mosi=%d", cpld_MOSI);
     // the master device should bring cpld_SS high between every transaction.
 
@@ -317,8 +341,8 @@ always @(posedge cpld_SCK or posedge cpld_SS) begin
 
     if (spi_bit_count == 0) begin
       allowing_arm_access <= cpld_MOSI;
-      arm_to_mcu_write_state_sync <= arm_to_mcu_write_state;
-      mcu_to_arm_read_state_sync <= mcu_to_arm_read_state;
+      arm_to_mcu_write_state_sync <= arm_to_mcu_write_state;  // TODO use this
+      mcu_to_arm_read_state_sync <= mcu_to_arm_read_state;  // TODO use this
       // $display("SPI: Set allowing_arm_access to %d", cpld_MOSI);
     end else if (allowing_arm_access == 1) begin
       if (spi_bit_count < 8) begin
