@@ -50,6 +50,13 @@ class ROM:
         assert size <= self.size, \
             "Read %d bytes for ROM %s, but it's specified to only have %d" % (size, self, self.size)
         data = b"".join(data)
+        # calculate checksum
+        if 1:
+            csum = 0
+            for ptr in range(0, len(data)-8, 4):
+                v = struct.unpack("<i", data[ptr:ptr+4])
+                csum = (csum + v[0]) & 0xffffffff
+            print("checksum for %s with len %d: %08x" % (repr(self.files), len(data), csum))
         return (data, size)
 
     def as_source_proto(self):
@@ -252,7 +259,7 @@ def FlashImage(roms,
     assert(len(bootloader_bank) == bootloader_bank_size)
 
     # Now put it all together
-    flash = bootloader_bank + flash
+    flash = switch_byte_order(bootloader_bank, byte_order) + flash
     assert len(flash) <= flash_size, \
         "An error occurred: flash ended up %d bytes long and should be max %d" % (len(flash), flash_size)
 
