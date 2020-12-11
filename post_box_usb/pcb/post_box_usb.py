@@ -38,9 +38,9 @@
 # cable, and prevents the target machine from taking power from the output
 # buffer.
 
-# -----------------------------------------------------------------
-# r1: Brainstorming how to deal with reverse polarity (fixed in r2)
-# -----------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# r1: Brainstorming how to deal with reverse polarity (improved in r2, fixed? in r3)
+# ----------------------------------------------------------------------------------
 
 # If the target connector is plugged in backwards, the following happens:
 
@@ -108,15 +108,34 @@
 # If I've worked this through correctly, it should now be safe to leave the
 # adapter plugged in backwards indefinitely without damage.
 
+# ------------------
+# Changes made in r3
+# ------------------
+
+# done(r3) switch power protection to mosfet (PMV65XP,215)
+# done(r3) add test points for testreq/testack to make them easy to scope
+# done(r3) change testreq resistor to 68R and remove ground shunt (set to 0R)
+
 # -------------------------------------------------
 # Things that have been done, or are still to do...
 # -------------------------------------------------
 
-# TODO(r2) make a test script that can set up a board and validate it by testing the ibx250 or a3000
-# TODO(r2) add disable mode to post_box_usb firmware, so it doesn't cause machines to hang on boot when there's no serial connection.
-# TODO(r2) make post_box_usb board.py better at finding the serial port, because it's terrible on windows
-# TODO(r2) see if i can make the firmware buildable (or at least flashable) without the full arduino system
-# TODO(r2) try programming the FPGA from the MCU
+# TODO make a test script that can set up a board and validate it by testing the ibx250 or a3000
+# TODO add disable mode to post_box_usb firmware, so it doesn't cause machines to hang on boot when there's no serial connection.
+# TODO make post_box_usb board.py better at finding the serial port, because it's terrible on windows
+# TODO see if i can make the firmware buildable (or at least flashable) without the full arduino system
+
+# TODO(r3) verify that the A5000 reset issue isn't because of the BAT54
+# nope(r3) get rid of ground shunt?  or just not fit it?  make a breakable link? -- i'll leave it there but fit a link.
+# done(r3) make diode footprint bigger
+#  currently using Diode_SMD:D_SOD-323_HandSoldering, but BAT54GW is SOD123!
+#  switch to Diode_SMD:D_SOD-123.
+# done(r3) make led footprints smaller
+#  https://www.we-online.de/katalog/datasheet/150080RS75000.pdf
+#  LED package is 2mm wide; recommended land pattern 3.2 wide with 1.1mm wide 1.2mm tall pads.
+#  LED_SMD:LED_0805_2012Metric looks right.
+
+# done(r2) try programming the FPGA from the MCU
 
 # done(r1) Verify 74HCT125 and 74LCX125 pinout and wiring
 # done(r1) Verify that 1k series resistor and 10k pullup are sensible.
@@ -232,23 +251,23 @@ swd2 = myelin_kicad_pcb.Component(
 
 # yellow LED that lights when the USB side of the board is powered
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
-power_led = myelin_kicad_pcb.DSOD323("power", "GND", "power_led_anode", ref="L1")
+power_led = myelin_kicad_pcb.LED0805("power", "GND", "power_led_anode", ref="L1")
 
 # yellow LED that lights when the USB serial port is connected (and flashes on traffic)
 mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R12")
-mcu_txd_led = myelin_kicad_pcb.DSOD323("led", "mcu_RXD", "mcu_txd_led_anode", ref="L2")
+mcu_txd_led = myelin_kicad_pcb.LED0805("led", "mcu_RXD", "mcu_txd_led_anode", ref="L2")
 
 # NF
 mcu_rxd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_rxd_led_anode", ref="R13")
-mcu_rxd_led = myelin_kicad_pcb.DSOD323("link/act", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
+mcu_rxd_led = myelin_kicad_pcb.LED0805("link/act", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
 
 # green LED to indicate that target is powered
 target_power_led_r = myelin_kicad_pcb.R0805("330R", "target_5V_ext", "target_power_led_anode", ref="R21")
-target_power_led = myelin_kicad_pcb.DSOD323("target pwr", "target_GND", "target_power_led_anode", ref="L4")
+target_power_led = myelin_kicad_pcb.LED0805("target pwr", "target_GND", "target_power_led_anode", ref="L4")
 
 # red LED mounted in reverse: this will light when the POST connector is plugged in backwards
 target_power_reversed_led_r = myelin_kicad_pcb.R0805("330R", "target_GND", "target_power_reversed_led_anode", ref="R22")
-target_power_reversed_led = myelin_kicad_pcb.DSOD323("POLARITY", "target_5V_ext", "target_power_reversed_led_anode", ref="L5")
+target_power_reversed_led = myelin_kicad_pcb.LED0805("POLARITY", "target_5V_ext", "target_power_reversed_led_anode", ref="L5")
 
 # Micro USB socket, mounted on the bottom of the board
 micro_usb = myelin_kicad_pcb.Component(
@@ -371,7 +390,6 @@ reset_header = myelin_kicad_pcb.Component(
     ],
 )
 
-# TODO commit lattice_tn100 part to myelin-kicad.pretty repo
 # Lattice lcmxo256 MachXO FPGA, in 100-pin TQFP package
 fpga = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:lattice_tn100",  # 14x14mm 100-pin TQFP
@@ -763,6 +781,20 @@ post_header = myelin_kicad_pcb.Component(
     ],
 )
 
+test_header = myelin_kicad_pcb.Component(
+    footprint="Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
+    identifier="TEST",
+    value="pins",
+    pins=[
+        Pin(1, "", "target_5V_ext"),
+        Pin(2, "", "target_D0"),
+        Pin(3, "", "target_testreq_ext"),
+        Pin(4, "", "target_testack_ext"),
+        Pin(5, "", "target_reset_ext"),
+        Pin(6, "", "target_GND"),
+    ],
+)
+
 # Fuses, from an earlier attempt at r2 which put fuses on target_5V and
 # target_GND rather than a protection diode and some resistors.
 
@@ -789,11 +821,21 @@ post_header = myelin_kicad_pcb.Component(
 #     ),
 # ]
 
+target_5V_mosfet = myelin_kicad_pcb.Component(
+    footprint="Package_TO_SOT_SMD:SOT-23",
+    identifier="U2",
+    value="PMV65XP,215",
+    pins=[
+        Pin(1, "G", "target_GND"),
+        Pin(2, "S", "target_5V"),
+        Pin(3, "D", "target_5V_ext"),
+    ],
+)
+
 # What is the footprint for an appropriate polyfuse here?
 # target_5V_fuse = myelin_kicad_pcb.R0805("PTC", "target_5V_unfused", "target_5V_fused", ref="F2")
 # target_GND_fuse = myelin_kicad_pcb.R0805("PTC", "target_GND_unfused", "target_GND", ref="F1")
 
-target_5V_diode = myelin_kicad_pcb.DSOD323("BAT54", "target_5V", "target_5V_ext", ref="D1")  # 5V_ext ->|- 5V
 target_5V_protection = myelin_kicad_pcb.R0805("1k", "target_5V", "target_5V_r", ref="R14")  # for LCX input
 
 target_D0_pullup = myelin_kicad_pcb.R0805("2k2", "target_D0", "target_5V", ref="R6")
@@ -802,10 +844,13 @@ target_D0_pullup = myelin_kicad_pcb.R0805("2k2", "target_D0", "target_5V", ref="
 target_testreq_pullup = myelin_kicad_pcb.R0805("100k", "target_testreq", "target_5V", ref="R23")
 
 # Protection resistors and diodes from req/ack/reset lines
-target_testreq_protection = myelin_kicad_pcb.R0805("1k", "target_testreq_ext", "target_testreq", ref="R15")  # for LCX input
+target_testreq_protection = myelin_kicad_pcb.R0805("68R", "target_testreq_ext", "target_testreq", ref="R15")  # for LCX input
 target_testack_protection = myelin_kicad_pcb.R0805("68R", "target_testack_ext", "target_testack", ref="R16")
 target_reset_protection = myelin_kicad_pcb.R0805("68R", "target_reset_ext", "target_reset_prediode", ref="R17")
-target_reset_diode = myelin_kicad_pcb.DSOD323("BAT54", "target_reset", "target_reset_prediode", ref="D2")  # prediode ->|- reset
+target_reset_diode = myelin_kicad_pcb.DSOD123("BAT54", "target_reset", "target_reset_prediode", ref="D2")  # prediode ->|- reset
+
+# The following resistors are just shunted out, as 110R between the grounds
+# turned out to cause random failures :(
 
 # If the host machine happens to share a ground with the target and the test
 # connector is plugged in backwards, the target's 5V rail will be connected to
@@ -814,9 +859,9 @@ target_reset_diode = myelin_kicad_pcb.DSOD323("BAT54", "target_reset", "target_r
 # 0805 resistors are typically rated at 0.1 W, i.e. 5^2/0.1 = 250 ohms is the lowest they can be.
 # Three 330R in parallel is 110R, so 45 mA will flow in a short condition, which will be fine.
 ground_connection = [
-    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R18"),
-    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R19"),
-    myelin_kicad_pcb.R0805("330R", "target_GND", "GND", ref="R20"),
+    myelin_kicad_pcb.R0805("0R NF", "target_GND", "GND", ref="R18"),
+    myelin_kicad_pcb.R0805("0R NF", "target_GND", "GND", ref="R19"),
+    myelin_kicad_pcb.R0805("0R", "target_GND", "GND", ref="R20"),
 ]
 
 for n in range(50):
