@@ -3,6 +3,7 @@ FPGA	LCMXO256		myelin-kicad:lattice_tn100
 X1	MC146 32768Hz		Crystals:Crystal_SMD_SeikoEpson_MC146-4pin_6.7x1.5mm_HandSoldering
 U1	MCP1700T-3302E/MB		TO_SOT_Packages_SMD:SOT-89-3
 U2	PMV65XP,215		Package_TO_SOT_SMD:SOT-23
+L2	WS2812B-V5		myelin-kicad:WS2812B_PP
 CON	pins		Connector_PinHeader_2.54mm:PinHeader_2x13_P2.54mm_Vertical
 FPGA_IO	pins		Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical
 FPGA_IO2	pins		Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical
@@ -31,7 +32,6 @@ C1	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSold
 C2	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C5	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 L5	POLARITY	Diode 0805: POLARITY	LED_SMD:LED_0805_2012Metric
-L2	led	Diode 0805: led	LED_SMD:LED_0805_2012Metric
 L3	link/act	Diode 0805: link/act	LED_SMD:LED_0805_2012Metric
 L1	power	Diode 0805: power	LED_SMD:LED_0805_2012Metric
 L4	target pwr	Diode 0805: target pwr	LED_SMD:LED_0805_2012Metric
@@ -40,9 +40,9 @@ MCU	ATSAMD21E18A-AU	IC ARM MCU; https://www.digikey.com/products/en?keywords=ATS
 HSBUF	74LCX125M	IC buffer 4-bit OC hot swap; https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
 OUTBUF	74HCT125D	IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401	Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
 USB	usb	Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.	myelin-kicad:micro_usb_b_smd_molex
-R18	0R	Resistor 0805: 0R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R19	0R	Resistor 0805: 0R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R20	0R	Resistor 0805: 0R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R18	0R NF	Resistor 0805: 0R NF	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+R19	0R NF	Resistor 0805: 0R NF	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R23	100k	Resistor 0805: 100k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R1	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R10	10k	Resistor 0805: 10k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
@@ -53,7 +53,6 @@ R2	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R7	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R8	1k	Resistor 0805: 1k	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R6	2k2	Resistor 0805: 2k2	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-R12	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R13	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R21	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 R22	330R	Resistor 0805: 330R	Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder

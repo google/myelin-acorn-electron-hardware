@@ -253,13 +253,22 @@ swd2 = myelin_kicad_pcb.Component(
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
 power_led = myelin_kicad_pcb.LED0805("power", "GND", "power_led_anode", ref="L1")
 
-# yellow LED that lights when the USB serial port is connected (and flashes on traffic)
-mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R12")
-mcu_txd_led = myelin_kicad_pcb.LED0805("led", "mcu_RXD", "mcu_txd_led_anode", ref="L2")
+# multicolor LED - TBD
+multicolor_led = myelin_kicad_pcb.Component(
+    footprint="myelin-kicad:WS2812B_PP",
+    identifier="L2",
+    value="WS2812B-V5",  # Need V5 for 3.3V compatibility on DI pin
+    pins=[
+        Pin(1, "5V", "5V"),
+        Pin(2, "DO", ""),
+        Pin(3, "GND", "GND"),
+        Pin(4, "DI", "PA19"),
+    ],
+)
 
-# NF
-mcu_rxd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_rxd_led_anode", ref="R13")
-mcu_rxd_led = myelin_kicad_pcb.LED0805("link/act", "mcu_TXD", "mcu_rxd_led_anode", ref="L3")
+# yellow LED that lights when the USB serial port is connected (and flashes on traffic)
+mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R13")
+mcu_txd_led = myelin_kicad_pcb.LED0805("link/act", "mcu_TXD", "mcu_txd_led_anode", ref="L3")
 
 # green LED to indicate that target is powered
 target_power_led_r = myelin_kicad_pcb.R0805("330R", "target_5V_ext", "target_power_led_anode", ref="R21")
