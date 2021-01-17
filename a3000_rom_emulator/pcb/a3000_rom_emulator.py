@@ -340,7 +340,7 @@ cpld = myelin_kicad_pcb.Component(
 )
 # This chip has a ton of power pins!  Add a ton of capacitors.
 cpld_caps = [
-    myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="CC%d" % n)
+    myelin_kicad_pcb.C0805("100n NF", "3V3", "GND", ref="CC%d" % n)
     for n in range(2)
 ] + [
     myelin_kicad_pcb.C0402("100n", "3V3", "GND", ref="CC%d" % n)
@@ -493,7 +493,7 @@ flash = [
 ]
 # Three capacitors per chip (2 x Vio, 1 x Vcc)
 flash_caps = [
-    myelin_kicad_pcb.C0805("100n", "3V3", "GND", ref="FC%d" % n)
+    myelin_kicad_pcb.C0805("100n NF" if n in (2, 5) else "100n", "3V3", "GND", ref="FC%d" % n)
     for n in range(6)
 ]
 

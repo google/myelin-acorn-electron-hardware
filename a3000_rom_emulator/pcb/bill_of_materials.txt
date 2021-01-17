@@ -14,14 +14,14 @@ CC9	100n	Capacitor 0402: 100n	Capacitor_SMD:C_0402_1005Metric
 C10	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C11	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C13	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-CC0	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-CC1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC0	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC1	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC2	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC3	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 FC4	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-FC5	100n	Capacitor 0805: 100n	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC0	100n NF	Capacitor 0805: 100n NF	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+CC1	100n NF	Capacitor 0805: 100n NF	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC2	100n NF	Capacitor 0805: 100n NF	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+FC5	100n NF	Capacitor 0805: 100n NF	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C1	10u	Capacitor 0805: 10u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C12	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 C6	1u	Capacitor 0805: 1u	Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder

@@ -76,27 +76,12 @@ C13
 - Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
-CC0
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-CC1
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
 FC0
 - Value: 100n
 - Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 FC1
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-FC2
 - Value: 100n
 - Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
@@ -111,9 +96,24 @@ FC4
 - Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+CC0
+- Value: 100n NF
+- Description: Capacitor 0805: 100n NF
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+CC1
+- Value: 100n NF
+- Description: Capacitor 0805: 100n NF
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+FC2
+- Value: 100n NF
+- Description: Capacitor 0805: 100n NF
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 FC5
-- Value: 100n
-- Description: Capacitor 0805: 100n
+- Value: 100n NF
+- Description: Capacitor 0805: 100n NF
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C1
