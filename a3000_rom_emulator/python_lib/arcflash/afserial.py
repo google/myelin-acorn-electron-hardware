@@ -16,15 +16,47 @@ from __future__ import print_function
 import glob
 import os
 import serial
+import serial.tools.list_ports
 
 def guess_port():
-    port = os.environ.get('ROM_PORT')
+    # Look for modern ARCFLASH_PORT env var
+    port = os.environ.get("ARCFLASH_PORT")
     if port:
+        print("Using %s from ARCFLASH_PORT environment variable" % port)
         return port
-    for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbmodem* /dev/tty.usbserial* /dev/tty.wchusbserial*".split():
-        matches = glob.glob(pattern)
-        if matches:
-            return matches[0]
+
+    # Look for old-style ROM_PORT env var
+    port = os.environ.get("ROM_PORT")
+    if port:
+        print("Using %s from ROM_PORT environment variable" % port)
+        return port
+
+    # Try to detect a connected Arcflash or Circuit Playground
+    arcflash_port = circuitplay_port = None
+    for port in serial.tools.list_ports.comports():
+        print(port.device,
+            port.product,
+            port.hwid,
+            port.vid,
+            port.pid,
+            port.manufacturer,
+        )
+        if port.vid == 0x1209 and port.pid == 0xFE07:
+            print("Found an Arcflash at %s" % port.device)
+            arcflash_port = port.device
+        elif port.vid == 0x239A and port.pid in (0x0018, 0x8018):
+            print("Found a Circuit Playground Express at %s" % port.device)
+            circuitplay_port = port.device
+
+    if arcflash_port:
+        print("Detected an Arcflash on %s" % arcflash_port)
+        return arcflash_port
+
+    if circuitplay_port:
+        print("Detected a Circuit Playground (probably an Arcflash) on %s" % circuitplay_port)
+        return circuitplay_port
+
+    raise Exception("Could not find a connected Arcflash")
 
 class Port:
     def __init__(self):
