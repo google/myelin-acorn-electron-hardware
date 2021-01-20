@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 
 import serial.tools.list_ports
@@ -7,7 +8,7 @@ assert sys.version_info[0] >= 3, "Python 3+ required"
 
 def cmd(s):
     print(s)
-    return os.system(s)
+    return subprocess.check_call(s, shell=True)
 
 here = os.getcwd()
 build_path = os.path.join(
