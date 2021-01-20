@@ -5,14 +5,21 @@ import serial.tools.list_ports
 
 assert sys.version_info[0] >= 3, "Python 3+ required"
 
+def cmd(s):
+    print(s)
+    return os.system(s)
+
 here = os.getcwd()
 build_path = os.path.join(
     here,
     "build_output_%s" % sys.platform,  # just in case things differ between platforms
 )
 
-arduino_cli = "arduino-cli"  # in case we need a path to it at some point
-std_args = "--verbose --fqbn arduino:samd:adafruit_circuitplayground_m0"
+# Allow overriding arduino-cli with a local version
+arduino_cli = os.environ.get("ARDUINO_CLI", "arduino-cli")
+
+# std_args = "--verbose --fqbn arduino:samd:adafruit_circuitplayground_m0"
+std_args = "--verbose --fqbn myelin:samd:arcflash --config-file ./arduino-cli.json"
 
 # Figure out where the Arcflash is plugged in
 upload_port = None
@@ -40,15 +47,36 @@ if not upload_port:
 
 print("Using %s as the upload port" % upload_port)
 
-os.system("%s compile %s --libraries src --build-path %s" % (
+# Copy xsvftool if necessary
+xsvf_path = "../../third_party/libxsvf"
+xsvf_dest = "src/libxsvf"
+os.makedirs(xsvf_dest, exist_ok=True)
+for f in os.listdir(xsvf_path):
+    if os.path.splitext(f)[1] not in (".c", ".cpp", ".h"): continue
+    if f in ("xsvftool-ft232h.c", "xsvftool-gpio.c"): continue
+    src = os.path.join(xsvf_path, f)
+    dest = os.path.join(xsvf_dest, f)
+
+    content = open(src).read()
+    if not os.path.exists(dest) or open(dest).read() != content:
+        open(dest, "w").write(content)
+        print("  %s -> %s" % (src, dest))
+
+# Build it
+cmd("%s compile %s --libraries src --build-path %s" % (
     arduino_cli,
     std_args,
     build_path,
 ))
 
-os.system("%s upload %s --port %s --input-dir %s" % (
+# And upload to the Arcflash board
+cmd("%s upload %s --port %s --input-dir %s" % (
     arduino_cli,
     std_args,
     upload_port,
     build_path,
 ))
+
+print("\n"
+      "Done!  If you get a popup about ARCBOOT not being ejected properly, ignore it;\n"
+      "it's a side effect of the UF2 bootloader resetting after the download.")
