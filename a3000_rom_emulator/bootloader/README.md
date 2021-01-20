@@ -14,13 +14,12 @@ To program into an Arcflash with a working bootloader, [install arduino-cli](htt
 ~~~
 cp update-bootloader-*.ino bootloader.ino
 arduino-cli compile --verbose --fqbn arduino:samd:adafruit_circuitplayground_m0
+# Use /dev/ttyACM* (Linux) or COMn (Windows) here:
 arduino-cli upload --verbose --fqbn arduino:samd:adafruit_circuitplayground_m0 --port /dev/tty.usbmodem*
 ~~~
 
 To rebuild:
 
 ~~~
-git clone https://github.com/myelin/uf2-samdx1.git
-(cd uf2-samdx1; make BOARD=myelin_arcflash)
-cp uf2-samdx1/build/myelin_arcflash/{bootloader-*.bin,update-*.{ino,uf2}} ./
+make clean build
 ~~~
