@@ -81,7 +81,7 @@ show-results:
 # Program using a simple_cpld_programmer board
 
 program:
-	python ${SHARED_PATH}/../simple_cpld_programmer/tools/program_cpld.py ${MODULE}-${PART}.svf
+	python3 ${SHARED_PATH}/../simple_cpld_programmer/tools/program_cpld.py ${MODULE}-${PART}.svf
 
 # Program using xc3sprog and an FTDI board
 

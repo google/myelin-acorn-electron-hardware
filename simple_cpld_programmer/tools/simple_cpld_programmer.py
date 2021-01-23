@@ -14,14 +14,26 @@ from __future__ import print_function
 # limitations under the License.
 
 import glob
+
 import serial
+import serial.tools.list_ports
 
 def guess_port():
-    port = None
-    for pattern in "/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbmodem* /dev/tty.usbserial* /dev/tty.wchusbserial*".split():
-        matches = glob.glob(pattern)
-        if matches:
-            return matches[0]
+    # Try to detect a connected Arduino-like device
+    arcflash_port = circuitplay_port = None
+    for port in serial.tools.list_ports.comports():
+        print(port.device,
+            port.product,
+            port.hwid,
+            port.vid,
+            port.pid,
+            port.manufacturer,
+        )
+        if not port.vid:
+            # Virtual device -- this isn't it
+            continue
+        print("Found something that looks like a serial port at %s" % port.device)
+        return port.device
 
 class Port:
     def __init__(self):

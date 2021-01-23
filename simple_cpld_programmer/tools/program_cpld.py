@@ -20,9 +20,13 @@ import simple_cpld_programmer
 import sys
 import time
 
+
+assert sys.version_info[0] >= 3, "Python 3+ required"
+
+
 def main():
     svf_fn, = sys.argv[1:]
-    svf = open(svf_fn).read() + "\n\x04"
+    svf = open(svf_fn, "rb").read() + b"\n\x04"
 
     with simple_cpld_programmer.Port() as ser:
         # print("Serial port opened:", ser)
@@ -33,22 +37,22 @@ def main():
             print(repr(r))
             time.sleep(0.1)
 
-        ser.write("C\n")
+        ser.write(b"C\n")
 
-        resp = ''
+        resp = b''
         print("Waiting for SEND SVF")
         while True:
             r = ser.read(1024)
             if r:
                 resp += r
                 print(repr(r))
-                if resp.find("SEND SVF") != -1:
+                if resp.find(b"SEND SVF") != -1:
                     print("got SEND SVF - continuing")
                     break
             time.sleep(0.1)
 
         svf_start_time = time.time()
-        resp = ''
+        resp = b''
         SLEEP_TIME = 0.01
         sleep_count = 0
         svf_pos = 0
@@ -68,9 +72,9 @@ def main():
                 n = ser.write(svf[svf_pos:p])
                 if n:
                     stars -= 1
-                    #print("  (%d bytes written)" % n)
-                    #print("  (sent: %s)" % repr(svf[svf_pos:p]))
-                    line_no += svf[svf_pos:p].count("\n")
+                    # print("  (%d bytes written)" % n)
+                    # print("  (sent: %s)" % repr(svf[svf_pos:p]))
+                    line_no += svf[svf_pos:p].count(b"\n")
                     svf_pos += n
 
             while True:
@@ -80,15 +84,15 @@ def main():
                 #print(r)
                 resp += r
                 while True:
-                    p = resp.find("\n")
+                    p = resp.find(b"\n")
                     if p == -1: break
                     line = resp[:p].strip()
-                    if line == "*#":
+                    if line == b"*#":
                         stars += 1
                     else:
                         print("\r%s" % line)
                     resp = resp[p+1:]
-                    if line.find("SVF DONE") != -1:
+                    if line.find(b"SVF DONE") != -1:
                         all_done = True
                         print("all done")
             if not n:

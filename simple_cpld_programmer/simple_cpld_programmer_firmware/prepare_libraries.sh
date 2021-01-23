@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # This script copies various files from //third_party/libxsvf into
-# ./libraries/libxsvf, to make it buildable as an Arduino library.
+# ./src/libxsvf, to make it buildable as an Arduino library.
 
 set -e
 
 SRC=../../third_party/libxsvf
-DEST=libraries/libxsvf
+DEST=src/libxsvf
 
 cd $(dirname $0)
 rm -rf $DEST

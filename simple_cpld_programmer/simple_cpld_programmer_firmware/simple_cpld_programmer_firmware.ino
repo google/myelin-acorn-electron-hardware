@@ -15,7 +15,7 @@
 #if defined(__AVR__)
 #include <avr/power.h>
 #endif
-#include "libxsvf.h"
+#include "src/libxsvf/libxsvf.h"
 
 // This code allows a Pro Micro to program CPLDs by playing commands from an
 // SVF file.
@@ -25,13 +25,13 @@
 
 // Pro Micro pins
 
-// TDO = D18 (PF7)
+// TDO = A0/D18 (PF7) purple
 #define TDO_PIN 18
-// TMS = D19 (PF6)
+// TMS = A1/D19 (PF6) blue
 #define TMS_PIN 19
-// TCK = D20 (PF5)
+// TCK = A2/D20 (PF5) green
 #define TCK_PIN 20
-// TDI = D21 (PF4)
+// TDI = A3/D21 (PF4) yellow
 #define TDI_PIN 21
 
 #else  // ARM board (experimental)
