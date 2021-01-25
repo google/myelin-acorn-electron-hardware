@@ -51,8 +51,8 @@
 //#define NOISY
 
 void setup() {
-  // For some reason the caterina bootloader on Chinese Pro Micro
-  // boards doesn't always set the clock prescaler properly.
+  // For some reason the caterina bootloader on Pro Micro clones
+  // doesn't always set the clock prescaler properly.
   clock_prescale_set(clock_div_1);
 
   // Set pin directions for CPLD JTAG
