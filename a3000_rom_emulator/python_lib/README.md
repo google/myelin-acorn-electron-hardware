@@ -8,7 +8,7 @@ USB.
 
 Project homepage: http://myelin.nz/arcflash
 
-Python library code: https://github.com/google/myelin-acorn-electron-hardware/tree/master/a3000_rom_emulator/python_lib
+Python library code: https://github.com/google/myelin-acorn-electron-hardware/tree/main/a3000_rom_emulator/python_lib
 
 ## Getting started
 

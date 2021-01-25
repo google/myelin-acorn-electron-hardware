@@ -8,7 +8,7 @@ rpcemu, = glob("../../../archimedes/rpcemu*/")
 FlashImage(
 
     # Flip pairs of bytes to match the wiring in the Risc PC adapter PCB v1
-    # https://github.com/google/myelin-acorn-electron-hardware/tree/master/a3000_rom_emulator/riscpc_adapter_pcb
+    # https://github.com/google/myelin-acorn-electron-hardware/tree/main/a3000_rom_emulator/riscpc_adapter_pcb
     byte_order = "2301",
 
     # Skip the bootloader until it works on Risc PC
