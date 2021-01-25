@@ -168,8 +168,8 @@ class ADFSDisk(Disk):
         self.sectors_used.add_space(dir_sector, 5)  # 5 sectors for a dir
         start = dir_sector * 256
         # header at 0:5
-        master_seq_1 = self.read1(start + 0x4fa)
-        print("%s: sequence number: %d" % (dir_name, master_seq_1))
+        main_seq_1 = self.read1(start + 0x4fa)
+        print("%s: sequence number: %d" % (dir_name, main_seq_1))
         header = self.image[start+1:start+5]
         if header != 'Hugo': print("WARNING: bad header: %s" % repr(header))
         # footer at 4cb:500
@@ -183,8 +183,8 @@ class ADFSDisk(Disk):
         dir_title = adfs_string(self.image[start + 0x4d9:start + 0x4ec])
         print("%s: dir title: %s" % (dir_name, repr(dir_title)))
         # 4ec-4f9 reserved
-        master_seq_2 = self.read1(start + 0x4fa)
-        if master_seq_1 != master_seq_2: print("WARNING: master seq mismatch; broken directory")
+        main_seq_2 = self.read1(start + 0x4fa)
+        if main_seq_1 != main_seq_2: print("WARNING: main seq mismatch; broken directory")
         identifier = self.image[start + 0x4fb:start + 0x4ff]
         if identifier != 'Hugo': print("WARNING: bad identifier: %s" % repr(identifier))
         if NOISY: print("checksum: 0x%x" % self.read1(start + 0x4ff))
