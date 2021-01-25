@@ -65,7 +65,7 @@ entity serial_sd_adapter is
 
         -- AVR interface: MISO, MOSI, SCK, /SS, INT.
         -- The first four are a standard SPI port, with the AVR as
-        -- master and CPLD as slave.  INT is an output from the CPLD
+        -- controller and CPLD as peripheral.  INT is an output from the CPLD
         -- that goes high when we have a byte to send to the AVR.
 
         avr_INT : out std_logic;
@@ -92,7 +92,7 @@ architecture Behavioural of serial_sd_adapter is
     signal latched_nPGFC : std_logic := '1';
     signal latched_nPGFD : std_logic := '1';
 
-    ---- Fast SPI port (slave, for AVR) ----
+    ---- Fast SPI port (peripheral, for AVR) ----
 
     signal int_avr_MISO : std_logic; -- output to AVR
 
@@ -139,7 +139,7 @@ architecture Behavioural of serial_sd_adapter is
     signal avr_spi_port_sel : std_logic := '0'; -- port 0 or 1
     signal avr_spi_transmitting : std_logic := '0'; -- toggle avr_TXD_state when done
 
-    ---- SPI (master, for SD card) ---
+    ---- SPI (controller, for SD card) ---
 
     signal bitbang_MOSI : std_logic := '1';
     signal bitbang_SCK : std_logic := '1';
@@ -177,7 +177,7 @@ begin
           else 'Z';
     end generate;
 
-    ---- Fast SPI slave for AVR ---
+    ---- Fast SPI peripheral for AVR ---
 
     nAVR_SPI_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"A0") else '1';
     nAVR_SPI_STATUS_REG_ACCESS <= '0' when (latched_nPGFC = '0' and bbc_A = x"A1") else '1';
