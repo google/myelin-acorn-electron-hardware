@@ -17,12 +17,11 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 from glob import glob
 import os
 from pcbnew import *
 import sys
-
-layer_count = int(os.environ['LAYERS'])
 
 def generate_outputs(fn, fab_output_path, preview_output_path):
 
@@ -129,4 +128,12 @@ def generate_outputs(fn, fab_output_path, preview_output_path):
     drill.CreateDrillandMapFilesSet(fab_output_path, True, False)
 
 if __name__ == '__main__':
-    generate_outputs(sys.argv[1], 'gerber_tmp', '.')
+
+    parser = argparse.ArgumentParser(description='Generate fab outputs.')
+    parser.add_argument('board_fn', type=str, help='Path to kicad_pcb file.')
+    parser.add_argument('--layers', type=int, dest='layers', help='Number of layers to plot.')
+
+    args = parser.parse_args()
+
+    layer_count = args.layers
+    generate_outputs(args.board_fn, 'gerber_tmp', '.')

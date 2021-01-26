@@ -15,6 +15,9 @@
 # This script sets up various expected files in the current folder
 
 import os
+import sys
+
+assert sys.version_info.major >= 3, "Requires Python 3"
 
 name = os.environ['NAME']
 output_name = os.environ['OUTPUT_NAME']
@@ -32,9 +35,10 @@ open(".gitignore", "w").writelines("%s\n" % x for x in sorted(ignore))
 
 # Create fp-lib-table
 if not os.path.exists("fp-lib-table"):
-  print>>open("fp-lib-table", "w"), """(fp_lib_table
+    with open("fp-lib-table", "w") as f:
+        print("""(fp_lib_table
   (lib (name myelin-kicad)(type Github)(uri https://github.com/myelin/myelin-kicad.pretty)(options allow_pretty_writing_to_this_dir=${KIPRJMOD}/../../third_party/myelin-kicad.pretty)(descr ""))
-)"""
+)""", file=f)
 
 # Create empty .pro if it doesn't exist
 if not os.path.exists(pro):
@@ -44,7 +48,8 @@ if not os.path.exists(pro):
 
 # Add default .kicad_pcb if there isn't one
 if not os.path.exists(pcb):
-    print>>open(pcb, "w"), """(kicad_pcb (version 4) (host pcbnew 4.0.6)
+    with open(pcb, "w") as f:
+        print("""(kicad_pcb (version 4) (host pcbnew 4.0.6)
 
   (general
     (links 6)
@@ -151,4 +156,4 @@ if not os.path.exists(pcb):
     (uvia_dia 0.8128)
     (uvia_drill 0.3302)
   )
-)"""
+)""", file=f)

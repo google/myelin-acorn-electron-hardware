@@ -45,7 +45,7 @@ clean:
 	rm -vrf gerber_tmp
 
 setup:
-	NAME=$(NAME) OUTPUT_NAME=$(OUTPUT_NAME) python $(ROOT)/common/setup_defaults.py
+	NAME=$(NAME) OUTPUT_NAME=$(OUTPUT_NAME) python3 $(ROOT)/common/setup_defaults.py
 
 net: $(NAME).net
 
@@ -58,7 +58,8 @@ KICAD_ROOT=/Applications/KiCad/kicad.app
 
 $(OUTPUT_NAME).zip: $(NAME).kicad_pcb
 	rm -rf gerber_tmp
-	PYTHONPATH=$(KICAD_ROOT)/Contents/Frameworks/python/site-packages LAYERS=$(LAYERS) $(KICAD_ROOT)/Contents/Frameworks/Python.framework/Versions/Current/bin/python $(ROOT)/common/build_fab_outputs.py $<
+	PYTHONPATH=$(KICAD_ROOT)/Contents/Frameworks/python/site-packages $(KICAD_ROOT)/Contents/Frameworks/Python.framework/Versions/Current/bin/python $(ROOT)/common/build_fab_outputs.py --layers $(LAYERS) $<
+	#PYTHONPATH="/mnt/c/Program Files/KiCad/lib/python2.7/site-packages" "/mnt/c/Program Files/KiCad/bin/python.exe" $(ROOT)/common/build_fab_outputs.py --layers $(LAYERS) $<
 	cd gerber_tmp && zip ../$(OUTPUT_NAME) *
 	# Build gerber previews using pcb-tools.  If this fails, python3 -m pip install --user pcb-tools; brew install cairo
 	python3 $(ROOT)/common/build_gerber_previews.py
