@@ -1,12 +1,12 @@
 [submodule "third_party/myelin-kicad.pretty"]
 	path = third_party/myelin-kicad.pretty
-	url = git@github.com:myelin/myelin-kicad.pretty
+	url = https://github.com/myelin/myelin-kicad.pretty.git
 [submodule "third_party/Arduino-Makefile"]
 	path = third_party/Arduino-Makefile
-	url = git@github.com:sudar/Arduino-Makefile.git
+	url = https://github.com/sudar/Arduino-Makefile.git
 [submodule "third_party/libxsvf"]
 	path = third_party/libxsvf
-	url = git@github.com:myelin/libxsvf.git
+	url = https://github.com/myelin/libxsvf.git
 [submodule "third_party/pcb-tools"]
 	path = third_party/pcb-tools
-	url = git@github.com:curtacircuitos/pcb-tools.git
+	url = https://github.com/curtacircuitos/pcb-tools.git
