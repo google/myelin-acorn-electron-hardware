@@ -41,4 +41,4 @@ set_global_assignment -name DEVICE AUTO
 set_global_assignment -name TOP_LEVEL_ENTITY 10m04_cpu_socket
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:57:33  JANUARY 29, 2018"
-set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Lite Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "19.1.0 Lite Edition"

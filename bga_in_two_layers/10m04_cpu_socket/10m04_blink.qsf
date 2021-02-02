@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE 10M04SCU169C8G
 set_global_assignment -name TOP_LEVEL_ENTITY cpu_socket_fpga
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "12:21:29  JANUARY 13, 2018"
-set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Lite Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "19.1.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -254,6 +254,7 @@ set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
 set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name VERILOG_FILE uart.v
 set_global_assignment -name VHDL_FILE inferred_ram.vhd
 set_global_assignment -name VHDL_FILE elk_user_flash.vhd
@@ -263,4 +264,3 @@ set_global_assignment -name VHDL_FILE elk_interface.vhd
 set_global_assignment -name VHDL_FILE main_to_elk.vhd
 set_global_assignment -name VHDL_FILE main.vhd
 set_global_assignment -name QIP_FILE uart_fifo.qip
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
