@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE 10M04SCU169C8G
 set_global_assignment -name TOP_LEVEL_ENTITY blink_10m04
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "12:21:29  JANUARY 13, 2018"
-set_global_assignment -name LAST_QUARTUS_VERSION "17.1.0 Lite Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "19.1.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -63,8 +63,6 @@ set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name QSYS_FILE internal_osc.qsys
-set_global_assignment -name VHDL_FILE main.vhd
 
 set_location_assignment PIN_A2 -to c1_11
 set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to c1_11
@@ -245,5 +243,7 @@ set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 3
 set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 1A
 set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 2
 
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name VCCA_USER_VOLTAGE 3.3V
+set_global_assignment -name QSYS_FILE internal_osc.qsys
+set_global_assignment -name VHDL_FILE main.vhd
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
