@@ -11,10 +11,15 @@ def cmd(s):
     return subprocess.check_call(s, shell=True)
 
 here = os.getcwd()
-build_path = os.path.join(
-    here,
-    "build_output_%s" % sys.platform,  # just in case things differ between platforms
-)
+build_path = os.environ.get('ARCFLASH_BUILD')
+if not build_path:
+    build_path = os.path.join(
+        here,
+        "build_output_%s" % sys.platform,  # just in case things differ between platforms
+    )
+
+# By default, we don't cache anything; set ARCFLASH_CACHE=1 to build quicker
+clean_first = os.environ.get("ARCFLASH_CACHE") != "1"
 
 # Allow overriding arduino-cli with a local version
 arduino_cli = os.environ.get("ARDUINO_CLI", "arduino-cli")
@@ -23,7 +28,7 @@ arduino_cli = os.environ.get("ARDUINO_CLI", "arduino-cli")
 std_args = "--verbose --fqbn myelin:samd:arcflash --config-file ./arduino-cli.json"
 
 # Figure out where the Arcflash is plugged in
-upload_port = None
+upload_port = arcflash_port = circuitplay_port = None
 for port in serial.tools.list_ports.comports():
     print(port.device,
         port.product,
@@ -34,14 +39,19 @@ for port in serial.tools.list_ports.comports():
     )
     if port.vid == 0x1209 and port.pid == 0xFE07:
         print("Found an Arcflash at %s" % port.device)
-        upload_port = port.device
+        arcflash_port = port.device
     elif port.vid == 0x239A and port.pid in (0x0018, 0x8018):
         print("Found a Circuit Playground Express at %s" % port.device)
-        upload_port = port.device
+        circuitplay_port = port.device
 
 if "ARCFLASH_PORT" in os.environ:
     upload_port = os.environ["ARCFLASH_PORT"]
     print("Using %s from ARCFLASH_PORT environment variable" % upload_port)
+elif arcflash_port:
+    upload_port = arcflash_port
+elif circuitplay_port:
+    raise Exception("No Arcflash found, only a Circuit Playground Express.  Is this an Arcflash running the old bootloader?  Update the bootloader then try programming firmware again.")
+    upload_port = circuitplay_port
 
 if not upload_port:
     raise Exception("Could not find a connected Arcflash")
@@ -64,20 +74,24 @@ for f in os.listdir(xsvf_path):
         print("  %s -> %s" % (src, dest))
 
 # Build it
-cmd("%s compile %s --libraries src --build-path %s" % (
+cmd("%s compile %s %s --libraries src --build-path %s" % (
     arduino_cli,
+    "--clean" if clean_first else "",
     std_args,
     build_path,
 ))
 
-# And upload to the Arcflash board
-cmd("%s upload %s --port %s --input-dir %s" % (
-    arduino_cli,
-    std_args,
-    upload_port,
-    build_path,
-))
+if upload_port == 'none':
+    print("Skipping uploading as upload_port == none")
+else:
+    # And upload to the Arcflash board
+    cmd("%s upload %s --port %s --input-dir %s" % (
+        arduino_cli,
+        std_args,
+        upload_port,
+        build_path,
+    ))
 
-print("\n"
-      "Done!  If you get a popup about ARCBOOT not being ejected properly, ignore it;\n"
-      "it's a side effect of the UF2 bootloader resetting after the download.")
+    print("\n"
+          "Done!  If you get a popup about ARCBOOT not being ejected properly, ignore it;\n"
+          "it's a side effect of the UF2 bootloader resetting after the download.")

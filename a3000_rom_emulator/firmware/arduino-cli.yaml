@@ -1,2 +1,5 @@
 directories:
   user: .
+board_manager:
+  additional_urls:
+  - https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
