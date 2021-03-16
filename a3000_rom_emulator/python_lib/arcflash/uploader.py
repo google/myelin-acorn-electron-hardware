@@ -78,7 +78,7 @@ def upload(rom):
                 if not m: continue
 
                 start, size = int(m.group(1)), int(m.group(2))
-                print("* Sending data from %d-%d" % (start, start+size))
+                print("* [%.1f%%] Sending data from %d-%d" % (start * 100.0 / len(rom), start, start+size))
                 blk = rom[start:start+size]
                 #print `blk[:64]`
                 while len(blk):
