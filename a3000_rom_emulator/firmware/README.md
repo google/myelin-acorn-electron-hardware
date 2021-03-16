@@ -12,7 +12,7 @@ If you see "Platform not installed" or "Error resolving FQBN" errors, update you
 
 ~~~
 arduino-cli core update-index
-arduino-cli core install arduino:samd
+arduino-cli core install adafruit:samd
 ~~~
 
 If you see linker errors ("Undefined reference to \`Uart::Uart(SERCOM\*, ...") on Windows, just rerun build_and_upload.py; this just seems to happen sometimes (?!)
