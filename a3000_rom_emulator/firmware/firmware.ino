@@ -872,6 +872,36 @@ void loop() {
         reset();
         break;
       }
+      case 'K': {
+        // Continuity check, section 10.16 in the datasheet
+        Serial.println("CONTINUITY CHECK");
+        select_spi();
+
+        flash_write_both(0x555, 0x0071);
+        flash_write_both(0x555, 0x0070);
+        uint32_t status = flash_read(0);
+        Serial.println(status, HEX);  // expect bit zero = 0
+        if (status & 1) {
+          Serial.println("FAIL - FLASH0 continuity check bit is stuck.");
+        }
+        if (status & 0x10000) {
+          Serial.println("FAIL - FLASH1 continuity check bit is stuck.");
+        }
+        flash_write_both(0x2aaa55, 0xff00);
+        flash_write_both(0x1555aa, 0x00ff);
+        flash_write_both(0x555, 0x0070);
+        status = flash_read(0);
+        Serial.println(status, HEX);  // expect bit zero = 1
+        if (!(status & 1)) {
+          Serial.println("FAIL - FLASH0 continuity test did not pass.");
+        }
+        if (!(status & 0x10000)) {
+          Serial.println("FAIL - FLASH1 continuity test did not pass.");
+        }
+        flash_unlock();
+        reset();
+        break;
+      }
       case 'P': {
         while (!Serial.available()) {
           if (check_disconnect()) break;
