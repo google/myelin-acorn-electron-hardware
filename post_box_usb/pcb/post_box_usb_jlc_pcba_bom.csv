@@ -1,0 +1,21 @@
+Comment,Designator,Footprint,LCSC
+Capacitor 0805: 100n,"C3,C4,C8,C9,C10,C11,C12,C14,C15,DC1,DC2",Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C49678
+Capacitor 0805: 100n,C13,Capacitor_SMD:C_0805_2012Metric,C49678
+Capacitor 0805: 1u,"C1,C2,C5",Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C28323
+Diode 0805: POLARITY,L5,LED_SMD:LED_0805_2012Metric,C72037
+Diode 0805: link/act,L3,LED_SMD:LED_0805_2012Metric,C2296
+Diode 0805: power,L1,LED_SMD:LED_0805_2012Metric,C2296
+Diode 0805: target pwr,L4,LED_SMD:LED_0805_2012Metric,C63855
+Diode SOD123: BAT54,D2,Diode_SMD:D_SOD-123,C152458
+IC buffer 4-bit OC,OUTBUF,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,C5962
+IC buffer 4-bit OC hot swap,HSBUF,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,C238953
+P-MOSFET,U2,Package_TO_SOT_SMD:SOT-23,C75561
+Resistor 0805: 0R,R20,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17477
+Resistor 0805: 100k,R23,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17407
+Resistor 0805: 10k,"R1,R9,R10,R11",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17414
+Resistor 0805: 1k,"R2,R7,R8,R14",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17513
+Resistor 0805: 2k2,R6,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17520
+Resistor 0805: 330R,"R3,R13,R21,R22",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17630
+Resistor 0805: 4k7,"R4,R5",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17673
+Resistor 0805: 68R,"R15,R16,R17",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17802
+Surface mount micro USB socket with mounting holes,USB,Connector_USB:USB_Micro-B_Molex-105017-0001,C132563

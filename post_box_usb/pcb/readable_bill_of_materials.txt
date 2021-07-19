@@ -1,80 +1,25 @@
 This is the human-readable bill of materials.
 See bill_of_materials.txt for a terser version suitable for spreadsheet import.
 
-FPGA
-- Value: LCMXO256
-- Description: 
-- KiCad package: myelin-kicad:lattice_tn100
+C3
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
-X1
-- Value: MC146 32768Hz
-- Description: 
-- KiCad package: Crystals:Crystal_SMD_SeikoEpson_MC146-4pin_6.7x1.5mm_HandSoldering
+C4
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
-U1
-- Value: MCP1700T-3302E/MB
-- Description: 
-- KiCad package: TO_SOT_Packages_SMD:SOT-89-3
+C8
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
-U2
-- Value: PMV65XP,215
-- Description: 
-- KiCad package: Package_TO_SOT_SMD:SOT-23
-
-L2
-- Value: WS2812B-V5
-- Description: 
-- KiCad package: myelin-kicad:WS2812B_PP
-
-CON
-- Value: pins
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x13_P2.54mm_Vertical
-
-FPGA_IO
-- Value: pins
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical
-
-FPGA_IO2
-- Value: pins
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical
-
-POST
-- Value: pins
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
-
-TEST
-- Value: pins
-- Description: 
-- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
-
-PWR
-- Value: reset
-- Description: 
-- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
-
-RST
-- Value: reset
-- Description: 
-- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
-
-SWD2
-- Value: swd
-- Description: 
-- KiCad package: Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD
-
-HOST
-- Value: usb host
-- Description: 
-- KiCad package: Connectors:USB_A
-
-FPGA_JTAG
-- Value: lattice jtag
-- Description: 2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.
-- KiCad package: Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical
+C9
+- Value: 100n
+- Description: Capacitor 0805: 100n
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C10
 - Value: 100n
@@ -106,26 +51,6 @@ C15
 - Description: Capacitor 0805: 100n
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
-C3
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-C4
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-C8
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-C9
-- Value: 100n
-- Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
 DC1
 - Value: 100n
 - Description: Capacitor 0805: 100n
@@ -134,16 +59,6 @@ DC1
 DC2
 - Value: 100n
 - Description: Capacitor 0805: 100n
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-C6
-- Value: 15p
-- Description: Capacitor 0805: 15p
-- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-C7
-- Value: 15p
-- Description: Capacitor 0805: 15p
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 C1
@@ -160,6 +75,21 @@ C5
 - Value: 1u
 - Description: Capacitor 0805: 1u
 - KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C6
+- Value: NF 15p
+- Description: Capacitor 0805: NF 15p
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+C7
+- Value: NF 15p
+- Description: Capacitor 0805: NF 15p
+- KiCad package: Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+X1
+- Value: NF MC146 32768Hz
+- Description: Crystal 32726Hz
+- KiCad package: Crystals:Crystal_SMD_SeikoEpson_MC146-4pin_6.7x1.5mm_HandSoldering
 
 L5
 - Value: POLARITY
@@ -186,39 +116,79 @@ D2
 - Description: Diode SOD123: BAT54
 - KiCad package: Diode_SMD:D_SOD-123
 
+FPGA
+- Value: LCMXO256
+- Description: FPGA 256 LUT
+- KiCad package: myelin-kicad:lattice_tn100
+
 MCU
 - Value: ATSAMD21E18A-AU
 - Description: IC ARM MCU; https://www.digikey.com/products/en?keywords=ATSAMD21E18A-AU-ND
 - KiCad package: Housings_QFP:TQFP-32_7x7mm_Pitch0.8mm
 
-HSBUF
-- Value: 74LCX125M
-- Description: IC buffer 4-bit OC hot swap; https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496
-- KiCad package: Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
-
 OUTBUF
 - Value: 74HCT125D
-- Description: IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401
+- Description: IC buffer 4-bit OC
 - KiCad package: Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
 
-USB
-- Value: usb
-- Description: Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.
-- KiCad package: myelin-kicad:micro_usb_b_smd_molex
+HSBUF
+- Value: 74LCX125M
+- Description: IC buffer 4-bit OC hot swap
+- KiCad package: Package_SO:SOIC-14_3.9x8.7mm_P1.27mm
+
+U2
+- Value: PMV65XP,215
+- Description: P-MOSFET
+- KiCad package: Package_TO_SOT_SMD:SOT-23
+
+PWR
+- Value: NF power
+- Description: Pin header 0.1 inch 1x2
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+
+RST
+- Value: NF reset
+- Description: Pin header 0.1 inch 1x2
+- KiCad package: Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm
+
+TEST
+- Value: NF pins
+- Description: Pin header 0.1 inch 1x6
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
+
+POST
+- Value: pins
+- Description: Pin header 0.1 inch 1x6
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
+
+CON
+- Value: NF pins
+- Description: Pin header 0.1 inch 2x13
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x13_P2.54mm_Vertical
+
+FPGA_IO
+- Value: NF pins
+- Description: Pin header 0.1 inch 2x20
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical
+
+FPGA_JTAG
+- Value: NF lattice jtag
+- Description: Pin header 0.1 inch 2x5 for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.
+- KiCad package: Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical
+
+FPGA_IO2
+- Value: NF pins
+- Description: Pin header 0.1 inch 2x8
+- KiCad package: Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical
+
+L2
+- Value: WS2812B-V5
+- Description: RGB LED
+- KiCad package: myelin-kicad:WS2812B_PP
 
 R20
 - Value: 0R
 - Description: Resistor 0805: 0R
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R18
-- Value: 0R NF
-- Description: Resistor 0805: 0R NF
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R19
-- Value: 0R NF
-- Description: Resistor 0805: 0R NF
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 R23
@@ -231,6 +201,11 @@ R1
 - Description: Resistor 0805: 10k
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+R9
+- Value: 10k
+- Description: Resistor 0805: 10k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 R10
 - Value: 10k
 - Description: Resistor 0805: 10k
@@ -239,16 +214,6 @@ R10
 R11
 - Value: 10k
 - Description: Resistor 0805: 10k
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R9
-- Value: 10k
-- Description: Resistor 0805: 10k
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R14
-- Value: 1k
-- Description: Resistor 0805: 1k
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 R2
@@ -266,9 +231,19 @@ R8
 - Description: Resistor 0805: 1k
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+R14
+- Value: 1k
+- Description: Resistor 0805: 1k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 R6
 - Value: 2k2
 - Description: Resistor 0805: 2k2
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R3
+- Value: 330R
+- Description: Resistor 0805: 330R
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 R13
@@ -282,11 +257,6 @@ R21
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
 R22
-- Value: 330R
-- Description: Resistor 0805: 330R
-- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
-
-R3
 - Value: 330R
 - Description: Resistor 0805: 330R
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
@@ -315,4 +285,34 @@ R17
 - Value: 68R
 - Description: Resistor 0805: 68R
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R18
+- Value: NF 0R
+- Description: Resistor 0805: NF 0R
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R19
+- Value: NF 0R
+- Description: Resistor 0805: NF 0R
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+SWD2
+- Value: swd
+- Description: SWD header - ARM standard
+- KiCad package: Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD
+
+USB
+- Value: usb
+- Description: Surface mount micro USB socket with mounting holes
+- KiCad package: Connector_USB:USB_Micro-B_Molex-105017-0001
+
+HOST
+- Value: NF usb host
+- Description: USB-A socket
+- KiCad package: Connectors:USB_A
+
+U1
+- Value: MCP1700T-3302E/MB
+- Description: Voltage regulator 3.3V
+- KiCad package: TO_SOT_Packages_SMD:SOT-89-3
 

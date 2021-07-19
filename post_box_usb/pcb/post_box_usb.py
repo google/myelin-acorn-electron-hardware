@@ -125,7 +125,8 @@
 # TODO make post_box_usb board.py better at finding the serial port, because it's terrible on windows
 # TODO see if i can make the firmware buildable (or at least flashable) without the full arduino system
 
-# TODO(r3) verify that the A5000 reset issue isn't because of the BAT54
+# TODO(r4) Add a 1k resistor between 5V and GND to stop 10k resistors from pulling 5V up high enough to run LEDs
+# TODO(r4) verify that the A5000 reset issue isn't because of the BAT54
 # nope(r3) get rid of ground shunt?  or just not fit it?  make a breakable link? -- i'll leave it there but fit a link.
 # done(r3) make diode footprint bigger
 #  currently using Diode_SMD:D_SOD-323_HandSoldering, but BAT54GW is SOD123!
@@ -211,6 +212,7 @@ swd = myelin_kicad_pcb.Component(
     footprint="Tag-Connect_TC2030-IDC-FP_2x03_P1.27mm_Vertical",
     identifier="SWD",
     value="swd",
+    desc="SWD header - Tag-Connect TC2030",
     exclude_from_bom=True,
     pins=[
         # Tag-Connect SWD layout: http://www.tag-connect.com/Materials/TC2030-CTX.pdf
@@ -229,6 +231,7 @@ swd2 = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD",
     identifier="SWD2",
     value="swd",
+    desc="SWD header - ARM standard",
     pins=[
         # Pin numbers zig-zag:
         # 1 VCC  2 SWDIO
@@ -251,13 +254,14 @@ swd2 = myelin_kicad_pcb.Component(
 
 # yellow LED that lights when the USB side of the board is powered
 power_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "power_led_anode", ref="R3")
-power_led = myelin_kicad_pcb.LED0805("power", "GND", "power_led_anode", ref="L1")
+power_led = myelin_kicad_pcb.LED0805("power", "GND", "power_led_anode", ref="L1", jlc_part="C2296")  # JLC: 17-21SUYC/TR8
 
 # multicolor LED - TBD
 multicolor_led = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:WS2812B_PP",
     identifier="L2",
     value="WS2812B-V5",  # Need V5 for 3.3V compatibility on DI pin
+    desc="RGB LED",
     pins=[
         Pin(1, "5V", "5V"),
         Pin(2, "DO", ""),
@@ -268,22 +272,24 @@ multicolor_led = myelin_kicad_pcb.Component(
 
 # yellow LED that lights when the USB serial port is connected (and flashes on traffic)
 mcu_txd_led_r = myelin_kicad_pcb.R0805("330R", "3V3", "mcu_txd_led_anode", ref="R13")
-mcu_txd_led = myelin_kicad_pcb.LED0805("link/act", "mcu_TXD", "mcu_txd_led_anode", ref="L3")
+mcu_txd_led = myelin_kicad_pcb.LED0805("link/act", "mcu_TXD", "mcu_txd_led_anode", ref="L3", jlc_part="C2296")  # JLC: 17-21SUYC/TR8
 
 # green LED to indicate that target is powered
 target_power_led_r = myelin_kicad_pcb.R0805("330R", "target_5V_ext", "target_power_led_anode", ref="R21")
-target_power_led = myelin_kicad_pcb.LED0805("target pwr", "target_GND", "target_power_led_anode", ref="L4")
+target_power_led = myelin_kicad_pcb.LED0805("target pwr", "target_GND", "target_power_led_anode", ref="L4", jlc_part="C63855")  # JLC: 17-21/GHC-XS1T2M/3T
 
 # red LED mounted in reverse: this will light when the POST connector is plugged in backwards
 target_power_reversed_led_r = myelin_kicad_pcb.R0805("330R", "target_GND", "target_power_reversed_led_anode", ref="R22")
-target_power_reversed_led = myelin_kicad_pcb.LED0805("POLARITY", "target_5V_ext", "target_power_reversed_led_anode", ref="L5")
+target_power_reversed_led = myelin_kicad_pcb.LED0805("POLARITY", "target_5V_ext", "target_power_reversed_led_anode", ref="L5", jlc_part="C72037")  # JLC: 17-21SURC/S530-A3/TR8
 
 # Micro USB socket, mounted on the bottom of the board
 micro_usb = myelin_kicad_pcb.Component(
-    footprint="myelin-kicad:micro_usb_b_smd_molex",
+    footprint="Connector_USB:USB_Micro-B_Molex-105017-0001",
     identifier="USB",
     value="usb",
-    desc="Molex 1050170001 (Digikey WM1399CT-ND) surface mount micro USB socket with mounting holes.",
+    jlc_part="C132563",  # Amphenol 10118194-0001LF
+    link="https://www.digikey.com/en/products/detail/molex/1050170001/2350832",
+    desc="Surface mount micro USB socket with mounting holes",
     pins=[
         Pin(1, "V", ["5V"]),  # input from host
         Pin(2, "-", ["USBDM"]),
@@ -297,7 +303,8 @@ micro_usb = myelin_kicad_pcb.Component(
 usb_host = myelin_kicad_pcb.Component(
     footprint="Connectors:USB_A",
     identifier="HOST",
-    value="usb host",
+    value="NF usb host",
+    desc="USB-A socket",
     pins=[
         Pin(1, "V", ["5V"]),  # output to device
         Pin(2, "-", ["USBDM"]),
@@ -317,18 +324,20 @@ usb_host = myelin_kicad_pcb.Component(
 xtal = myelin_kicad_pcb.Component(
     footprint="Crystals:Crystal_SMD_SeikoEpson_MC146-4pin_6.7x1.5mm_HandSoldering",
     identifier="X1",
-    value="MC146 32768Hz",
+    desc="Crystal 32726Hz",
+    value="NF MC146 32768Hz",
     pins=[
         Pin(1, "X1", ["XTAL_IN"]),
         Pin(4, "X2", ["XTAL_OUT"]),
     ],
 )
-xtal_cap1 = myelin_kicad_pcb.C0805("15p", "GND", "XTAL_IN", ref="C6")
-xtal_cap1 = myelin_kicad_pcb.C0805("15p", "GND", "XTAL_OUT", ref="C7")
+xtal_cap1 = myelin_kicad_pcb.C0805("NF 15p", "GND", "XTAL_IN", ref="C6")
+xtal_cap1 = myelin_kicad_pcb.C0805("NF 15p", "GND", "XTAL_OUT", ref="C7")
 
 regulator = myelin_kicad_pcb.Component(
     footprint="TO_SOT_Packages_SMD:SOT-89-3",
     identifier="U1",
+    desc="Voltage regulator 3.3V",
     value="MCP1700T-3302E/MB",
     pins=[
         Pin(2, "VIN", ["5V"]),
@@ -348,7 +357,8 @@ reg_out_cap = myelin_kicad_pcb.C0805("1u", "3V3", "GND", ref="C2")
 pin_header = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x13_P2.54mm_Vertical",
     identifier="CON",
-    value="pins",
+    value="NF pins",
+    desc="Pin header 0.1 inch 2x13",
     pins=[
         Pin(1, "", ["3V3"]),
         Pin(2, "", ["GND"]),
@@ -382,7 +392,8 @@ pin_header = myelin_kicad_pcb.Component(
 power_header = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
     identifier="PWR",
-    value="reset",
+    value="NF power",
+    desc="Pin header 0.1 inch 1x2",
     pins=[
         Pin(1, "", ["3V3"]),
         Pin(2, "", ["5V"]),
@@ -392,7 +403,8 @@ power_header = myelin_kicad_pcb.Component(
 reset_header = myelin_kicad_pcb.Component(
     footprint="Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm",
     identifier="RST",
-    value="reset",
+    value="NF reset",
+    desc="Pin header 0.1 inch 1x2",
     pins=[
         Pin(1, "", ["GND"]),
         Pin(2, "", ["mcu_RESET"]),
@@ -404,6 +416,7 @@ fpga = myelin_kicad_pcb.Component(
     footprint="myelin-kicad:lattice_tn100",  # 14x14mm 100-pin TQFP
     identifier="FPGA",
     value="LCMXO256",
+    desc="FPGA 256 LUT",
     pins=[
         Pin(  1, "PL2A",         "fpga_GPIO47"),
         Pin(  2, "PL2B",         "fpga_GPIO44"),
@@ -537,8 +550,8 @@ fpga_caps = [
 fpga_jtag = myelin_kicad_pcb.Component(
     footprint="Connector_Multicomp:Multicomp_MC9A12-1034_2x05_P2.54mm_Vertical",
     identifier="FPGA_JTAG",
-    value="lattice jtag",
-    desc="2x5 header for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
+    value="NF lattice jtag",
+    desc="Pin header 0.1 inch 2x5 for JTAG programming.  Use generic 0.1 inch header strip or Digikey ED1543-ND.",
     pins=[
         Pin( 1, "TCK",  "fpga_TCK"), # top left
         Pin( 2, "GND",  "GND"),      # top right
@@ -556,7 +569,8 @@ fpga_jtag = myelin_kicad_pcb.Component(
 fpga_gpio = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical",
     identifier="FPGA_IO",
-    value="pins",
+    value="NF pins",
+    desc="Pin header 0.1 inch 2x20",
     pins=[
         Pin( 1, "", ["GND"]),
         Pin( 2, "", ["3V3"]),
@@ -604,7 +618,8 @@ fpga_gpio = myelin_kicad_pcb.Component(
 fpga_gpio_top = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_2x08_P2.54mm_Vertical",
     identifier="FPGA_IO2",
-    value="pins",
+    value="NF pins",
+    desc="Pin header 0.1 inch 2x8",
     pins=[
         Pin( 1, "", ["GND"]),
         Pin( 2, "", ["3V3"]),
@@ -645,8 +660,10 @@ hotswap_buf = [
             footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
             identifier=ident,
             value="74LCX125M",
+            jlc_part="C238953",  # Extended, min qty 2500 if they don't have it in stock
             # https://www.onsemi.com/products/standard-logic/buffers/74lcx125
-            desc="IC buffer 4-bit OC hot swap; https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496",
+            desc="IC buffer 4-bit OC hot swap",
+            link="https://www.digikey.com/product-detail/en/on-semiconductor/74LCX125MX/74LCX125MXCT-ND/965496",
             pins=[
                 Pin( 1, "1nOE", conn[0][0]),
                 Pin( 2, "1A",   conn[0][1]),
@@ -741,7 +758,9 @@ out_buf = [
             footprint="Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",
             identifier=ident,
             value="74HCT125D",
-            desc="IC buffer 4-bit OC; https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401",
+            jlc_part="C5962",
+            desc="IC buffer 4-bit OC",
+            link="https://www.digikey.com/product-detail/en/nexperia-usa-inc/74HCT125D-653/1727-2834-1-ND/763401",
             pins=[
                 Pin( 1, "1nOE", conn[0][0]),
                 Pin( 2, "1A",   conn[0][1]),
@@ -780,6 +799,7 @@ post_header = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
     identifier="POST",
     value="pins",
+    desc="Pin header 0.1 inch 1x6",
     pins=[
         Pin(1, "", "target_5V_ext"),
         Pin(2, "", "target_D0"),
@@ -793,7 +813,8 @@ post_header = myelin_kicad_pcb.Component(
 test_header = myelin_kicad_pcb.Component(
     footprint="Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
     identifier="TEST",
-    value="pins",
+    value="NF pins",
+    desc="Pin header 0.1 inch 1x6",
     pins=[
         Pin(1, "", "target_5V_ext"),
         Pin(2, "", "target_D0"),
@@ -833,7 +854,9 @@ test_header = myelin_kicad_pcb.Component(
 target_5V_mosfet = myelin_kicad_pcb.Component(
     footprint="Package_TO_SOT_SMD:SOT-23",
     identifier="U2",
+    desc="P-MOSFET",
     value="PMV65XP,215",
+    jlc_part="C75561",
     pins=[
         Pin(1, "G", "target_GND"),
         Pin(2, "S", "target_5V"),
@@ -856,7 +879,7 @@ target_testreq_pullup = myelin_kicad_pcb.R0805("100k", "target_testreq", "target
 target_testreq_protection = myelin_kicad_pcb.R0805("68R", "target_testreq_ext", "target_testreq", ref="R15")  # for LCX input
 target_testack_protection = myelin_kicad_pcb.R0805("68R", "target_testack_ext", "target_testack", ref="R16")
 target_reset_protection = myelin_kicad_pcb.R0805("68R", "target_reset_ext", "target_reset_prediode", ref="R17")
-target_reset_diode = myelin_kicad_pcb.DSOD123("BAT54", "target_reset", "target_reset_prediode", ref="D2")  # prediode ->|- reset
+target_reset_diode = myelin_kicad_pcb.DSOD123("BAT54", "target_reset", "target_reset_prediode", ref="D2", jlc_part="C152458")  # prediode ->|- reset
 
 # The following resistors are just shunted out, as 110R between the grounds
 # turned out to cause random failures :(
@@ -868,8 +891,8 @@ target_reset_diode = myelin_kicad_pcb.DSOD123("BAT54", "target_reset", "target_r
 # 0805 resistors are typically rated at 0.1 W, i.e. 5^2/0.1 = 250 ohms is the lowest they can be.
 # Three 330R in parallel is 110R, so 45 mA will flow in a short condition, which will be fine.
 ground_connection = [
-    myelin_kicad_pcb.R0805("0R NF", "target_GND", "GND", ref="R18"),
-    myelin_kicad_pcb.R0805("0R NF", "target_GND", "GND", ref="R19"),
+    myelin_kicad_pcb.R0805("NF 0R", "target_GND", "GND", ref="R18"),
+    myelin_kicad_pcb.R0805("NF 0R", "target_GND", "GND", ref="R19"),
     myelin_kicad_pcb.R0805("0R", "target_GND", "GND", ref="R20"),
 ]
 
@@ -884,4 +907,5 @@ for n in range(50):
 
 myelin_kicad_pcb.dump_netlist("%s.net" % PROJECT_NAME)
 myelin_kicad_pcb.dump_bom("bill_of_materials.txt",
-                          "readable_bill_of_materials.txt")
+                          "readable_bill_of_materials.txt",
+                          jlc_fn="%s_jlc_pcba_bom.csv" % PROJECT_NAME)
