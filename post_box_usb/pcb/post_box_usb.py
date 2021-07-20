@@ -868,6 +868,13 @@ target_5V_mosfet = myelin_kicad_pcb.Component(
 # target_5V_fuse = myelin_kicad_pcb.R0805("PTC", "target_5V_unfused", "target_5V_fused", ref="F2")
 # target_GND_fuse = myelin_kicad_pcb.R0805("PTC", "target_GND_unfused", "target_GND", ref="F1")
 
+# Pulldown on target_5V_ext so L4 doesn't light due to parasitic current through R7 and R8.
+# Split into two to be extra careful about heat dissipation.
+target_5V_ext_pulldowns = [
+    myelin_kicad_pcb.R0805("1k", "target_5V_ext", "target_GND", ref="R24"),
+    myelin_kicad_pcb.R0805("1k", "target_5V_ext", "target_GND", ref="R25"),
+]
+
 target_5V_protection = myelin_kicad_pcb.R0805("1k", "target_5V", "target_5V_r", ref="R14")  # for LCX input
 
 target_D0_pullup = myelin_kicad_pcb.R0805("2k2", "target_D0", "target_5V", ref="R6")

@@ -13,7 +13,7 @@ P-MOSFET,U2,Package_TO_SOT_SMD:SOT-23,C75561
 Resistor 0805: 0R,R20,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17477
 Resistor 0805: 100k,R23,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17407
 Resistor 0805: 10k,"R1,R9,R10,R11",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17414
-Resistor 0805: 1k,"R2,R7,R8,R14",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17513
+Resistor 0805: 1k,"R2,R7,R8,R14,R24,R25",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17513
 Resistor 0805: 2k2,R6,Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17520
 Resistor 0805: 330R,"R3,R13,R21,R22",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17630
 Resistor 0805: 4k7,"R4,R5",Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder,C17673

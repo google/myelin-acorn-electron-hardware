@@ -236,6 +236,16 @@ R14
 - Description: Resistor 0805: 1k
 - KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
 
+R24
+- Value: 1k
+- Description: Resistor 0805: 1k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
+R25
+- Value: 1k
+- Description: Resistor 0805: 1k
+- KiCad package: Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder
+
 R6
 - Value: 2k2
 - Description: Resistor 0805: 2k2
