@@ -21,3 +21,7 @@ POWER=low
 
 SHARED_PATH ?= ../../common
 include ${SHARED_PATH}/Makefile.xilinx
+
+test2: test
+	# Python + cocotb tests
+	make -fMakefile.test

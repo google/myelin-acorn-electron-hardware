@@ -1,4 +1,4 @@
-# CPLD RTL
+# Arcflash CPLD RTL
 
 This is the RTL for the Xilinx XC95144XL CPLD on the Arcflash board.
 
@@ -8,4 +8,6 @@ To build the `.svf` image: `make local`
 
 Arcflash has no external JTAG connector; program the CPLD via the MCU: `make program`
 
-To run the testbench, install `iverilog` and `gtkwave`, and run: `make test`
+To run the testbenches (the old Verilog one and the new Python/cocotb one), install Icarus Verilog and `cocotb`, and run: `make test2`
+
+I run builds under Linux but test on macOS, so this means `brew install icarus-verilog gtkwave python3; python3 -m venv ~/ve; source ~/ve/bin/activate; pip3 install cocotb pytest; make test2`
