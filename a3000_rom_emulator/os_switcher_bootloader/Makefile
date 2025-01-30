@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TOOLCHAIN_ROOT=/opt/gcc-arm-none-eabi-4_9-2014q4/bin
+TOOLCHAIN_ROOT=/opt/gcc-arm-none-eabi-8-2019-q3-update/bin
 
 AS = $(TOOLCHAIN_ROOT)/arm-none-eabi-as
 CCC = $(TOOLCHAIN_ROOT)/arm-none-eabi-g++
 CC = $(TOOLCHAIN_ROOT)/arm-none-eabi-gcc
 LD = $(TOOLCHAIN_ROOT)/arm-none-eabi-g++
 OBJCOPY = $(TOOLCHAIN_ROOT)/arm-none-eabi-objcopy
+OBJDUMP = $(TOOLCHAIN_ROOT)/arm-none-eabi-objdump
+SIZE = $(TOOLCHAIN_ROOT)/arm-none-eabi-size
 
 # assembler: generate PIC code
 ASFLAGS = -k
@@ -36,6 +38,7 @@ LDFLAGS = -nostdlib
 default: all
 
 clean:
+	make -C ../../third_party/nanopb/generator/proto clean
 	rm -vf *_boot.bin *.elf *.list *.o *.rom *.pb *.pb.* ../../third_party/nanopb/*.o
 
 all: arcflash.rom jump_to_rom.bin ../python_lib/arcflash/bootloader.bin
@@ -63,7 +66,7 @@ cstartup.o: arcflash.pb.h
 
 # nanopb build step
 ../../third_party/nanopb/generator/proto/nanopb_pb2.py: ../../third_party/nanopb/generator/proto/nanopb.proto
-	cd ../../third_party/nanopb/generator/proto; protoc --python_out=. nanopb.proto
+	cd ../../third_party/nanopb/generator/proto; protoc --python_out=. nanopb.proto plugin.proto
 
 arcflash.pb arcflash.pb.c arcflash.pb.h ../python_lib/arcflash/arcflash_pb2.py: arcflash.proto ../../third_party/nanopb/generator/proto/nanopb_pb2.py
 	protoc -o arcflash.pb --python_out=../python_lib/arcflash $<
@@ -85,18 +88,18 @@ RPC_BOOT_OBJS=$(SHARED_OBJS) rpc_main.o rpc_start.o
 
 arc_boot.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher.ld -Wl,-Map,arc_boot.map -o $@ $(SWITCHER_OBJS)
-	arm-none-eabi-objdump -S --disassemble arc_boot.elf > arc_boot.list
+	$(OBJDUMP) -S --disassemble arc_boot.elf > arc_boot.list
 
 arc_boot_standalone.elf: $(SWITCHER_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=switcher-at-zero.ld -Wl,-Map,arc_boot_standalone.map -o $@ $(SWITCHER_OBJS)
-	arm-none-eabi-objdump -S --disassemble arc_boot_standalone.elf > arc_boot_standalone.list
+	$(OBJDUMP) -S --disassemble arc_boot_standalone.elf > arc_boot_standalone.list
 
 rpc_boot.elf: $(RPC_BOOT_OBJS)
 	$(LD) $(CFLAGS) $(LDFLAGS) -Wl,--script=rpc_boot.ld -Wl,-Map,rpc_boot.map -o $@ $(RPC_BOOT_OBJS)
-	arm-none-eabi-objdump -S --disassemble rpc_boot.elf > rpc_boot.list
+	$(OBJDUMP) -S --disassemble rpc_boot.elf > rpc_boot.list
 
 %.bin: %.elf
-	arm-none-eabi-size $<
+	$(SIZE) $<
 	$(OBJCOPY) -O binary $< $@
 	ls -al $@
 
@@ -104,7 +107,7 @@ arcflash.rom: risc_os.bin arc_boot.bin rpc_boot.bin
 	python merge_binaries.py $@
 	# to make addresses correct for Arc: --adjust-vma=0x03800000
 	# to make addresses correct for RPC: --adjust-vma=0xfc000000
-	arm-none-eabi-objdump -D -bbinary -marm -Mno-force-thumb -Mreg-names-raw --adjust-vma=0x03800000 $@ > arcflash.list
+	$(OBJDUMP) -D -bbinary -marm -Mno-force-thumb -Mreg-names-raw --adjust-vma=0x03800000 $@ > arcflash.list
 
 ../python_lib/arcflash/bootloader.bin: arcflash.rom
 	cp $< $@

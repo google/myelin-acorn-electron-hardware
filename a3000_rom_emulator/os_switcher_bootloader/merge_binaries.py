@@ -6,9 +6,9 @@ import sys
 output_fn = sys.argv[1]
 
 # Read binaries
-risc_os = open("risc_os.bin").read()
-arc_boot = open("arc_boot.bin").read()
-rpc_boot = open("rpc_boot.bin").read()
+risc_os = open("risc_os.bin", "rb").read()
+arc_boot = open("arc_boot.bin", "rb").read()
+rpc_boot = open("rpc_boot.bin", "rb").read()
 
 # Combine everything.  See README.md for details on memory map.
 f = open(output_fn, "wb")

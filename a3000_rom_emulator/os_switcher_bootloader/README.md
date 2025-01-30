@@ -9,8 +9,11 @@ Getting started
 ---------------
 
 Prerequisites:
-- Python (2 or 3 should work)
+- [GNU Arm Embedded Toolchain](https://developer.arm.com/downloads/-/gnu-rm) (GCC 9 dropped ARM2 support though, so you need 9-2019-q3-update)
+- Python 3
 - protobuf (on macOS: brew install protobuf)
+
+On macOS: `brew install protobuf python`, and to de-quarantine the toolchain, `find /opt/gcc-arm-none-eabi-8-2019-q3-update/ -type f -perm +111 -exec xattr -d com.apple.quarantine {} \;`
 
 To build, run 'make clean all'.  This will generate switcher.rom, which can be
 run on Arculator -- just put it in one of the riscos folders and set rom_set
