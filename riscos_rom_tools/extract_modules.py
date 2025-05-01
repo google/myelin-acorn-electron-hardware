@@ -45,6 +45,9 @@ def translate_filename(risc_fn):
 rom = open(os_fn, "rb").read()
 print("Read %d-byte ROM from %s" % (len(rom), os_fn))
 
+os.makedirs("modules", exist_ok=True)
+
+module_list = open("module_list.txt", "wt")
 
 def rom_word(ptr):
     return struct.unpack("<L", rom[ptr : ptr + 4])[0]
@@ -75,8 +78,9 @@ print(
 
 # Now find all modules; each is preceded by a size word, and the last module is followed by a zero word.
 
-print("Save kernel as modules/kernel.bin")
-with open("modules/kernel.bin", "wb") as kf:
+kernel_fn = "modules/00000000 - kernel.bin"
+print(f"Save kernel as {kernel_fn}")
+with open(kernel_fn, "wb") as kf:
     kf.write(rom[: f - 4])
 
 while 1:
@@ -95,52 +99,69 @@ while 1:
         "Module: start=0x%x, title=%s, copyright=%s, size=%d"
         % (f, repr(module_title), repr(module_copyright), module_size)
     )
+    module_list.write(f"{module_title.decode()}\n")
     module = rom[f : f + module_size]
     assert len(module) == module_size
-    module_fn = (
-        "modules/%s.riscosmodule"
-        % bytearray(
+    module_fn = "modules/%08x - %s.riscosmodule" % (
+        f,
+        bytearray(
             c if (c != ord("/") and 32 <= c <= 127) else 32
             for c in (module_title + b" - " + module_copyright)
-        ).decode()
+        ).decode(),
     )
     print("-> save to %s" % repr(module_fn))
     with open(module_fn, "wb") as mf:
         mf.write(module)
     f += module_size
 
-print("Looking for ResourceFS at 0x%x" % f)
-while 1:
-    offset_to_next = rom_word(f)
-    if offset_to_next == 0:
-        break
+if len(rom) - f < 10000:
+    print(
+        "Not much room at the end of the ROM; it's probably an old ROM with no ResourceFS"
+    )
+    credits = rom[f:]
+    credits = credits[: credits.find(b"\x00")]
+    for line in credits.split(b"\n"):
+        if line:
+            print(line)
+else:
+    extract_resourcefs(f)
 
-    offset = 20
-    filename = rom_string(f + offset)
-    # print(offset_to_next, repr(filename))
 
-    offset = (offset + len(filename) + 1 + 3) & ~3
-    file_size = rom_word(f + offset) - 4
-    # print(file_size)
+def extract_resourcefs(f):
+    print("Looking for ResourceFS at 0x%x" % f)
+    while 1:
+        offset_to_next = rom_word(f)
+        if offset_to_next == 0:
+            break
 
-    offset += 4
-    file_data = rom[f + offset : f + offset + file_size]
-    assert len(file_data) == file_size
+        offset = 20
+        filename = rom_string(f + offset)
+        print(offset_to_next, repr(filename))
 
-    offset = (offset + file_size + 3) & ~3
-    # print(offset)
+        offset = (offset + len(filename) + 1 + 3) & ~3
+        file_size = rom_word(f + offset) - 4
+        print(file_size)
 
-    assert offset == offset_to_next
+        offset += 4
+        file_data = rom[f + offset : f + offset + file_size]
+        assert (
+            len(file_data) == file_size
+        ), f"file data is {len(file_data)} B long -- does not match file size {file_size} B"
 
-    localfn = "resources/%s" % translate_filename(filename)
-    print("%s -> %s (%d bytes)" % (repr(filename), repr(localfn), file_size))
-    p = []
-    for part in localfn.split("/")[:-1]:
-        p.append(part)
-        pth = "/".join(p)
-        if not os.path.exists(pth):
-            os.mkdir(pth)
-    with open(localfn, "wb") as rf:
-        rf.write(file_data)
+        offset = (offset + file_size + 3) & ~3
+        # print(offset)
 
-    f += offset_to_next
+        assert offset == offset_to_next
+
+        localfn = "resources/%s" % translate_filename(filename)
+        print("%s -> %s (%d bytes)" % (repr(filename), repr(localfn), file_size))
+        p = []
+        for part in localfn.split("/")[:-1]:
+            p.append(part)
+            pth = "/".join(p)
+            if not os.path.exists(pth):
+                os.mkdir(pth)
+        with open(localfn, "wb") as rf:
+            rf.write(file_data)
+
+        f += offset_to_next
