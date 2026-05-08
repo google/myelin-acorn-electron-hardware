@@ -1,3 +1,7 @@
+# MOVED to https://github.com/myelin/acorn-hardware
+
+Any future development will happen over there.
+
 myelin-acorn-electron-hardware
 ==============================
 
